@@ -53,7 +53,7 @@ sprite
 ------
 
 Demonstrates a seamless background image that can be scolled in any
-direction. As well as animated sprites (TBD).
+direction. As well as animated sprites.
 
 common
 ------

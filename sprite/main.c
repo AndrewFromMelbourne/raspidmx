@@ -36,6 +36,7 @@
 #include "image.h"
 #include "key.h"
 #include "seamlessBackground.h"
+#include "sprite.h"
 
 #include "bcm_host.h"
 
@@ -50,24 +51,30 @@ int main(void)
     IMAGE_T image;
     const char *texture = "texture.png";
 
-    //---------------------------------------------------------------------
-
     if (loadSeamlessBackgroundPng(&image, texture, true, true) == false)
     {
         fprintf(stderr, "scrolling: unable to load %s\n", texture);
         exit(EXIT_FAILURE);
     }
 
-    int32_t viewWidth = image.width / 2;
-    int32_t viewHeight = image.height / 2;
+    int32_t tViewWidth = image.width / 2;
+    int32_t tViewHeight = image.height / 2;
 
-    int32_t xOffsetMax = viewWidth - 1;
-    int32_t xOffset = xOffsetMax / 2;
-    int32_t xDirection = 1;
+    int32_t tXoffsetMax = tViewWidth - 1;
+    int32_t tXoffset = tXoffsetMax / 2;
+    int32_t tXdirection = 1;
 
-    int32_t yOffsetMax = viewHeight - 1;
-    int32_t yOffset = yOffsetMax / 2;
-    int32_t yDirection = 0;
+    int32_t tYoffsetMax = tViewHeight - 1;
+    int32_t tYoffset = tYoffsetMax / 2;
+    int32_t tYdirection = 0;
+
+    //---------------------------------------------------------------------
+
+    SPRITE_T sprite;
+    loadSpritePng(&sprite, "sprite.png", 12, 1);
+
+    int32_t sXoffsetMax = (sprite.columns - 1) * sprite.width;
+    int32_t sXoffset = 0;
 
     //---------------------------------------------------------------------
 
@@ -95,21 +102,39 @@ int main(void)
 
     //---------------------------------------------------------------------
 
-    DISPMANX_RESOURCE_HANDLE_T frontResource =
+    DISPMANX_RESOURCE_HANDLE_T frontTResource =
         vc_dispmanx_resource_create(
             image.type,
             image.width | (image.pitch << 16),
             image.height | (image.alignedHeight << 16),
             &vc_image_ptr);
-    assert(frontResource != 0);
+    assert(frontTResource != 0);
 
-    DISPMANX_RESOURCE_HANDLE_T backResource =
+    DISPMANX_RESOURCE_HANDLE_T backTResource =
         vc_dispmanx_resource_create(
             image.type,
             image.width | (image.pitch << 16),
             image.height | (image.alignedHeight << 16),
             &vc_image_ptr);
-    assert(backResource != 0);
+    assert(backTResource != 0);
+
+    //---------------------------------------------------------------------
+
+    DISPMANX_RESOURCE_HANDLE_T frontSResource =
+        vc_dispmanx_resource_create(
+            sprite.image.type,
+            sprite.image.width | (sprite.image.pitch << 16),
+            sprite.image.height | (sprite.image.alignedHeight << 16),
+            &vc_image_ptr);
+    assert(frontSResource != 0);
+
+    DISPMANX_RESOURCE_HANDLE_T backSResource =
+        vc_dispmanx_resource_create(
+            sprite.image.type,
+            sprite.image.width | (sprite.image.pitch << 16),
+            sprite.image.height | (sprite.image.alignedHeight << 16),
+            &vc_image_ptr);
+    assert(backSResource != 0);
 
     //---------------------------------------------------------------------
 
@@ -132,17 +157,39 @@ int main(void)
 
     vc_dispmanx_rect_set(&dst_rect, 0, 0, image.width, image.height);
 
-    result = vc_dispmanx_resource_write_data(frontResource,
+    result = vc_dispmanx_resource_write_data(frontTResource,
                                              image.type,
                                              image.pitch,
                                              image.buffer,
                                              &dst_rect);
     assert(result == 0);
 
-    result = vc_dispmanx_resource_write_data(backResource,
+    result = vc_dispmanx_resource_write_data(backTResource,
                                              image.type,
                                              image.pitch,
                                              image.buffer,
+                                             &dst_rect);
+    assert(result == 0);
+
+    //---------------------------------------------------------------------
+
+    vc_dispmanx_rect_set(&dst_rect,
+                         0,
+                         0,
+                         sprite.image.width,
+                         sprite.image.height);
+
+    result = vc_dispmanx_resource_write_data(frontSResource,
+                                             sprite.image.type,
+                                             sprite.image.pitch,
+                                             sprite.image.buffer,
+                                             &dst_rect);
+    assert(result == 0);
+
+    result = vc_dispmanx_resource_write_data(backSResource,
+                                             sprite.image.type,
+                                             sprite.image.pitch,
+                                             sprite.image.buffer,
                                              &dst_rect);
     assert(result == 0);
 
@@ -181,42 +228,61 @@ int main(void)
     //---------------------------------------------------------------------
 
     vc_dispmanx_rect_set(&src_rect,
-                         xOffset << 16,
-                         yOffset << 16,
-                         viewWidth << 16,
-                         viewHeight << 16);
+                         tXoffset << 16,
+                         tYoffset << 16,
+                         tViewWidth << 16,
+                         tViewHeight << 16);
 
     vc_dispmanx_rect_set(&dst_rect,
-                         (info.width - viewWidth) / 2,
-                         (info.height - viewHeight) / 2,
-                         viewWidth,
-                         viewHeight);
+                         (info.width - tViewWidth) / 2,
+                         (info.height - tViewHeight) / 2,
+                         tViewWidth,
+                         tViewHeight);
 
-    DISPMANX_ELEMENT_HANDLE_T element =
+    DISPMANX_ELEMENT_HANDLE_T tElement =
         vc_dispmanx_element_add(update,
                                 display,
                                 2, // layer
                                 &dst_rect,
-                                frontResource,
+                                frontTResource,
                                 &src_rect,
                                 DISPMANX_PROTECTION_NONE,
                                 &alpha,
                                 NULL, // clamp
                                 DISPMANX_NO_ROTATE);
-    assert(element != 0);
+    assert(tElement != 0);
+
+    //---------------------------------------------------------------------
+
+    vc_dispmanx_rect_set(&src_rect,
+                         sXoffset << 16,
+                         0 << 16,
+                         sprite.width << 16,
+                         sprite.height << 16);
+
+    vc_dispmanx_rect_set(&dst_rect,
+                         (info.width - sprite.width) / 2,
+                         (info.height - sprite.height) / 2,
+                         sprite.width,
+                         sprite.height);
+
+    DISPMANX_ELEMENT_HANDLE_T sElement =
+        vc_dispmanx_element_add(update,
+                                display,
+                                3, // layer
+                                &dst_rect,
+                                frontSResource,
+                                &src_rect,
+                                DISPMANX_PROTECTION_NONE,
+                                &alpha,
+                                NULL, // clamp
+                                DISPMANX_NO_ROTATE);
+    assert(tElement != 0);
 
     //---------------------------------------------------------------------
 
     result = vc_dispmanx_update_submit_sync(update);
     assert(result == 0);
-
-    //---------------------------------------------------------------------
-
-    vc_dispmanx_rect_set(&dst_rect,
-                         (info.width - viewWidth) / 2,
-                         (info.height - viewHeight) / 2,
-                         viewWidth,
-                         viewHeight);
 
     //---------------------------------------------------------------------
 
@@ -230,26 +296,26 @@ int main(void)
             {
             case 'w':
 
-                xDirection = 0;
-                yDirection = -1;
+                tXdirection = 0;
+                tYdirection = -1;
                 break;
 
             case 's':
 
-                xDirection = 0;
-                yDirection = 1;
+                tXdirection = 0;
+                tYdirection = 1;
                 break;
 
             case 'a':
 
-                xDirection = -1;
-                yDirection = 0;
+                tXdirection = -1;
+                tYdirection = 0;
                 break;
 
             case 'd':
 
-                xDirection = 1;
-                yDirection = 0;
+                tXdirection = 1;
+                tYdirection = 0;
                 break;
 
             default:
@@ -261,49 +327,64 @@ int main(void)
 
         //-----------------------------------------------------------------
 
-        xOffset += xDirection;
+        tXoffset += tXdirection;
 
-        if (xOffset < 0)
+        if (tXoffset < 0)
         {
-            xOffset = xOffsetMax;
+            tXoffset = tXoffsetMax;
         }
-        else if (xOffset > xOffsetMax)
+        else if (tXoffset > tXoffsetMax)
         {
-            xOffset = 0;
+            tXoffset = 0;
         }
 
-        yOffset += yDirection;
+        tYoffset += tYdirection;
 
-        if (yOffset < 0)
+        if (tYoffset < 0)
         {
-            yOffset = yOffsetMax;
+            tYoffset = tYoffsetMax;
         }
-        else if (yOffset > yOffsetMax)
+        else if (tYoffset > tYoffsetMax)
         {
-            yOffset = 0;
+            tYoffset = 0;
         }
 
         //-----------------------------------------------------------------
 
-        vc_dispmanx_rect_set(&src_rect,
-                             xOffset << 16,
-                             yOffset << 16,
-                             viewWidth << 16,
-                             viewHeight << 16);
+        sXoffset += sprite.width;
+
+        if (sXoffset > sXoffsetMax)
+        {
+            sXoffset = 0;
+        }
 
         //-----------------------------------------------------------------
 
         DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
         assert(update != 0);
 
+        //-----------------------------------------------------------------
+
         result = vc_dispmanx_element_change_source(update,
-                                                   element,
-                                                   backResource);
+                                                   tElement,
+                                                   backTResource);
         assert(result == 0);
+
+        vc_dispmanx_rect_set(&src_rect,
+                             tXoffset << 16,
+                             tYoffset << 16,
+                             tViewWidth << 16,
+                             tViewHeight << 16);
+
+        vc_dispmanx_rect_set(&dst_rect,
+                             (info.width - tViewWidth) / 2,
+                             (info.height - tViewHeight) / 2,
+                             tViewWidth,
+                             tViewHeight);
 
         result = 
         vc_dispmanx_element_change_attributes(update,
-                                              element,
+                                              tElement,
                                               ELEMENT_CHANGE_SRC_RECT,
                                               0,
                                               255,
@@ -313,21 +394,55 @@ int main(void)
                                               DISPMANX_NO_ROTATE);
         assert(result == 0);
 
+        //-----------------------------------------------------------------
+
+        vc_dispmanx_rect_set(&src_rect,
+                             sXoffset << 16,
+                             0 << 16,
+                             sprite.width << 16,
+                             sprite.height << 16);
+
+        vc_dispmanx_rect_set(&dst_rect,
+                             (info.width - sprite.width) / 2,
+                             (info.height - sprite.height) / 2,
+                             sprite.width,
+                             sprite.height);
+
+        result = 
+        vc_dispmanx_element_change_attributes(update,
+                                              sElement,
+                                              ELEMENT_CHANGE_SRC_RECT,
+                                              0,
+                                              255,
+                                              &dst_rect,
+                                              &src_rect,
+                                              0,
+                                              DISPMANX_NO_ROTATE);
+        assert(result == 0);
+
+        //-----------------------------------------------------------------
+
         result = vc_dispmanx_update_submit_sync(update);
         assert(result == 0);
 
         //-----------------------------------------------------------------
 
-        DISPMANX_RESOURCE_HANDLE_T tmp = frontResource;
-        frontResource = backResource;
-        backResource = tmp;
+        DISPMANX_RESOURCE_HANDLE_T tmp;
+        
+        tmp = frontTResource;
+        frontTResource = backTResource;
+        backTResource = tmp;
+
+        tmp = frontSResource;
+        frontSResource = backSResource;
+        backSResource = tmp;
     }
 
     //---------------------------------------------------------------------
 
     update = vc_dispmanx_update_start(0);
     assert(update != 0);
-    result = vc_dispmanx_element_remove(update, element);
+    result = vc_dispmanx_element_remove(update, tElement);
     assert(result == 0);
     result = vc_dispmanx_element_remove(update, bgElement);
     assert(result == 0);
@@ -336,9 +451,9 @@ int main(void)
 
     //---------------------------------------------------------------------
 
-    result = vc_dispmanx_resource_delete(frontResource);
+    result = vc_dispmanx_resource_delete(frontTResource);
     assert(result == 0);
-    result = vc_dispmanx_resource_delete(backResource);
+    result = vc_dispmanx_resource_delete(backTResource);
     assert(result == 0);
     result = vc_dispmanx_resource_delete(bgResource);
     assert(result == 0);
