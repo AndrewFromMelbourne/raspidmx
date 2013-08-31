@@ -1,0 +1,12 @@
+# object files
+
+*.o
+
+# programs
+
+life/life
+pngview/pngview
+rgb_triangle/rgb_triangle
+sprite/sprite
+test_pattern/test_pattern
+worms/worms
