@@ -1,4 +1,4 @@
-OBJS=sprite.o ../common/loadpng.o ../common/image.o ../common/key.o ../common/seamlessBackground.o
+OBJS=main.o ../common/loadpng.o ../common/image.o ../common/key.o ../common/seamlessBackground.o ../common/sprite.o
 BIN=sprite
 
 CFLAGS+=-Wall -g -O3 -I../common
