@@ -3,15 +3,22 @@ Dispmanx
 
 There are a number of APIs available for the Raspberry Pi that can make use
 of the computers GPU. These include OpenMAX, Open GL ES(1 and 2) and OpenVG.
-The has short examples for theses and other APIs. They can be found in
-/opt/vc/src/hello_pi/. Among these examples is a program called
-hello_dispmanx. It is a very small example of the Dispmanx windowing
-system. Apart from this:-
+The raspberrypi/firmware repository has short examples for theses and other
+APIs. They can be found in /opt/vc/src/hello_pi/ on the Raspbian 'wheezy'
+image. Among these examples is a program called hello_dispmanx. It is a
+very small example of the Dispmanx windowing system. Apart from this:-
 
 https://github.com/raspberrypi/firmware/tree/master/opt/vc/src/hello_pi/hello_dispmanx
 
-example, there is very little documentation available for this API.
-Hopefully these programs can be used as a starting point.
+example, there is very little documentation available for this API. There
+are snippets of information on the Raspberry Pi forum, but I have not found
+a single place with detailed information on DispmanX.  Hopefully these
+programs can be used as a starting point for anyone wanting to make use of
+DispmanX.
+
+The programs demonstrate layers with the following types: RGB565 (16 bit),
+RGB888 (24 bit), RGBA16 (16 bit with transparency) and RGBA32
+(32 bit with transparency)
 
 test_pattern
 ------------
@@ -23,12 +30,13 @@ rgb_triangle
 ------------
 
 Displays a triangle in a layer with red, green and blue gradients starting
-at each corner respectively. Blends to grey in the center. 
+at each corner respectively. Blends to grey in the center. Demonstrates
+changing size of source and destination rectangles.
 
 life
 ----
 
-Conway's game of life.
+Conway's game of life. Demonstrates double buffering.
 
 worms
 -----
@@ -45,7 +53,7 @@ sprite
 ------
 
 Demonstrates a seamless background image that can be scolled in any
-direction. As well as animated sprites.
+direction. As well as animated sprites (TBD).
 
 common
 ------
