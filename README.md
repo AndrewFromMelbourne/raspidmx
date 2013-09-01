@@ -49,8 +49,8 @@ pngview
 
 Load a png image file and display it as a Dispmanx layer.
 
-sprite
-------
+game
+----
 
 Demonstrates a seamless background image that can be scolled in any
 direction. As well as animated sprites.

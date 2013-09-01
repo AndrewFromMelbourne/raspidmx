@@ -25,6 +25,7 @@
 //
 //-------------------------------------------------------------------------
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -96,6 +97,89 @@ newLife(
             }
         }
     }
+
+    //---------------------------------------------------------------------
+
+    VC_IMAGE_TYPE_T type = VC_IMAGE_RGB565;
+    uint32_t vc_image_ptr;
+    int result = 0;
+
+    life->frontResource = 
+        vc_dispmanx_resource_create(
+            type,
+            life->width | (life->pitch << 16),
+            life->height | (life->alignedHeight << 16),
+            &vc_image_ptr);
+    assert(life->frontResource != 0);
+
+    life->backResource = 
+        vc_dispmanx_resource_create(
+            type,
+            life->width | (life->pitch << 16),
+            life->height | (life->alignedHeight << 16),
+            &vc_image_ptr);
+    assert(life->backResource != 0);
+
+    //---------------------------------------------------------------------
+
+    vc_dispmanx_rect_set(&(life->dstRect), 0, 0, life->width, life->height);
+
+    result = vc_dispmanx_resource_write_data(life->frontResource,
+                                             type,
+                                             life->pitch,
+                                             life->buffer,
+                                             &(life->dstRect));
+    assert(result == 0);
+}
+
+//-------------------------------------------------------------------------
+
+void
+addElementLife(
+    LIFE_T *life,
+    DISPMANX_MODEINFO_T *info,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update)
+{
+    VC_DISPMANX_ALPHA_T alpha =
+    {
+        DISPMANX_FLAGS_ALPHA_FIXED_ALL_PIXELS, 
+        255, /*alpha 0->255*/
+        0
+    };
+
+    int32_t dst_size = info->height - (info->height % life->height);
+
+    //---------------------------------------------------------------------
+
+    vc_dispmanx_rect_set(&(life->srcRect),
+                         0,
+                         0,
+                         life->width << 16,
+                         life->height << 16);
+
+    vc_dispmanx_rect_set(&(life->dstRect),
+                         (info->width - dst_size) / 2,
+                         (info->height - dst_size) / 2,
+                         dst_size,
+                         dst_size);
+
+    DISPMANX_ELEMENT_HANDLE_T element =
+        vc_dispmanx_element_add(update,
+                                display,
+                                1,
+                                &(life->dstRect),
+                                life->frontResource,
+                                &(life->srcRect),
+                                DISPMANX_PROTECTION_NONE,
+                                &alpha,
+                                NULL,
+                                DISPMANX_NO_ROTATE);
+    assert(element != 0);
+
+    //---------------------------------------------------------------------
+
+    vc_dispmanx_rect_set(&(life->dstRect), 0, 0, life->width, life->height);
 }
 
 //-------------------------------------------------------------------------
@@ -525,6 +609,36 @@ iterateLife(
             imageBuffer[off] = DEAD;
         }
     }
+
+    //---------------------------------------------------------------------
+
+    int result = 0;
+    VC_IMAGE_TYPE_T type = VC_IMAGE_RGB565;
+
+    result = vc_dispmanx_resource_write_data(life->backResource,
+                                             type,
+                                             life->pitch,
+                                             life->buffer,
+                                             &(life->dstRect));
+    assert(result == 0);
+}
+
+void
+changeSourceLife(
+    LIFE_T *life,
+    DISPMANX_UPDATE_HANDLE_T update)
+{
+    int result = 0;
+    result = vc_dispmanx_element_change_source(update,
+                                               life->element,
+                                               life->backResource);
+    assert(result == 0);
+
+    // swap front and back resources
+
+    DISPMANX_RESOURCE_HANDLE_T tmp = life->frontResource;
+    life->frontResource = life->backResource;
+    life->backResource = tmp;
 }
 
 //-------------------------------------------------------------------------
@@ -547,5 +661,23 @@ destroyLife(
     life->alignedWidth = 0;
     life->height = 0;
     life->pitch = 0;
+
+    //---------------------------------------------------------------------
+
+    int result = 0;
+
+    DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
+    assert(update != 0);
+    result = vc_dispmanx_element_remove(update, life->element);
+    assert(result == 0);
+    result = vc_dispmanx_update_submit_sync(update);
+    assert(result == 0);
+
+    //---------------------------------------------------------------------
+
+    result = vc_dispmanx_resource_delete(life->frontResource);
+    assert(result == 0);
+    result = vc_dispmanx_resource_delete(life->backResource);
+    assert(result == 0);
 }
 

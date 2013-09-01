@@ -25,66 +25,64 @@
 //
 //-------------------------------------------------------------------------
 
+#ifndef SEAMLESS_BG_H
+#define SEAMLESS_BG_H
+
 #include <stdbool.h>
 
 #include "image.h"
-#include "loadpng.h"
-#include "seamlessBackground.h"
+
+#include "bcm_host.h"
 
 //-------------------------------------------------------------------------
 
+typedef struct
+{
+    IMAGE_T image;
+    int32_t viewWidth;
+    int32_t viewHeight;
+    int32_t xOffsetMax;
+    int32_t xOffset;
+    int32_t yOffsetMax;
+    int32_t yOffset;
+    int16_t direction;
+    int16_t directionMax;
+    int32_t xDirections[8];
+    int32_t yDirections[8];
+    VC_RECT_T srcRect;
+    VC_RECT_T dstRect;
+    DISPMANX_RESOURCE_HANDLE_T frontResource;
+    DISPMANX_RESOURCE_HANDLE_T backResource;
+    DISPMANX_ELEMENT_HANDLE_T element;
+} SEAMLESS_BACKGROUND_T;
+
+//-------------------------------------------------------------------------
+
+void initSeamlessBg(SEAMLESS_BACKGROUND_T *sb);
+
+void
+addElementSeamlessBg(
+    SEAMLESS_BACKGROUND_T *sb,
+    DISPMANX_MODEINFO_T *info,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update);
+
+void setDirectionSeamlessBg(SEAMLESS_BACKGROUND_T *sb, char c);
+
+void
+updatePositionSeamlessBg(
+    SEAMLESS_BACKGROUND_T *sb,
+    DISPMANX_UPDATE_HANDLE_T update);
+
+void destroySeamlessBg(SEAMLESS_BACKGROUND_T *sb);
+
 bool
-loadSeamlessBackgroundPng(
+loadSeamlessBgPng(
     IMAGE_T* image,
     const char *file,
     bool extendX,
-    bool extendY)
-{
-    IMAGE_T baseImage;
-    bool loaded = loadPng(&baseImage, file);
+    bool extendY);
 
-    if (loaded)
-    {
-        int32_t width = (extendX) ? baseImage.width*2 : baseImage.width;
-        int32_t height = (extendY) ? baseImage.height*2 : baseImage.height;
+//-------------------------------------------------------------------------
 
-        initImage(image, baseImage.type, width, height);
-
-        if (extendX)
-        {
-            int32_t rowLength = baseImage.width * baseImage.bytesPerPixel;
-
-            int32_t baseOffset = 0;
-            int32_t offset = 0;
-
-            int32_t y = 0;
-            for (y = 0 ; y < baseImage.width ; y++)
-            {
-                baseOffset = y * baseImage.pitch;
-                offset = y * image->pitch;
-
-                memcpy(image->buffer + offset,
-                       baseImage.buffer + baseOffset,
-                       rowLength);
-
-                memcpy(image->buffer + offset + rowLength,
-                       baseImage.buffer + baseOffset,
-                       rowLength);
-            }
-        }
-        else
-        {
-            memcpy(image->buffer, baseImage.buffer, baseImage.size);
-        }
-
-        if (extendY)
-        {
-            int32_t size = image->pitch * baseImage.height;
-
-            memcpy(image->buffer + size, image->buffer, size);
-        }
-    }
-
-    return loaded;
-}
-
+#endif

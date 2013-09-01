@@ -30,6 +30,8 @@
 
 #include <stdint.h>
 
+#include "bcm_host.h"
+
 //-------------------------------------------------------------------------
 
 typedef struct
@@ -41,12 +43,33 @@ typedef struct
     int32_t pitch;
     uint16_t *buffer;
     uint16_t *last;
+    VC_RECT_T srcRect;
+    VC_RECT_T dstRect;
+    DISPMANX_RESOURCE_HANDLE_T frontResource;
+    DISPMANX_RESOURCE_HANDLE_T backResource;
+    DISPMANX_ELEMENT_HANDLE_T element;
 } LIFE_T;
 
 //-------------------------------------------------------------------------
 
 void newLife(LIFE_T *life, int32_t size);
-void iterateLife(LIFE_T *life);
+
+void
+addElementLife(
+    LIFE_T *life,
+    DISPMANX_MODEINFO_T *info,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update);
+
+void
+iterateLife(
+    LIFE_T *life);
+
+void
+changeSourceLife(
+    LIFE_T *life,
+    DISPMANX_UPDATE_HANDLE_T update);
+
 void destroyLife(LIFE_T *life);
 
 //-------------------------------------------------------------------------

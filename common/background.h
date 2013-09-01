@@ -25,31 +25,35 @@
 //
 //-------------------------------------------------------------------------
 
-#include <stdbool.h>
-
-#include "image.h"
-#include "loadpng.h"
-#include "sprite.h"
+#ifndef BACKGROUND_H
+#define BACKGROUND_H
 
 //-------------------------------------------------------------------------
 
-bool
-loadSpritePng(
-    SPRITE_T *sprite,
-    const char *file,
-    int columns,
-    int rows)
+#include "bcm_host.h"
+
+//-------------------------------------------------------------------------
+
+typedef struct
 {
-    bool loaded = loadPng(&(sprite->image), file);
+    DISPMANX_RESOURCE_HANDLE_T resource;
+    DISPMANX_ELEMENT_HANDLE_T element;
+} BACKGROUND_T;
 
-    if (loaded)
-    {
-        sprite->width = sprite->image.width / columns;
-        sprite->height = sprite->image.height / rows;
-        sprite->columns = columns;   
-        sprite->rows = rows;   
-    }
+//-------------------------------------------------------------------------
 
-    return loaded;
-}
+void initBackground(BACKGROUND_T *bg);
+
+void
+addElementBackground(
+    BACKGROUND_T *bg,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update);
+
+void destroyBackground(BACKGROUND_T *bg);
+
+
+//-------------------------------------------------------------------------
+
+#endif
 

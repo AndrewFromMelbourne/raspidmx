@@ -1,5 +1,8 @@
-OBJS=main.o ../common/loadpng.o ../common/image.o ../common/key.o ../common/seamlessBackground.o ../common/sprite.o
-BIN=sprite
+OBJS=main.o seamlessBg.o sprite.o \
+	 ../common/background.o ../common/image.o \
+	 ../common/key.o ../common/loadpng.o
+
+BIN=game
 
 CFLAGS+=-Wall -g -O3 -I../common
 LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm -L/usr/local/lib -lpng

@@ -28,9 +28,9 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include <stdbool.h>
-
 #include "image.h"
+
+#include "bcm_host.h"
 
 //-------------------------------------------------------------------------
 
@@ -40,17 +40,32 @@ typedef struct
     int width;
     int height;
     int columns;
-    int rows;
+    int xOffsetMax;
+    int xOffset;
+    VC_RECT_T srcRect;
+    VC_RECT_T dstRect;
+    DISPMANX_RESOURCE_HANDLE_T frontResource;
+    DISPMANX_RESOURCE_HANDLE_T backResource;
+    DISPMANX_ELEMENT_HANDLE_T element;
 } SPRITE_T;
 
 //-------------------------------------------------------------------------
 
-bool
-loadSpritePng(
-    SPRITE_T *sprite,
-    const char *file,
-    int columns,
-    int rows);
+void initSprite(SPRITE_T *s);
+
+void
+addElementSprite(
+    SPRITE_T *s,
+    DISPMANX_MODEINFO_T *info,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update);
+
+void
+updatePositionSprite(
+    SPRITE_T *s,
+    DISPMANX_UPDATE_HANDLE_T update);
+
+void destroySprite(SPRITE_T *s);
 
 //-------------------------------------------------------------------------
 

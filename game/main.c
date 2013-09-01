@@ -29,15 +29,16 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <termio.h>
 #include <unistd.h>
-#include <sys/time.h>
-
-#include "bcm_host.h"
 
 #include "background.h"
+#include "element_change.h"
+#include "image.h"
 #include "key.h"
-#include "life.h"
+#include "seamlessBg.h"
+#include "sprite.h"
+
+#include "bcm_host.h"
 
 //-------------------------------------------------------------------------
 
@@ -45,33 +46,8 @@
 
 //-------------------------------------------------------------------------
 
-int main(int argc, char *argv[])
+int main(void)
 {
-    int opt = 0;
-    int32_t size = 350;
-
-    //-------------------------------------------------------------------
-
-    while ((opt = getopt(argc, argv, "s:")) != -1)
-    {
-        switch (opt)
-        {
-        case 's':
-
-            size = atoi(optarg);
-            break;
-
-        default:
-
-            fprintf(stderr, "Usage: %s [-s size]\n", argv[0]);
-            fprintf(stderr, "    -s - size of image to create\n");
-            exit(EXIT_FAILURE);
-            break;
-        }
-    }
-
-    //-------------------------------------------------------------------
-
     bcm_host_init();
 
     //---------------------------------------------------------------------
@@ -79,8 +55,11 @@ int main(int argc, char *argv[])
     BACKGROUND_T bg;
     initBackground(&bg);
 
-    LIFE_T life;
-    newLife(&life, size);
+    SEAMLESS_BACKGROUND_T sb;
+    initSeamlessBg(&sb);
+
+    SPRITE_T sprite;
+    initSprite(&sprite);
 
     //---------------------------------------------------------------------
 
@@ -90,7 +69,6 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     DISPMANX_MODEINFO_T info;
-
     int result = vc_dispmanx_display_get_info(display, &info);
     assert(result == 0);
 
@@ -99,40 +77,31 @@ int main(int argc, char *argv[])
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
     assert(update != 0);
 
-    //---------------------------------------------------------------------
-
     addElementBackground(&bg, display, update);
-    addElementLife(&life, &info, display, update);
-
-    //---------------------------------------------------------------------
+    addElementSeamlessBg(&sb, &info, display, update);
+    addElementSprite(&sprite, &info, display, update);
 
     result = vc_dispmanx_update_submit_sync(update);
     assert(result == 0);
 
     //---------------------------------------------------------------------
 
-    struct timeval start_time;
-    gettimeofday(&start_time, NULL);
-
-    //---------------------------------------------------------------------
-
     int c = 0;
-    uint32_t frame = 0;
+
     while (c != 27)
     {
-        keyPressed(&c);
+        if (keyPressed(&c))
+        {
+            setDirectionSeamlessBg(&sb, c);
+        }
 
         //-----------------------------------------------------------------
 
-        iterateLife(&life);
-        ++frame;
-
-        //-----------------------------------------------------------------
-
-        update = vc_dispmanx_update_start(0);
+        DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
         assert(update != 0);
 
-        changeSourceLife(&life, update);
+        updatePositionSeamlessBg(&sb, update);
+        updatePositionSprite(&sprite, update);
 
         result = vc_dispmanx_update_submit_sync(update);
         assert(result == 0);
@@ -140,20 +109,9 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    struct timeval end_time;
-    gettimeofday(&end_time, NULL);
-
-    struct timeval total_time;
-    timersub(&end_time, &start_time, &total_time);
-    int32_t time_taken = (total_time.tv_sec * 1000000) + total_time.tv_usec;
-    double frames_per_second = (frame * 1000000.0) / time_taken;
-
-    printf("%0.1f frames per second\n", frames_per_second);
-
-    //---------------------------------------------------------------------
-
     destroyBackground(&bg);
-    destroyLife(&life);
+    destroySeamlessBg(&sb);
+    destroySprite(&sprite);
 
     //---------------------------------------------------------------------
 
