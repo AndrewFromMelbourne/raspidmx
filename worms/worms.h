@@ -32,6 +32,8 @@
 
 #include "image.h"
 
+#include "bcm_host.h"
+
 //-------------------------------------------------------------------------
 
 typedef struct
@@ -53,6 +55,10 @@ typedef struct
 {
     uint16_t size;
     WORM_T *worms;
+    IMAGE_T image;
+    DISPMANX_RESOURCE_HANDLE_T frontResource;
+    DISPMANX_RESOURCE_HANDLE_T backResource;
+    DISPMANX_ELEMENT_HANDLE_T element;
 } WORMS_T;
 
 //-------------------------------------------------------------------------
@@ -62,11 +68,21 @@ initWorms(
     uint16_t number,
     uint16_t length,
     WORMS_T *worms,
-    IMAGE_T *image);
+    VC_IMAGE_TYPE_T imageType,
+    DISPMANX_MODEINFO_T *info);
 
-void updateWorms(WORMS_T *worms, IMAGE_T *image);
-void drawWorms(WORMS_T *worms, IMAGE_T *image);
-void undrawWorms(WORMS_T *worms, IMAGE_T *image);
+void updateWorms(WORMS_T *worms);
+void drawWorms(WORMS_T *worms);
+void undrawWorms(WORMS_T *worms);
+
+void
+addElementWorms(
+    WORMS_T *worms,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update);
+void writeDataWorms(WORMS_T *worms);
+void changeSourceWorms(WORMS_T *worms, DISPMANX_UPDATE_HANDLE_T update);
+
 void destroyWorms(WORMS_T *worms);
 
 //-------------------------------------------------------------------------

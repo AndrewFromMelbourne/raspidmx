@@ -1,4 +1,5 @@
-OBJS=main.o worms.o ../common/hsv2rgb.o ../common/image.o ../common/key.o
+OBJS=main.o worms.o ../common/background.o ../common/hsv2rgb.o \
+	 ../common/image.o ../common/key.o
 BIN=worms
 
 CFLAGS+=-Wall -g -O3 -I../common

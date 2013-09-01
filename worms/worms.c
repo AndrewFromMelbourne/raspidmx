@@ -25,6 +25,7 @@
 //
 //-------------------------------------------------------------------------
 
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,6 +34,8 @@
 #include "hsv2rgb.h"
 #include "image.h"
 #include "worms.h"
+
+#include "bcm_host.h"
 
 //-------------------------------------------------------------------------
 
@@ -186,8 +189,10 @@ initWorms(
     uint16_t number,
     uint16_t length,
     WORMS_T *worms,
-    IMAGE_T *image)
+    VC_IMAGE_TYPE_T imageType,
+    DISPMANX_MODEINFO_T *info)
 {
+    initImage(&(worms->image), imageType, info->width, info->height);
     srand(time(NULL));
 
     worms->size = number;
@@ -203,22 +208,135 @@ initWorms(
     for (i = 0 ; i < worms->size ; i++)
     {
         WORM_T *worm = &(worms->worms[i]);
-        initWorm(i, number, length, worm, image);
+        initWorm(i, number, length, worm, &(worms->image));
     }
+
+    //---------------------------------------------------------------------
+
+    uint32_t vc_image_ptr;
+
+    worms->frontResource =
+        vc_dispmanx_resource_create(
+            worms->image.type,
+            worms->image.width  |(worms->image.pitch << 16),
+            worms->image.height | (worms->image.alignedHeight << 16),
+            &vc_image_ptr);
+    assert(worms->frontResource != 0);
+
+    worms->backResource =
+        vc_dispmanx_resource_create(worms->image.type,
+            worms->image.width | (worms->image.pitch << 16),
+            worms->image.height | (worms->image.alignedHeight << 16),
+            &vc_image_ptr);
+    assert(worms->backResource != 0);
+
+    //---------------------------------------------------------------------
+
+    int result = 0;
+
+    VC_RECT_T dst_rect;
+    vc_dispmanx_rect_set(&dst_rect,
+                         0,
+                         0,
+                         worms->image.width,
+                         worms->image.height);
+
+    result = vc_dispmanx_resource_write_data(worms->frontResource,
+                                             worms->image.type,
+                                             worms->image.pitch,
+                                             worms->image.buffer,
+                                             &dst_rect);
+    assert(result == 0);
+}
+
+//-------------------------------------------------------------------------
+
+void
+addElementWorms(
+    WORMS_T *worms,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update)
+{
+    VC_DISPMANX_ALPHA_T alpha = { DISPMANX_FLAGS_ALPHA_FROM_SOURCE, 0, 0 };
+
+    VC_RECT_T src_rect;
+    vc_dispmanx_rect_set(&src_rect,
+                         0,
+                         0,
+                         worms->image.width << 16,
+                         worms->image.height << 16);
+
+    VC_RECT_T dst_rect;
+    vc_dispmanx_rect_set(&dst_rect,
+                         0,
+                         0,
+                         worms->image.width,
+                         worms->image.height);
+
+    worms->element =
+        vc_dispmanx_element_add(update,
+                                display,
+                                2000,
+                                &dst_rect,
+                                worms->frontResource,
+                                &src_rect,
+                                DISPMANX_PROTECTION_NONE,
+                                &alpha,
+                                NULL,
+                                DISPMANX_NO_ROTATE);
+    assert(worms->element != 0);
+}
+
+//-------------------------------------------------------------------------
+
+void
+writeDataWorms(
+    WORMS_T *worms)
+{
+    VC_RECT_T dst_rect;
+    vc_dispmanx_rect_set(&dst_rect,
+                         0,
+                         0,
+                         worms->image.width,
+                         worms->image.height);
+
+    int result = vc_dispmanx_resource_write_data(worms->backResource,
+                                                 worms->image.type,
+                                                 worms->image.pitch,
+                                                 worms->image.buffer,
+                                                 &dst_rect);
+    assert(result == 0);
+}
+
+//-------------------------------------------------------------------------
+
+void
+changeSourceWorms(
+    WORMS_T *worms,
+    DISPMANX_UPDATE_HANDLE_T update)
+{
+    int result = 0;
+    result = vc_dispmanx_element_change_source(update,
+                                               worms->element,
+                                               worms->backResource);
+    assert(result == 0);
+
+    DISPMANX_RESOURCE_HANDLE_T tmp = worms->frontResource;
+    worms->frontResource = worms->backResource;
+    worms->backResource = tmp;
 }
 
 //-------------------------------------------------------------------------
 
 void
 updateWorms(
-    WORMS_T *worms,
-    IMAGE_T *image)
+    WORMS_T *worms)
 {
     uint16_t i = 0;
     for (i = 0 ; i < worms->size ; i++)
     {
         WORM_T *worm = &(worms->worms[i]);
-        updateWorm(worm, image);
+        updateWorm(worm, &(worms->image));
     }
 }
 
@@ -226,14 +344,13 @@ updateWorms(
 
 void
 drawWorms(
-    WORMS_T *worms,
-    IMAGE_T *image)
+    WORMS_T *worms)
 {
     uint16_t i = 0;
     for (i = 0 ; i < worms->size ; i++)
     {
         WORM_T *worm = &(worms->worms[i]);
-        drawWorm(worm, image);
+        drawWorm(worm, &(worms->image));
     }
 }
 
@@ -241,14 +358,13 @@ drawWorms(
 
 void
 undrawWorms(
-    WORMS_T *worms,
-    IMAGE_T *image)
+    WORMS_T *worms)
 {
     uint16_t i = 0;
     for (i = 0 ; i < worms->size ; i++)
     {
         WORM_T *worm = &(worms->worms[i]);
-        undrawWorm(worm, image);
+        undrawWorm(worm, &(worms->image));
     }
 }
 
@@ -269,5 +385,26 @@ destroyWorms(
 
     worms->size = 0;
     worms->worms = NULL;
+
+    destroyImage(&(worms->image));
+
+
+    //---------------------------------------------------------------------
+
+    int result = 0;
+
+    DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
+    assert(update != 0);
+    result = vc_dispmanx_element_remove(update, worms->element);
+    assert(result == 0);
+    result = vc_dispmanx_update_submit_sync(update);
+    assert(result == 0);
+
+    //---------------------------------------------------------------------
+
+    result = vc_dispmanx_resource_delete(worms->frontResource);
+    assert(result == 0);
+    result = vc_dispmanx_resource_delete(worms->backResource);
+    assert(result == 0);
 }
 

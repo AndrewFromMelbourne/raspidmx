@@ -34,6 +34,7 @@
 
 #include "bcm_host.h"
 
+#include "background.h"
 #include "image.h"
 #include "key.h"
 #include "worms.h"
@@ -54,15 +55,21 @@ int main(int argc, char *argv[])
 
     const char* imageTypeName = "RGBA32";
     VC_IMAGE_TYPE_T imageType = VC_IMAGE_MIN;
+    bool addBackground = false;
 
     program = argv[0];
 
     //-------------------------------------------------------------------
 
-    while ((opt = getopt(argc, argv, "t:")) != -1)
+    while ((opt = getopt(argc, argv, "bt:")) != -1)
     {
         switch (opt)
         {
+        case 'b':
+
+            addBackground = true;
+            break;
+
         case 't':
 
             imageTypeName = optarg;
@@ -70,7 +77,8 @@ int main(int argc, char *argv[])
 
         default:
 
-            fprintf(stderr, "Usage: %s [-t <type>]\n", program);
+            fprintf(stderr, "Usage: %s [-b] [-t <type>]\n", program);
+            fprintf(stderr, "    -b - create black background\n");
             fprintf(stderr, "    -t - type of image to create\n");
             fprintf(stderr, "         can be one of the following:");
             printImageTypes(stderr, " ", "", IMAGE_TYPES_WITH_ALPHA);
@@ -116,8 +124,12 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    IMAGE_T image;
-    initImage(&image, imageType, info.width, info.height);
+    BACKGROUND_T background;
+
+    if (addBackground)
+    {
+        initBackground(&background);
+    }
 
     //---------------------------------------------------------------------
 
@@ -125,66 +137,19 @@ int main(int argc, char *argv[])
     uint16_t worm_length = 25;
     WORMS_T worms;
 
-    initWorms(number_of_worms, worm_length, &worms, &image);
+    initWorms(number_of_worms, worm_length, &worms, imageType, &info);
 
     //---------------------------------------------------------------------
-
-    uint32_t vc_image_ptr;
-
-    DISPMANX_RESOURCE_HANDLE_T frontResource =
-        vc_dispmanx_resource_create(imageType,
-                                    image.width|(image.pitch<<16),
-                                    image.height|(image.alignedHeight<<16),
-                                    &vc_image_ptr);
-    assert(frontResource != 0);
-
-    DISPMANX_RESOURCE_HANDLE_T backResource =
-        vc_dispmanx_resource_create(imageType,
-                                    image.width|(image.pitch<<16),
-                                    image.height|(image.alignedHeight<<16),
-                                    &vc_image_ptr);
-    assert(backResource != 0);
-
-    //---------------------------------------------------------------------
-
-    VC_RECT_T dst_rect;
-    vc_dispmanx_rect_set(&dst_rect, 0, 0, image.width, image.height);
-
-    result = vc_dispmanx_resource_write_data(frontResource,
-                                             imageType,
-                                             image.pitch,
-                                             image.buffer,
-                                             &dst_rect);
-    assert(result == 0);
-
-    //---------------------------------------------------------------------
-
-    VC_DISPMANX_ALPHA_T alpha = { DISPMANX_FLAGS_ALPHA_FROM_SOURCE, 0, 0 };
-
-    VC_RECT_T src_rect;
-    vc_dispmanx_rect_set(&src_rect,
-                         0,
-                         0,
-                         image.width << 16,
-                         image.height << 16);
-
-    vc_dispmanx_rect_set(&dst_rect, 0, 0, image.width, image.height);
 
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
     assert(update != 0);
 
-    DISPMANX_ELEMENT_HANDLE_T element =
-        vc_dispmanx_element_add(update,
-                                display,
-                                2000, // layer
-                                &dst_rect,
-                                frontResource,
-                                &src_rect,
-                                DISPMANX_PROTECTION_NONE,
-                                &alpha,
-                                NULL, // clamp
-                                DISPMANX_NO_ROTATE);
-    assert(element != 0);
+    addElementWorms(&worms, display, update);
+
+    if (addBackground)
+    {
+        addElementBackground(&background, display, update);
+    }
 
     result = vc_dispmanx_update_submit_sync(update);
     assert(result == 0);
@@ -205,35 +170,20 @@ int main(int argc, char *argv[])
 
         //-----------------------------------------------------------------
 
-        undrawWorms(&worms, &image);
-        updateWorms(&worms, &image);
-        drawWorms(&worms, &image);
-
-        //-----------------------------------------------------------------
-
-        result = vc_dispmanx_resource_write_data(backResource,
-                                                 imageType,
-                                                 image.pitch,
-                                                 image.buffer,
-                                                 &dst_rect);
-        assert(result == 0);
+        undrawWorms(&worms);
+        updateWorms(&worms);
+        drawWorms(&worms);
+        writeDataWorms(&worms);
 
         //-----------------------------------------------------------------
 
         update = vc_dispmanx_update_start(0);
         assert(update != 0);
-        result = vc_dispmanx_element_change_source(update,
-                                                   element,
-                                                   backResource);
-        assert(result == 0);
+
+        changeSourceWorms(&worms, update);
+
         result = vc_dispmanx_update_submit_sync(update);
         assert(result == 0);
-
-        //-----------------------------------------------------------------
-
-        DISPMANX_RESOURCE_HANDLE_T tmp = frontResource;
-        frontResource = backResource;
-        backResource = tmp;
 
         //-----------------------------------------------------------------
 
@@ -253,28 +203,17 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    update = vc_dispmanx_update_start(0);
-    assert(update != 0);
-    result = vc_dispmanx_element_remove(update, element);
-    assert(result == 0);
-    result = vc_dispmanx_update_submit_sync(update);
-    assert(result == 0);
+    if (addBackground)
+    {
+        destroyBackground(&background);
+    }
 
-    //---------------------------------------------------------------------
-
-    result = vc_dispmanx_resource_delete(frontResource);
-    assert(result == 0);
-    result = vc_dispmanx_resource_delete(backResource);
-    assert(result == 0);
+    destroyWorms(&worms);
 
     //---------------------------------------------------------------------
 
     result = vc_dispmanx_display_close(display);
     assert(result == 0);
-
-    //---------------------------------------------------------------------
-
-    destroyImage(&image);
 
     //---------------------------------------------------------------------
 
