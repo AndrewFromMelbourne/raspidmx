@@ -70,19 +70,19 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-	BACKGROUND_LAYER_T backgroundLayer;
-	initBackgroundLayer(&backgroundLayer, 0x7BEF, 0);
+    BACKGROUND_LAYER_T backgroundLayer;
+    initBackgroundLayer(&backgroundLayer, 0x7BEF, 0);
 
     IMAGE_LAYER_T imageLayer;
-	initImageLayer(&imageLayer, argv[1], 1);
+    initImageLayer(&imageLayer, argv[1], 1);
 
     //---------------------------------------------------------------------
 
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
     assert(update != 0);
 
-	addElementBackgroundLayer(&backgroundLayer, display, update);
-	addElementImageLayerCentered(&imageLayer, &info, display, update);
+    addElementBackgroundLayer(&backgroundLayer, display, update);
+    addElementImageLayerCentered(&imageLayer, &info, display, update);
 
     result = vc_dispmanx_update_submit_sync(update);
     assert(result == 0);
@@ -96,8 +96,8 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-	destroyBackgroundLayer(&backgroundLayer);
-	destroyImageLayer(&imageLayer);
+    destroyBackgroundLayer(&backgroundLayer);
+    destroyImageLayer(&imageLayer);
 
     //---------------------------------------------------------------------
 
