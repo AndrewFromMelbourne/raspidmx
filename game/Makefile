@@ -1,5 +1,5 @@
-OBJS=main.o seamlessBg.o sprite.o \
-	 ../common/background.o ../common/image.o \
+OBJS=main.o scrollingLayer.o spriteLayer.o \
+	 ../common/backgroundLayer.o ../common/image.o \
 	 ../common/key.o ../common/loadpng.o
 
 BIN=game

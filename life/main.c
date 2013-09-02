@@ -35,7 +35,7 @@
 
 #include "bcm_host.h"
 
-#include "background.h"
+#include "backgroundLayer.h"
 #include "key.h"
 #include "life.h"
 
@@ -76,8 +76,8 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    BACKGROUND_T bg;
-    initBackground(&bg);
+    BACKGROUND_LAYER_T bg;
+    initBackgroundLayer(&bg, 0x0000, 0);
 
     LIFE_T life;
     newLife(&life, size);
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    addElementBackground(&bg, display, update);
+    addElementBackgroundLayer(&bg, display, update);
     addElementLife(&life, &info, display, update);
 
     //---------------------------------------------------------------------
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    destroyBackground(&bg);
+    destroyBackgroundLayer(&bg);
     destroyLife(&life);
 
     //---------------------------------------------------------------------

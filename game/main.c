@@ -31,12 +31,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "background.h"
+#include "backgroundLayer.h"
 #include "element_change.h"
 #include "image.h"
 #include "key.h"
-#include "seamlessBg.h"
-#include "sprite.h"
+#include "scrollingLayer.h"
+#include "spriteLayer.h"
 
 #include "bcm_host.h"
 
@@ -52,14 +52,14 @@ int main(void)
 
     //---------------------------------------------------------------------
 
-    BACKGROUND_T bg;
-    initBackground(&bg);
+    BACKGROUND_LAYER_T bg;
+    initBackgroundLayer(&bg, 0x0000, 0);
 
-    SEAMLESS_BACKGROUND_T sb;
-    initSeamlessBg(&sb);
+    SCROLLING_LAYER_T sl;
+    initScrollingLayer(&sl, "texture.png", 1);
 
-    SPRITE_T sprite;
-    initSprite(&sprite);
+    SPRITE_LAYER_T sprite;
+    initSpriteLayer(&sprite, "sprite.png", 2);
 
     //---------------------------------------------------------------------
 
@@ -77,9 +77,9 @@ int main(void)
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
     assert(update != 0);
 
-    addElementBackground(&bg, display, update);
-    addElementSeamlessBg(&sb, &info, display, update);
-    addElementSprite(&sprite, &info, display, update);
+    addElementBackgroundLayer(&bg, display, update);
+    addElementScrollingLayer(&sl, &info, display, update);
+    addElementSpriteLayer(&sprite, &info, display, update);
 
     result = vc_dispmanx_update_submit_sync(update);
     assert(result == 0);
@@ -92,7 +92,7 @@ int main(void)
     {
         if (keyPressed(&c))
         {
-            setDirectionSeamlessBg(&sb, c);
+            setDirectionScrollingLayer(&sl, c);
         }
 
         //-----------------------------------------------------------------
@@ -100,8 +100,8 @@ int main(void)
         DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
         assert(update != 0);
 
-        updatePositionSeamlessBg(&sb, update);
-        updatePositionSprite(&sprite, update);
+        updatePositionScrollingLayer(&sl, update);
+        updatePositionSpriteLayer(&sprite, update);
 
         result = vc_dispmanx_update_submit_sync(update);
         assert(result == 0);
@@ -109,9 +109,9 @@ int main(void)
 
     //---------------------------------------------------------------------
 
-    destroyBackground(&bg);
-    destroySeamlessBg(&sb);
-    destroySprite(&sprite);
+    destroyBackgroundLayer(&bg);
+    destroyScrollingLayer(&sl);
+    destroySpriteLayer(&sprite);
 
     //---------------------------------------------------------------------
 

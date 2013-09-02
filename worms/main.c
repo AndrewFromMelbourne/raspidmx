@@ -34,7 +34,7 @@
 
 #include "bcm_host.h"
 
-#include "background.h"
+#include "backgroundLayer.h"
 #include "image.h"
 #include "key.h"
 #include "worms.h"
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     const char* imageTypeName = "RGBA32";
     VC_IMAGE_TYPE_T imageType = VC_IMAGE_MIN;
-    bool addBackground = false;
+    bool addBackgroundLayer = false;
 
     program = argv[0];
 
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
         {
         case 'b':
 
-            addBackground = true;
+            addBackgroundLayer = true;
             break;
 
         case 't':
@@ -124,11 +124,11 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    BACKGROUND_T background;
+    BACKGROUND_LAYER_T backgroundLayer;
 
-    if (addBackground)
+    if (addBackgroundLayer)
     {
-        initBackground(&background);
+        initBackgroundLayer(&backgroundLayer, 0x0000, 0);
     }
 
     //---------------------------------------------------------------------
@@ -146,9 +146,9 @@ int main(int argc, char *argv[])
 
     addElementWorms(&worms, display, update);
 
-    if (addBackground)
+    if (addBackgroundLayer)
     {
-        addElementBackground(&background, display, update);
+        addElementBackgroundLayer(&backgroundLayer, display, update);
     }
 
     result = vc_dispmanx_update_submit_sync(update);
@@ -203,9 +203,9 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    if (addBackground)
+    if (addBackgroundLayer)
     {
-        destroyBackground(&background);
+        destroyBackgroundLayer(&backgroundLayer);
     }
 
     destroyWorms(&worms);

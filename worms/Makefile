@@ -1,4 +1,4 @@
-OBJS=main.o worms.o ../common/background.o ../common/hsv2rgb.o \
+OBJS=main.o worms.o ../common/backgroundLayer.o ../common/hsv2rgb.o \
 	 ../common/image.o ../common/key.o
 BIN=worms
 

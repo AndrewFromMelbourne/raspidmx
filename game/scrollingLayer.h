@@ -25,8 +25,10 @@
 //
 //-------------------------------------------------------------------------
 
-#ifndef SPRITE_H
-#define SPRITE_H
+#ifndef SCROLLING_LAYER_H
+#define SCROLLING_LAYER_H
+
+#include <stdbool.h>
 
 #include "image.h"
 
@@ -37,35 +39,53 @@
 typedef struct
 {
     IMAGE_T image;
-    int width;
-    int height;
-    int columns;
-    int xOffsetMax;
-    int xOffset;
+    int32_t viewWidth;
+    int32_t viewHeight;
+    int32_t xOffsetMax;
+    int32_t xOffset;
+    int32_t yOffsetMax;
+    int32_t yOffset;
+    int16_t direction;
+    int16_t directionMax;
+    int32_t xDirections[8];
+    int32_t yDirections[8];
     VC_RECT_T srcRect;
     VC_RECT_T dstRect;
+    int32_t layer;
     DISPMANX_RESOURCE_HANDLE_T frontResource;
     DISPMANX_RESOURCE_HANDLE_T backResource;
     DISPMANX_ELEMENT_HANDLE_T element;
-} SPRITE_T;
+} SCROLLING_LAYER_T;
 
 //-------------------------------------------------------------------------
 
-void initSprite(SPRITE_T *s);
+void
+initScrollingLayer(SCROLLING_LAYER_T *sl,
+    const char* file,
+    int32_t layer);
 
 void
-addElementSprite(
-    SPRITE_T *s,
+addElementScrollingLayer(
+    SCROLLING_LAYER_T *sl,
     DISPMANX_MODEINFO_T *info,
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update);
 
+void setDirectionScrollingLayer(SCROLLING_LAYER_T *sl, char c);
+
 void
-updatePositionSprite(
-    SPRITE_T *s,
+updatePositionScrollingLayer(
+    SCROLLING_LAYER_T *sl,
     DISPMANX_UPDATE_HANDLE_T update);
 
-void destroySprite(SPRITE_T *s);
+void destroyScrollingLayer(SCROLLING_LAYER_T *sl);
+
+bool
+loadScrollingLayerPng(
+    IMAGE_T* image,
+    const char *file,
+    bool extendX,
+    bool extendY);
 
 //-------------------------------------------------------------------------
 

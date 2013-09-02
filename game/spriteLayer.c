@@ -31,22 +31,22 @@
 #include "element_change.h"
 #include "image.h"
 #include "loadpng.h"
-#include "sprite.h"
+#include "spriteLayer.h"
 
 //-------------------------------------------------------------------------
 
-void
-initSprite(
-    SPRITE_T *s)
+void initSpriteLayer(
+    SPRITE_LAYER_T *s,
+    const char *file,
+    int32_t layer)
 {
     int result = 0;
-    const char* sprite = "sprite.png";
 
-    bool loaded = loadPng(&(s->image), sprite);
+    bool loaded = loadPng(&(s->image), file);
 
     if (loaded == false)
     {
-        fprintf(stderr, "sprite: unable to load %s\n", sprite);
+        fprintf(stderr, "sprite: unable to load %s\n", file);
         exit(EXIT_FAILURE);
     }
 
@@ -59,6 +59,8 @@ initSprite(
     //---------------------------------------------------------------------
 
     uint32_t vc_image_ptr;
+
+    s->layer = layer;
 
     s->frontResource =
         vc_dispmanx_resource_create(
@@ -102,8 +104,8 @@ initSprite(
 //-------------------------------------------------------------------------
 
 void
-addElementSprite(
-    SPRITE_T *s,
+addElementSpriteLayer(
+    SPRITE_LAYER_T *s,
     DISPMANX_MODEINFO_T *info,
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update)
@@ -132,7 +134,7 @@ addElementSprite(
     s->element =
         vc_dispmanx_element_add(update,
                                 display,
-                                2,
+                                s->layer,
                                 &(s->dstRect),
                                 s->frontResource,
                                 &(s->srcRect),
@@ -146,8 +148,8 @@ addElementSprite(
 //-------------------------------------------------------------------------
 
 void
-updatePositionSprite(
-    SPRITE_T *s,
+updatePositionSpriteLayer(
+    SPRITE_LAYER_T *s,
     DISPMANX_UPDATE_HANDLE_T update)
 {
     int result = 0;
@@ -191,8 +193,8 @@ updatePositionSprite(
 //-------------------------------------------------------------------------
 
 void
-destroySprite(
-    SPRITE_T *s)
+destroySpriteLayer(
+    SPRITE_LAYER_T *s)
 {
     int result = 0;
 

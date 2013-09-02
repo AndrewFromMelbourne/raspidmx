@@ -1,4 +1,5 @@
-OBJS=pngview.o ../common/loadpng.o ../common/image.o ../common/key.o
+OBJS=pngview.o ../common/backgroundLayer.o ../common/imageLayer.o \
+	 ../common/loadpng.o ../common/image.o ../common/key.o
 BIN=pngview
 
 CFLAGS+=-Wall -g -O3 -I../common

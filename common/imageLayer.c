@@ -28,41 +28,64 @@
 #include <assert.h>
 #include <stdbool.h>
 
-#include "background.h"
+#include "element_change.h"
+#include "image.h"
+#include "loadpng.h"
+#include "imageLayer.h"
 
 //-------------------------------------------------------------------------
 
-void
-initBackground(
-    BACKGROUND_T *bg)
+void initImageLayer(
+    IMAGE_LAYER_T *il,
+    const char *file,
+    int32_t layer)
 {
     int result = 0;
-    VC_IMAGE_TYPE_T type = VC_IMAGE_RGB565;
-    uint32_t vc_image_ptr;
 
-    bg->resource = vc_dispmanx_resource_create(type, 1, 1, &vc_image_ptr);
-    assert(bg->resource != 0);
+    bool loaded = loadPng(&(il->image), file);
+
+    if (loaded == false)
+    {
+        fprintf(stderr, "sprite: unable to load %s\n", file);
+        exit(EXIT_FAILURE);
+    }
 
     //---------------------------------------------------------------------
 
-    VC_RECT_T dst_rect;
-    vc_dispmanx_rect_set(&dst_rect, 0, 0, 1, 1);
+    uint32_t vc_image_ptr;
 
-    uint16_t background = 0x0000;
+    il->layer = layer;
 
-    result = vc_dispmanx_resource_write_data(bg->resource,
-                                             type,
-                                             sizeof(background),
-                                             &background,
-                                             &dst_rect);
+    il->resource =
+        vc_dispmanx_resource_create(
+            il->image.type,
+            il->image.width | (il->image.pitch << 16),
+            il->image.height | (il->image.alignedHeight << 16),
+            &vc_image_ptr);
+    assert(il->resource != 0);
+
+    //---------------------------------------------------------------------
+
+    vc_dispmanx_rect_set(&(il->dstRect),
+                         0,
+                         0,
+                         il->image.width,
+                         il->image.height);
+
+    result = vc_dispmanx_resource_write_data(il->resource,
+                                             il->image.type,
+                                             il->image.pitch,
+                                             il->image.buffer,
+                                             &(il->dstRect));
     assert(result == 0);
 }
 
 //-------------------------------------------------------------------------
 
 void
-addElementBackground(
-    BACKGROUND_T *bg,
+addElementImageLayerCentered(
+    IMAGE_LAYER_T *il,
+    DISPMANX_MODEINFO_T *info,
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update)
 {
@@ -75,44 +98,54 @@ addElementBackground(
 
     //---------------------------------------------------------------------
 
-    VC_RECT_T src_rect;
-    vc_dispmanx_rect_set(&src_rect, 0, 0, 1, 1);
+    vc_dispmanx_rect_set(&(il->srcRect),
+                         0 << 16,
+                         0 << 16,
+                         il->image.width << 16,
+                         il->image.height << 16);
 
-    VC_RECT_T dst_rect;
-    vc_dispmanx_rect_set(&dst_rect, 0, 0, 0, 0);
+    vc_dispmanx_rect_set(&(il->dstRect),
+                         (info->width - il->image.width) / 2,
+                         (info->height - il->image.height) / 2,
+                         il->image.width,
+                         il->image.height);
 
-    bg->element =
+    il->element =
         vc_dispmanx_element_add(update,
                                 display,
-                                0, // layer
-                                &dst_rect,
-                                bg->resource,
-                                &src_rect,
+                                il->layer,
+                                &(il->dstRect),
+                                il->resource,
+                                &(il->srcRect),
                                 DISPMANX_PROTECTION_NONE,
                                 &alpha,
                                 NULL, // clamp
                                 DISPMANX_NO_ROTATE);
-    assert(bg->element != 0);
+    assert(il->element != 0);
 }
 
 //-------------------------------------------------------------------------
 
 void
-destroyBackground(
-    BACKGROUND_T *bg)
+destroyImageLayer(
+    IMAGE_LAYER_T *il)
 {
     int result = 0;
 
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
     assert(update != 0);
-
-    result = vc_dispmanx_element_remove(update, bg->element);
+    result = vc_dispmanx_element_remove(update, il->element);
     assert(result == 0);
-
     result = vc_dispmanx_update_submit_sync(update);
     assert(result == 0);
 
-    result = vc_dispmanx_resource_delete(bg->resource);
+    //---------------------------------------------------------------------
+
+    result = vc_dispmanx_resource_delete(il->resource);
     assert(result == 0);
+
+    //---------------------------------------------------------------------
+
+    destroyImage(&(il->image));
 }
 

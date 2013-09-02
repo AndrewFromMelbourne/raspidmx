@@ -25,10 +25,8 @@
 //
 //-------------------------------------------------------------------------
 
-#ifndef SEAMLESS_BG_H
-#define SEAMLESS_BG_H
-
-#include <stdbool.h>
+#ifndef SPRITE_LAYER_H
+#define SPRITE_LAYER_H
 
 #include "image.h"
 
@@ -39,49 +37,39 @@
 typedef struct
 {
     IMAGE_T image;
-    int32_t viewWidth;
-    int32_t viewHeight;
-    int32_t xOffsetMax;
-    int32_t xOffset;
-    int32_t yOffsetMax;
-    int32_t yOffset;
-    int16_t direction;
-    int16_t directionMax;
-    int32_t xDirections[8];
-    int32_t yDirections[8];
+    int width;
+    int height;
+    int columns;
+    int xOffsetMax;
+    int xOffset;
     VC_RECT_T srcRect;
     VC_RECT_T dstRect;
+    int32_t layer;
     DISPMANX_RESOURCE_HANDLE_T frontResource;
     DISPMANX_RESOURCE_HANDLE_T backResource;
     DISPMANX_ELEMENT_HANDLE_T element;
-} SEAMLESS_BACKGROUND_T;
+} SPRITE_LAYER_T;
 
 //-------------------------------------------------------------------------
 
-void initSeamlessBg(SEAMLESS_BACKGROUND_T *sb);
+void initSpriteLayer(
+    SPRITE_LAYER_T *s,
+    const char *file,
+    int32_t layer);
 
 void
-addElementSeamlessBg(
-    SEAMLESS_BACKGROUND_T *sb,
+addElementSpriteLayer(
+    SPRITE_LAYER_T *s,
     DISPMANX_MODEINFO_T *info,
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update);
 
-void setDirectionSeamlessBg(SEAMLESS_BACKGROUND_T *sb, char c);
-
 void
-updatePositionSeamlessBg(
-    SEAMLESS_BACKGROUND_T *sb,
+updatePositionSpriteLayer(
+    SPRITE_LAYER_T *s,
     DISPMANX_UPDATE_HANDLE_T update);
 
-void destroySeamlessBg(SEAMLESS_BACKGROUND_T *sb);
-
-bool
-loadSeamlessBgPng(
-    IMAGE_T* image,
-    const char *file,
-    bool extendX,
-    bool extendY);
+void destroySpriteLayer(SPRITE_LAYER_T *s);
 
 //-------------------------------------------------------------------------
 

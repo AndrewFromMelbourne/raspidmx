@@ -25,10 +25,10 @@
 //
 //-------------------------------------------------------------------------
 
-#ifndef BACKGROUND_H
-#define BACKGROUND_H
+#ifndef IMAGE_LAYER_H
+#define IMAGE_LAYER_H
 
-//-------------------------------------------------------------------------
+#include "image.h"
 
 #include "bcm_host.h"
 
@@ -36,24 +36,30 @@
 
 typedef struct
 {
+    IMAGE_T image;
+    VC_RECT_T srcRect;
+    VC_RECT_T dstRect;
+    int32_t layer;
     DISPMANX_RESOURCE_HANDLE_T resource;
     DISPMANX_ELEMENT_HANDLE_T element;
-} BACKGROUND_T;
+} IMAGE_LAYER_T;
 
 //-------------------------------------------------------------------------
 
-void initBackground(BACKGROUND_T *bg);
+void initImageLayer(
+    IMAGE_LAYER_T *il,
+    const char *file,
+    int32_t layer);
 
 void
-addElementBackground(
-    BACKGROUND_T *bg,
+addElementImageLayerCentered(
+    IMAGE_LAYER_T *il,
+    DISPMANX_MODEINFO_T *info,
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update);
 
-void destroyBackground(BACKGROUND_T *bg);
-
+void destroyImageLayer(IMAGE_LAYER_T *il);
 
 //-------------------------------------------------------------------------
 
 #endif
-

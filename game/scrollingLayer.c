@@ -32,105 +32,106 @@
 #include "element_change.h"
 #include "image.h"
 #include "loadpng.h"
-#include "seamlessBg.h"
+#include "scrollingLayer.h"
 
 #include "bcm_host.h"
 
 //-------------------------------------------------------------------------
 
 void
-initSeamlessBg(
-    SEAMLESS_BACKGROUND_T *sb)
+initScrollingLayer(SCROLLING_LAYER_T *sl,
+    const char* file,
+    int32_t layer)
 {
     int result = 0;
 
     //---------------------------------------------------------------------
-    const char *texture = "texture.png";
-
-    if (loadSeamlessBgPng(&sb->image, texture, true, true) == false)
+    if (loadScrollingLayerPng(&sl->image, file, true, true) == false)
     {
-        fprintf(stderr, "seamlessBg: unable to load %s\n", texture);
+        fprintf(stderr, "seamlessBg: unable to load %s\n", file);
         exit(EXIT_FAILURE);
     }
 
-    sb->viewWidth = sb->image.width / 2;
-    sb->viewHeight = sb->image.height / 2;
+    sl->viewWidth = sl->image.width / 2;
+    sl->viewHeight = sl->image.height / 2;
 
-    sb->xOffsetMax = sb->viewWidth - 1;
-    sb->xOffset = sb->xOffsetMax / 2;
+    sl->xOffsetMax = sl->viewWidth - 1;
+    sl->xOffset = sl->xOffsetMax / 2;
 
-    sb->yOffsetMax = sb->viewHeight - 1;
-    sb->yOffset = sb->yOffsetMax / 2;
+    sl->yOffsetMax = sl->viewHeight - 1;
+    sl->yOffset = sl->yOffsetMax / 2;
 
-    sb->direction = 0;
-    sb->directionMax = 7;
+    sl->direction = 0;
+    sl->directionMax = 7;
 
-    sb->xDirections[0] = 0;
-    sb->xDirections[1] = 3;
-    sb->xDirections[2] = 4;
-    sb->xDirections[3] = 3;
-    sb->xDirections[4] = 0;
-    sb->xDirections[5] = -3;
-    sb->xDirections[6] = -4;
-    sb->xDirections[7] = -3;
+    sl->xDirections[0] = 0;
+    sl->xDirections[1] = 3;
+    sl->xDirections[2] = 4;
+    sl->xDirections[3] = 3;
+    sl->xDirections[4] = 0;
+    sl->xDirections[5] = -3;
+    sl->xDirections[6] = -4;
+    sl->xDirections[7] = -3;
 
-    sb->yDirections[0] = 4;
-    sb->yDirections[1] = 3;
-    sb->yDirections[2] = 0;
-    sb->yDirections[3] = -3;
-    sb->yDirections[4] = -4;
-    sb->yDirections[5] = -3;
-    sb->yDirections[6] = 0;
-    sb->yDirections[7] = 3;
+    sl->yDirections[0] = 4;
+    sl->yDirections[1] = 3;
+    sl->yDirections[2] = 0;
+    sl->yDirections[3] = -3;
+    sl->yDirections[4] = -4;
+    sl->yDirections[5] = -3;
+    sl->yDirections[6] = 0;
+    sl->yDirections[7] = 3;
 
     //---------------------------------------------------------------------
 
     uint32_t vc_image_ptr;
 
-    sb->frontResource =
-        vc_dispmanx_resource_create(
-            sb->image.type,
-            sb->image.width | (sb->image.pitch << 16),
-            sb->image.height | (sb->image.alignedHeight << 16),
-            &vc_image_ptr);
-    assert(sb->frontResource != 0);
+    sl->layer = layer;
 
-    sb->backResource =
+    sl->frontResource =
         vc_dispmanx_resource_create(
-            sb->image.type,
-            sb->image.width | (sb->image.pitch << 16),
-            sb->image.height | (sb->image.alignedHeight << 16),
+            sl->image.type,
+            sl->image.width | (sl->image.pitch << 16),
+            sl->image.height | (sl->image.alignedHeight << 16),
             &vc_image_ptr);
-    assert(sb->backResource != 0);
+    assert(sl->frontResource != 0);
+
+    sl->backResource =
+        vc_dispmanx_resource_create(
+            sl->image.type,
+            sl->image.width | (sl->image.pitch << 16),
+            sl->image.height | (sl->image.alignedHeight << 16),
+            &vc_image_ptr);
+    assert(sl->backResource != 0);
 
     //---------------------------------------------------------------------
 
-    vc_dispmanx_rect_set(&(sb->dstRect),
+    vc_dispmanx_rect_set(&(sl->dstRect),
                          0,
                          0,
-                         sb->image.width,
-                         sb->image.height);
+                         sl->image.width,
+                         sl->image.height);
 
-    result = vc_dispmanx_resource_write_data(sb->frontResource,
-                                             sb->image.type,
-                                             sb->image.pitch,
-                                             sb->image.buffer,
-                                             &(sb->dstRect));
+    result = vc_dispmanx_resource_write_data(sl->frontResource,
+                                             sl->image.type,
+                                             sl->image.pitch,
+                                             sl->image.buffer,
+                                             &(sl->dstRect));
     assert(result == 0);
 
-    result = vc_dispmanx_resource_write_data(sb->backResource,
-                                             sb->image.type,
-                                             sb->image.pitch,
-                                             sb->image.buffer,
-                                             &(sb->dstRect));
+    result = vc_dispmanx_resource_write_data(sl->backResource,
+                                             sl->image.type,
+                                             sl->image.pitch,
+                                             sl->image.buffer,
+                                             &(sl->dstRect));
     assert(result == 0);
 }
 
 //-------------------------------------------------------------------------
 
 void
-addElementSeamlessBg(
-    SEAMLESS_BACKGROUND_T *sb,
+addElementScrollingLayer(
+    SCROLLING_LAYER_T *sl,
     DISPMANX_MODEINFO_T *info,
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update)
@@ -142,36 +143,36 @@ addElementSeamlessBg(
         0
     };
 
-    vc_dispmanx_rect_set(&sb->srcRect,
-                         sb->xOffset << 16,
-                         sb->yOffset << 16,
-                         sb->viewWidth << 16,
-                         sb->viewHeight << 16);
+    vc_dispmanx_rect_set(&sl->srcRect,
+                         sl->xOffset << 16,
+                         sl->yOffset << 16,
+                         sl->viewWidth << 16,
+                         sl->viewHeight << 16);
 
-    vc_dispmanx_rect_set(&(sb->dstRect),
-                         (info->width - sb->viewWidth) / 2,
-                         (info->height - sb->viewHeight) / 2,
-                         sb->viewWidth,
-                         sb->viewHeight);
+    vc_dispmanx_rect_set(&(sl->dstRect),
+                         (info->width - sl->viewWidth) / 2,
+                         (info->height - sl->viewHeight) / 2,
+                         sl->viewWidth,
+                         sl->viewHeight);
 
-    sb->element = vc_dispmanx_element_add(update,
+    sl->element = vc_dispmanx_element_add(update,
                                           display,
-                                          1,
-                                          &(sb->dstRect),
-                                          sb->frontResource,
-                                          &(sb->srcRect),
+                                          sl->layer,
+                                          &(sl->dstRect),
+                                          sl->frontResource,
+                                          &(sl->srcRect),
                                           DISPMANX_PROTECTION_NONE,
                                           &alpha,
                                           NULL,
                                           DISPMANX_NO_ROTATE);
-    assert(sb->element != 0);
+    assert(sl->element != 0);
 }
 
 //-------------------------------------------------------------------------
 
 void
-setDirectionSeamlessBg(
-    SEAMLESS_BACKGROUND_T *sb,
+setDirectionScrollingLayer(
+    SCROLLING_LAYER_T *sl,
     char c)
 {
     switch (tolower(c))
@@ -179,10 +180,10 @@ setDirectionSeamlessBg(
     case ',':
     case '<':
 
-        --(sb->direction);
-        if (sb->direction < 0)
+        --(sl->direction);
+        if (sl->direction < 0)
         {
-            sb->direction = sb->directionMax;
+            sl->direction = sl->directionMax;
         }
 
         break;
@@ -190,11 +191,11 @@ setDirectionSeamlessBg(
     case '.':
     case '>':
 
-        ++(sb->direction);
+        ++(sl->direction);
 
-        if (sb->direction > sb->directionMax)
+        if (sl->direction > sl->directionMax)
         {
-            sb->direction = 0;
+            sl->direction = 0;
         }
 
         break;
@@ -210,99 +211,99 @@ setDirectionSeamlessBg(
 //-------------------------------------------------------------------------
 
 void
-updatePositionSeamlessBg(
-    SEAMLESS_BACKGROUND_T *sb,
+updatePositionScrollingLayer(
+    SCROLLING_LAYER_T *sl,
     DISPMANX_UPDATE_HANDLE_T update)
 {
     int result = 0;
 
     //---------------------------------------------------------------------
 
-    sb->xOffset += sb->xDirections[sb->direction];
+    sl->xOffset += sl->xDirections[sl->direction];
 
-    if (sb->xOffset < 0)
+    if (sl->xOffset < 0)
     {
-        sb->xOffset = sb->xOffsetMax;
+        sl->xOffset = sl->xOffsetMax;
     }
-    else if (sb->xOffset > sb->xOffsetMax)
+    else if (sl->xOffset > sl->xOffsetMax)
     {
-        sb->xOffset = 0;
+        sl->xOffset = 0;
     }
 
-    sb->yOffset -= sb->yDirections[sb->direction];
+    sl->yOffset -= sl->yDirections[sl->direction];
 
-    if (sb->yOffset < 0)
+    if (sl->yOffset < 0)
     {
-        sb->yOffset = sb->yOffsetMax;
+        sl->yOffset = sl->yOffsetMax;
     }
-    else if (sb->yOffset > sb->yOffsetMax)
+    else if (sl->yOffset > sl->yOffsetMax)
     {
-        sb->yOffset = 0;
+        sl->yOffset = 0;
     }
 
     //---------------------------------------------------------------------
 
     result = vc_dispmanx_element_change_source(update,
-                                               sb->element,
-                                               sb->backResource);
+                                               sl->element,
+                                               sl->backResource);
     assert(result == 0);
 
-    vc_dispmanx_rect_set(&(sb->srcRect),
-                         sb->xOffset << 16,
-                         sb->yOffset << 16,
-                         sb->viewWidth << 16,
-                         sb->viewHeight << 16);
+    vc_dispmanx_rect_set(&(sl->srcRect),
+                         sl->xOffset << 16,
+                         sl->yOffset << 16,
+                         sl->viewWidth << 16,
+                         sl->viewHeight << 16);
 
     result = 
     vc_dispmanx_element_change_attributes(update,
-                                          sb->element,
+                                          sl->element,
                                           ELEMENT_CHANGE_SRC_RECT,
                                           0,
                                           255,
-                                          &(sb->dstRect),
-                                          &(sb->srcRect),
+                                          &(sl->dstRect),
+                                          &(sl->srcRect),
                                           0,
                                           DISPMANX_NO_ROTATE);
     assert(result == 0);
 
     //---------------------------------------------------------------------
 
-    DISPMANX_RESOURCE_HANDLE_T tmp = sb->frontResource;
-    sb->frontResource = sb->backResource;
-    sb->backResource = tmp;
+    DISPMANX_RESOURCE_HANDLE_T tmp = sl->frontResource;
+    sl->frontResource = sl->backResource;
+    sl->backResource = tmp;
 }
 
 //-------------------------------------------------------------------------
 
 void
-destroySeamlessBg(
-    SEAMLESS_BACKGROUND_T *sb)
+destroyScrollingLayer(
+    SCROLLING_LAYER_T *sl)
 {
     int result = 0;
 
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
     assert(update != 0);
-    result = vc_dispmanx_element_remove(update, sb->element);
+    result = vc_dispmanx_element_remove(update, sl->element);
     assert(result == 0);
     result = vc_dispmanx_update_submit_sync(update);
     assert(result == 0);
 
     //---------------------------------------------------------------------
 
-    result = vc_dispmanx_resource_delete(sb->frontResource);
+    result = vc_dispmanx_resource_delete(sl->frontResource);
     assert(result == 0);
-    result = vc_dispmanx_resource_delete(sb->backResource);
+    result = vc_dispmanx_resource_delete(sl->backResource);
     assert(result == 0);
 
     //---------------------------------------------------------------------
 
-    destroyImage(&(sb->image));
+    destroyImage(&(sl->image));
 }
 
 //-------------------------------------------------------------------------
 
 bool
-loadSeamlessBgPng(
+loadScrollingLayerPng(
     IMAGE_T* image,
     const char *file,
     bool extendX,
