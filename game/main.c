@@ -34,6 +34,7 @@
 #include "backgroundLayer.h"
 #include "element_change.h"
 #include "image.h"
+#include "imageLayer.h"
 #include "key.h"
 #include "scrollingLayer.h"
 #include "spriteLayer.h"
@@ -58,8 +59,11 @@ int main(void)
     SCROLLING_LAYER_T sl;
     initScrollingLayer(&sl, "texture.png", 1);
 
+    IMAGE_LAYER_T spotlight;
+    initImageLayer(&spotlight, "spotlight.png", 2);
+
     SPRITE_LAYER_T sprite;
-    initSpriteLayer(&sprite, "sprite.png", 2);
+    initSpriteLayer(&sprite, "sprite.png", 3);
 
     //---------------------------------------------------------------------
 
@@ -79,6 +83,7 @@ int main(void)
 
     addElementBackgroundLayer(&bg, display, update);
     addElementScrollingLayer(&sl, &info, display, update);
+    addElementImageLayerCentered(&spotlight, &info, display, update);
     addElementSpriteLayer(&sprite, &info, display, update);
 
     result = vc_dispmanx_update_submit_sync(update);
@@ -111,6 +116,7 @@ int main(void)
 
     destroyBackgroundLayer(&bg);
     destroyScrollingLayer(&sl);
+    destroyImageLayer(&spotlight);
     destroySpriteLayer(&sprite);
 
     //---------------------------------------------------------------------

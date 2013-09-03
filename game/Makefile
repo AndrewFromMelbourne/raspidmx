@@ -1,5 +1,5 @@
 OBJS=main.o scrollingLayer.o spriteLayer.o \
-	 ../common/backgroundLayer.o ../common/image.o \
+	 ../common/backgroundLayer.o ../common/image.o ../common/imageLayer.o \
 	 ../common/key.o ../common/loadpng.o
 
 BIN=game
