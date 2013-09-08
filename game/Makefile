@@ -4,8 +4,8 @@ OBJS=main.o scrollingLayer.o spriteLayer.o \
 
 BIN=game
 
-CFLAGS+=-Wall -g -O3 -I../common
-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm -L/usr/local/lib -lpng
+CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
+LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags)
 
 INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
 
