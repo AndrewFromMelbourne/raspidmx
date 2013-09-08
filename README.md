@@ -68,6 +68,7 @@ If you type make in the top level directory, the make file will build all
 the different programs in this repository. Each program has it's own make
 file, so you can build them individually if you wish.
 
+You will need to install libpng before you build the program. On Raspbian
 
-
+sudo apt-get install libpng12-dev
 
