@@ -44,15 +44,54 @@
 
 //-------------------------------------------------------------------------
 
+const char *program = NULL;
+
+//-------------------------------------------------------------------------
+
+void usage(void)
+{
+    fprintf(stderr, "Usage: %s [-b <RGBA>] <file.png>\n", program);
+    fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
+    fprintf(stderr, "         e.g. 0x000F is opaque black\n");
+
+    exit(EXIT_FAILURE);
+}
+
+//-------------------------------------------------------------------------
+
 int main(int argc, char *argv[])
 {
+    uint16_t background = 0x000F;
+
+    program = argv[0];
+
     //---------------------------------------------------------------------
 
-    if (argc != 2)
+    int opt = 0;
+
+    while ((opt = getopt(argc, argv, "b:")) != -1)
     {
-        fprintf(stderr, "usage: pngview <file.png>\n");
-        exit(EXIT_FAILURE);
+        switch(opt)
+        {
+        case 'b':
+
+            background = strtol(optarg, NULL, 16);
+            break;
+
+        default:
+
+            usage();
+            break;
+        }
     }
+
+    //---------------------------------------------------------------------
+
+    if (optind >= argc)
+    {
+        usage();
+    }
+
     //---------------------------------------------------------------------
 
     bcm_host_init();
@@ -71,10 +110,10 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     BACKGROUND_LAYER_T backgroundLayer;
-    initBackgroundLayer(&backgroundLayer, 0x7BEF, 0);
+    initBackgroundLayer(&backgroundLayer, background, 0);
 
     IMAGE_LAYER_T imageLayer;
-    initImageLayer(&imageLayer, argv[1], 1);
+    initImageLayer(&imageLayer, argv[optind], 1);
 
     //---------------------------------------------------------------------
 

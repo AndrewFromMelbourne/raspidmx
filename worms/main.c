@@ -45,7 +45,7 @@
 
 //-----------------------------------------------------------------------
 
-char* program = NULL;
+const char *program = NULL;
 
 //-------------------------------------------------------------------------
 
@@ -55,19 +55,19 @@ int main(int argc, char *argv[])
 
     const char* imageTypeName = "RGBA32";
     VC_IMAGE_TYPE_T imageType = VC_IMAGE_MIN;
-    bool addBackgroundLayer = false;
+    uint16_t  background = 0x0000;
 
     program = argv[0];
 
     //-------------------------------------------------------------------
 
-    while ((opt = getopt(argc, argv, "bt:")) != -1)
+    while ((opt = getopt(argc, argv, "b:t:")) != -1)
     {
         switch (opt)
         {
         case 'b':
 
-            addBackgroundLayer = true;
+            background = strtol(optarg, NULL, 16);
             break;
 
         case 't':
@@ -77,8 +77,9 @@ int main(int argc, char *argv[])
 
         default:
 
-            fprintf(stderr, "Usage: %s [-b] [-t <type>]\n", program);
-            fprintf(stderr, "    -b - create black background\n");
+            fprintf(stderr, "Usage: %s [-b <RGBA>] [-t <type>]\n", program);
+            fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
+            fprintf(stderr, "         e.g. 0x000F is opaque black\n");
             fprintf(stderr, "    -t - type of image to create\n");
             fprintf(stderr, "         can be one of the following:");
             printImageTypes(stderr, " ", "", IMAGE_TYPES_WITH_ALPHA);
@@ -125,11 +126,7 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     BACKGROUND_LAYER_T backgroundLayer;
-
-    if (addBackgroundLayer)
-    {
-        initBackgroundLayer(&backgroundLayer, 0x0000, 0);
-    }
+    initBackgroundLayer(&backgroundLayer, background, 0);
 
     //---------------------------------------------------------------------
 
@@ -145,11 +142,7 @@ int main(int argc, char *argv[])
     assert(update != 0);
 
     addElementWorms(&worms, display, update);
-
-    if (addBackgroundLayer)
-    {
-        addElementBackgroundLayer(&backgroundLayer, display, update);
-    }
+    addElementBackgroundLayer(&backgroundLayer, display, update);
 
     result = vc_dispmanx_update_submit_sync(update);
     assert(result == 0);
@@ -203,11 +196,7 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    if (addBackgroundLayer)
-    {
-        destroyBackgroundLayer(&backgroundLayer);
-    }
-
+    destroyBackgroundLayer(&backgroundLayer);
     destroyWorms(&worms);
 
     //---------------------------------------------------------------------

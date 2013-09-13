@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     BACKGROUND_LAYER_T bg;
-    initBackgroundLayer(&bg, 0x0000, 0);
+    initBackgroundLayer(&bg, 0x000F, 0);
 
     LIFE_T life;
     newLife(&life, size);

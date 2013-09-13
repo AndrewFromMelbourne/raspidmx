@@ -9,6 +9,6 @@ Dewdney
 The worms use a simple algorithm to randomly change direction by a few
 degrees each iteration.
 
-Unlike the other demonstations, no background layer is created. The worms
-will crawl over the frame buffer. Press 'Esc' to exit.
+Unlike the other demonstations, a transparent background layer is created by
+default. The worms will crawl over the frame buffer. Press 'Esc' to exit.
 

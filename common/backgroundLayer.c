@@ -39,7 +39,7 @@ initBackgroundLayer(
     int32_t layer)
 {
     int result = 0;
-    VC_IMAGE_TYPE_T type = VC_IMAGE_RGB565;
+    VC_IMAGE_TYPE_T type = VC_IMAGE_RGBA16;
     uint32_t vc_image_ptr;
 
     bg->resource = vc_dispmanx_resource_create(type, 1, 1, &vc_image_ptr);
@@ -71,7 +71,7 @@ addElementBackgroundLayer(
     VC_DISPMANX_ALPHA_T alpha =
     {
         DISPMANX_FLAGS_ALPHA_FROM_SOURCE, 
-        255, /*alpha 0->255*/
+        255,
         0
     };
 
