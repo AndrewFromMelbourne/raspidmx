@@ -63,7 +63,7 @@ int main(void)
     initImageLayer(&spotlight, "spotlight.png", 2);
 
     SPRITE_LAYER_T sprite;
-    initSpriteLayer(&sprite, "sprite.png", 3);
+    initSpriteLayer(&sprite, 12, 1, "sprite.png", 3);
 
     //---------------------------------------------------------------------
 
@@ -82,9 +82,9 @@ int main(void)
     assert(update != 0);
 
     addElementBackgroundLayer(&bg, display, update);
-    addElementScrollingLayer(&sl, &info, display, update);
+    addElementScrollingLayerCentered(&sl, &info, display, update);
     addElementImageLayerCentered(&spotlight, &info, display, update);
-    addElementSpriteLayer(&sprite, &info, display, update);
+    addElementSpriteLayerCentered(&sprite, &info, display, update);
 
     result = vc_dispmanx_update_submit_sync(update);
     assert(result == 0);

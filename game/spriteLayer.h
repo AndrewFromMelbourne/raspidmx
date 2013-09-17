@@ -40,8 +40,11 @@ typedef struct
     int width;
     int height;
     int columns;
+    int rows;
     int xOffsetMax;
     int xOffset;
+    int yOffsetMax;
+    int yOffset;
     VC_RECT_T srcRect;
     VC_RECT_T dstRect;
     int32_t layer;
@@ -54,11 +57,13 @@ typedef struct
 
 void initSpriteLayer(
     SPRITE_LAYER_T *s,
+    int columns,
+    int rows,
     const char *file,
     int32_t layer);
 
 void
-addElementSpriteLayer(
+addElementSpriteLayerCentered(
     SPRITE_LAYER_T *s,
     DISPMANX_MODEINFO_T *info,
     DISPMANX_DISPLAY_HANDLE_T display,

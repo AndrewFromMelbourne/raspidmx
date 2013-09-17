@@ -65,7 +65,7 @@ initScrollingLayer(SCROLLING_LAYER_T *sl,
     int32_t layer);
 
 void
-addElementScrollingLayer(
+addElementScrollingLayerCentered(
     SCROLLING_LAYER_T *sl,
     DISPMANX_MODEINFO_T *info,
     DISPMANX_DISPLAY_HANDLE_T display,

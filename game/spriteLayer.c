@@ -37,6 +37,8 @@
 
 void initSpriteLayer(
     SPRITE_LAYER_T *s,
+    int columns,
+    int rows,
     const char *file,
     int32_t layer)
 {
@@ -50,11 +52,14 @@ void initSpriteLayer(
         exit(EXIT_FAILURE);
     }
 
-    s->columns = 12;
+    s->columns = columns;
+    s->rows = rows;
     s->width = s->image.width / s->columns;
-    s->height = s->image.height;
+    s->height = s->image.height / s->rows;
     s->xOffsetMax = (s->columns - 1) * s->width;
     s->xOffset = 0;
+    s->yOffsetMax = (s->rows - 1) * s->height;
+    s->yOffset = 0;
 
     //---------------------------------------------------------------------
 
@@ -104,7 +109,7 @@ void initSpriteLayer(
 //-------------------------------------------------------------------------
 
 void
-addElementSpriteLayer(
+addElementSpriteLayerCentered(
     SPRITE_LAYER_T *s,
     DISPMANX_MODEINFO_T *info,
     DISPMANX_DISPLAY_HANDLE_T display,
@@ -121,7 +126,7 @@ addElementSpriteLayer(
 
     vc_dispmanx_rect_set(&(s->srcRect),
                          s->xOffset << 16,
-                         0 << 16,
+                         s->yOffset << 16,
                          s->width << 16,
                          s->height << 16);
 
@@ -161,13 +166,19 @@ updatePositionSpriteLayer(
     if (s->xOffset > s->xOffsetMax)
     {
         s->xOffset = 0;
+        s->yOffset += s->height;
+
+        if (s->yOffset > s->yOffsetMax)
+        {
+            s->yOffset = 0;
+        }
     }
 
     //---------------------------------------------------------------------
 
     vc_dispmanx_rect_set(&(s->srcRect),
                          s->xOffset << 16,
-                         0 << 16,
+                         s->yOffset << 16,
                          s->width << 16,
                          s->height << 16);
 
