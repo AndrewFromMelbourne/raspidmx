@@ -71,6 +71,12 @@ addElementScrollingLayerCentered(
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update);
 
+void
+addElementScrollingLayer(
+    SCROLLING_LAYER_T *sl,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update);
+
 void setDirectionScrollingLayer(SCROLLING_LAYER_T *sl, char c);
 
 void

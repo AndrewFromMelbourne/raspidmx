@@ -115,15 +115,6 @@ addElementSpriteLayerCentered(
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update)
 {
-    VC_DISPMANX_ALPHA_T alpha =
-    {
-        DISPMANX_FLAGS_ALPHA_FROM_SOURCE, 
-        255, /*alpha 0->255*/
-        0
-    };
-
-    //---------------------------------------------------------------------
-
     vc_dispmanx_rect_set(&(s->srcRect),
                          s->xOffset << 16,
                          s->yOffset << 16,
@@ -135,6 +126,26 @@ addElementSpriteLayerCentered(
                          (info->height - s->height) / 2,
                          s->width,
                          s->height);
+
+    addElementSpriteLayer(s, display, update);
+}
+
+//-------------------------------------------------------------------------
+
+void
+addElementSpriteLayer(
+    SPRITE_LAYER_T *s,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update)
+{
+    VC_DISPMANX_ALPHA_T alpha =
+    {
+        DISPMANX_FLAGS_ALPHA_FROM_SOURCE, 
+        255, /*alpha 0->255*/
+        0
+    };
+
+    //---------------------------------------------------------------------
 
     s->element =
         vc_dispmanx_element_add(update,

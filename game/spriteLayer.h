@@ -70,6 +70,12 @@ addElementSpriteLayerCentered(
     DISPMANX_UPDATE_HANDLE_T update);
 
 void
+addElementSpriteLayer(
+    SPRITE_LAYER_T *s,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update);
+
+void
 updatePositionSpriteLayer(
     SPRITE_LAYER_T *s,
     DISPMANX_UPDATE_HANDLE_T update);

@@ -117,6 +117,47 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
+    int32_t outWidth = imageLayer.image.width;
+    int32_t outHeight = imageLayer.image.height;
+
+    if ((imageLayer.image.width > info.width) &&
+        (imageLayer.image.height > info.height))
+    {
+    }
+    else
+    {
+        double imageAspect = (double)imageLayer.image.width
+                                     / imageLayer.image.height;
+        double screenAspect = (double)info.width / info.height;
+
+        if (imageAspect > screenAspect)
+        {
+            outWidth = info.width;
+            outHeight = (imageLayer.image.height * info.width)
+                         / imageLayer.image.width; 
+        }
+        else
+        {
+            outWidth = (imageLayer.image.width * info.height)
+                        / imageLayer.image.height; 
+            outHeight = info.height;
+        }
+    }
+
+    vc_dispmanx_rect_set(&(imageLayer.srcRect),
+                         0 << 16,
+                         0 << 16,
+                         imageLayer.image.width << 16,
+                         imageLayer.image.height << 16);
+
+    vc_dispmanx_rect_set(&(imageLayer.dstRect),
+                         (info.width - outWidth) / 2,
+                         (info.height - outHeight) / 2,
+                         outWidth,
+                         outHeight);
+
+    //---------------------------------------------------------------------
+
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
     assert(update != 0);
 

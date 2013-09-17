@@ -58,6 +58,12 @@ addElementImageLayerCentered(
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update);
 
+void
+addElementImageLayer(
+    IMAGE_LAYER_T *il,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update);
+
 void destroyImageLayer(IMAGE_LAYER_T *il);
 
 //-------------------------------------------------------------------------

@@ -89,15 +89,6 @@ addElementImageLayerCentered(
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update)
 {
-    VC_DISPMANX_ALPHA_T alpha =
-    {
-        DISPMANX_FLAGS_ALPHA_FROM_SOURCE, 
-        255, /*alpha 0->255*/
-        0
-    };
-
-    //---------------------------------------------------------------------
-
     vc_dispmanx_rect_set(&(il->srcRect),
                          0 << 16,
                          0 << 16,
@@ -109,6 +100,26 @@ addElementImageLayerCentered(
                          (info->height - il->image.height) / 2,
                          il->image.width,
                          il->image.height);
+
+    addElementImageLayer(il, display, update);
+}
+
+//-------------------------------------------------------------------------
+
+void
+addElementImageLayer(
+    IMAGE_LAYER_T *il,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update)
+{
+    VC_DISPMANX_ALPHA_T alpha =
+    {
+        DISPMANX_FLAGS_ALPHA_FROM_SOURCE, 
+        255, /*alpha 0->255*/
+        0
+    };
+
+    //---------------------------------------------------------------------
 
     il->element =
         vc_dispmanx_element_add(update,

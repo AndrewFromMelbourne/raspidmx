@@ -136,13 +136,6 @@ addElementScrollingLayerCentered(
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update)
 {
-    VC_DISPMANX_ALPHA_T alpha =
-    {
-        DISPMANX_FLAGS_ALPHA_FROM_SOURCE, 
-        255,
-        0
-    };
-
     vc_dispmanx_rect_set(&sl->srcRect,
                          sl->xOffset << 16,
                          sl->yOffset << 16,
@@ -154,6 +147,24 @@ addElementScrollingLayerCentered(
                          (info->height - sl->viewHeight) / 2,
                          sl->viewWidth,
                          sl->viewHeight);
+
+    addElementScrollingLayer(sl, display, update);
+}
+
+//-------------------------------------------------------------------------
+
+void
+addElementScrollingLayer(
+    SCROLLING_LAYER_T *sl,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update)
+{
+    VC_DISPMANX_ALPHA_T alpha =
+    {
+        DISPMANX_FLAGS_ALPHA_FROM_SOURCE, 
+        255,
+        0
+    };
 
     sl->element = vc_dispmanx_element_add(update,
                                           display,
