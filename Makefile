@@ -2,6 +2,7 @@ TARGETS=	life \
 			pngview \
 			rgb_triangle \
 			game \
+			spriteview \
 			test_pattern \
 			worms
 

@@ -49,6 +49,11 @@ pngview
 
 Load a png image file and display it as a Dispmanx layer.
 
+spriteview
+----------
+
+Loads a sprite (png) image file and displays it as an animation.
+
 game
 ----
 

@@ -1,8 +1,8 @@
-OBJS=main.o ../common/scrollingLayer.o ../common/spriteLayer.o \
-	 ../common/backgroundLayer.o ../common/image.o ../common/imageLayer.o \
+OBJS=spriteview.o ../common/spriteLayer.o \
+	 ../common/backgroundLayer.o ../common/image.o \
 	 ../common/key.o ../common/loadpng.o
 
-BIN=game
+BIN=spriteview
 
 CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
 LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags)

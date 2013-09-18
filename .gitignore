@@ -2,6 +2,10 @@
 
 *.o
 
+# code
+
+core
+
 # programs
 
 game/game
