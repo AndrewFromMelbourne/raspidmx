@@ -25,6 +25,8 @@
 //
 //-------------------------------------------------------------------------
 
+#define _GNU_SOURCE
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -57,7 +59,7 @@ int main(int argc, char *argv[])
     VC_IMAGE_TYPE_T imageType = VC_IMAGE_MIN;
     uint16_t  background = 0x0000;
 
-    program = argv[0];
+    program = basename(argv[0]);
 
     //-------------------------------------------------------------------
 

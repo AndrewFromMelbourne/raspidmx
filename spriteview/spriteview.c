@@ -25,6 +25,8 @@
 //
 //-------------------------------------------------------------------------
 
+#define _GNU_SOURCE
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -67,7 +69,7 @@ int main(int argc, char *argv[])
 	int rows = 1;
 	const char *file = NULL;
 
-    program = argv[0];
+    program = basename(argv[0]);
 
     //---------------------------------------------------------------------
 

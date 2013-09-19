@@ -25,6 +25,8 @@
 //
 //-------------------------------------------------------------------------
 
+#define _GNU_SOURCE
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -63,7 +65,7 @@ int main(int argc, char *argv[])
 
         default:
 
-            fprintf(stderr, "Usage: %s [-s size]\n", argv[0]);
+            fprintf(stderr, "Usage: %s [-s size]\n", basename(argv[0]));
             fprintf(stderr, "    -s - size of image to create\n");
             exit(EXIT_FAILURE);
             break;

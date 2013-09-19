@@ -25,6 +25,8 @@
 //
 //-------------------------------------------------------------------------
 
+#define _GNU_SOURCE
+
 #include <assert.h>
 #include <ctype.h>
 #include <stdbool.h>
@@ -66,7 +68,7 @@ int main(int argc, char *argv[])
 
     int result = 0;
 
-    program = argv[0];
+    program = basename(argv[0]);
 
     //-------------------------------------------------------------------
 
