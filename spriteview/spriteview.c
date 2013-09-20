@@ -54,7 +54,9 @@ const char *program = NULL;
 void usage(void)
 {
     fprintf(stderr, "Usage: %s ", program);
-    fprintf(stderr, "[-c <columns>] [-r <rows>] <file.png>\n");
+    fprintf(stderr, "[-b <RGBA>] [-c <columns>] [-r <rows>] <file.png>\n");
+    fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
+    fprintf(stderr, "         e.g. 0x000F is opaque black\n");
     fprintf(stderr, "    -c - number of columns in sprite\n");
     fprintf(stderr, "    -r - number of rows in sprite\n");
 
@@ -65,9 +67,10 @@ void usage(void)
 
 int main(int argc, char *argv[])
 {
-	int columns = 1;
-	int rows = 1;
-	const char *file = NULL;
+    uint16_t background = 0x000F;
+    int columns = 1;
+    int rows = 1;
+    const char *file = NULL;
 
     program = basename(argv[0]);
 
@@ -75,10 +78,15 @@ int main(int argc, char *argv[])
 
     int opt = 0;
 
-    while ((opt = getopt(argc, argv, "c:r:")) != -1)
+    while ((opt = getopt(argc, argv, "b:c:r:")) != -1)
     {
         switch(opt)
         {
+        case 'b':
+
+            background = strtol(optarg, NULL, 16);
+            break;
+
         case 'c':
 
             columns = atoi(optarg);
@@ -103,7 +111,7 @@ int main(int argc, char *argv[])
         usage();
     }
 
-	file = argv[optind];
+    file = argv[optind];
 
     //---------------------------------------------------------------------
 
@@ -112,7 +120,7 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     BACKGROUND_LAYER_T bg;
-    initBackgroundLayer(&bg, 0x000F, 0);
+    initBackgroundLayer(&bg, background, 0);
 
     SPRITE_LAYER_T sprite;
     initSpriteLayer(&sprite, columns, rows, file, 1);
