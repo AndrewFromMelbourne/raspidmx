@@ -150,20 +150,44 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     int c = 0;
+    bool paused = false;
+    bool step = false;
 
     while (c != 27)
     {
-        keyPressed(&c);
+        if (keyPressed(&c))
+        {
+            switch (c)
+            {
+            case 'p':
+
+                paused = !paused;
+                break;
+
+            case ' ':
+
+                if (paused)
+                {
+                    step = true;
+                }
+                break;
+            }
+        }
 
         //-----------------------------------------------------------------
 
-        DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
-        assert(update != 0);
+        if ((paused == false) || step)
+        {
+            DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
+            assert(update != 0);
 
-        updatePositionSpriteLayer(&sprite, update);
+            updatePositionSpriteLayer(&sprite, update);
 
-        result = vc_dispmanx_update_submit_sync(update);
-        assert(result == 0);
+            result = vc_dispmanx_update_submit_sync(update);
+            assert(result == 0);
+
+            step = false;
+        }
     }
 
     //---------------------------------------------------------------------

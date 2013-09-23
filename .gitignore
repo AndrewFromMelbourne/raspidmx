@@ -12,6 +12,7 @@ game/game
 life/life
 pngview/pngview
 rgb_triangle/rgb_triangle
+spriteview/spriteview
 test_pattern/test_pattern
 worms/worms
 
