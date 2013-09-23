@@ -164,7 +164,7 @@ addElementLife(
                          dst_size,
                          dst_size);
 
-    DISPMANX_ELEMENT_HANDLE_T element =
+    life->element =
         vc_dispmanx_element_add(update,
                                 display,
                                 1,
@@ -175,7 +175,7 @@ addElementLife(
                                 &alpha,
                                 NULL,
                                 DISPMANX_NO_ROTATE);
-    assert(element != 0);
+    assert(life->element != 0);
 
     //---------------------------------------------------------------------
 
