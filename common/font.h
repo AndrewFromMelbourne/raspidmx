@@ -1,3 +1,4 @@
+
 //-------------------------------------------------------------------------
 //
 // The MIT License (MIT)
@@ -25,66 +26,35 @@
 //
 //-------------------------------------------------------------------------
 
-#ifndef IMAGE_LAYER_H
-#define IMAGE_LAYER_H
+#ifndef FONT_H
+#define FONT_H
+
+//-------------------------------------------------------------------------
 
 #include "image.h"
 
-#include "bcm_host.h"
-
 //-------------------------------------------------------------------------
 
-typedef struct
-{
-    IMAGE_T image;
-    VC_RECT_T srcRect;
-    VC_RECT_T dstRect;
-    int32_t layer;
-    DISPMANX_RESOURCE_HANDLE_T resource;
-    DISPMANX_ELEMENT_HANDLE_T element;
-} IMAGE_LAYER_T;
+#define FONT_WIDTH 8
+#define FONT_HEIGHT 16
 
 //-------------------------------------------------------------------------
 
 void
-initImageLayer(
-    IMAGE_LAYER_T *il,
-    int32_t width,
-    int32_t height,
-    VC_IMAGE_TYPE_T type);
+drawChar(
+    int x,
+    int y,
+    uint8_t c,
+    RGBA8_T *rgb,
+    IMAGE_T *image);
 
 void
-createResourceImageLayer(
-    IMAGE_LAYER_T *il,
-    int32_t layer);
-
-void
-addElementImageLayerOffset(
-    IMAGE_LAYER_T *il,
-    int32_t xOffset,
-    int32_t yOffset,
-    DISPMANX_DISPLAY_HANDLE_T display,
-    DISPMANX_UPDATE_HANDLE_T update);
-
-void
-addElementImageLayerCentered(
-    IMAGE_LAYER_T *il,
-    DISPMANX_MODEINFO_T *info,
-    DISPMANX_DISPLAY_HANDLE_T display,
-    DISPMANX_UPDATE_HANDLE_T update);
-
-void
-addElementImageLayer(
-    IMAGE_LAYER_T *il,
-    DISPMANX_DISPLAY_HANDLE_T display,
-    DISPMANX_UPDATE_HANDLE_T update);
-
-void
-changeSourceImageLayer(
-    IMAGE_LAYER_T *il,
-    DISPMANX_UPDATE_HANDLE_T update);
-
-void destroyImageLayer(IMAGE_LAYER_T *il);
+drawString(
+    int x,
+    int y,
+    const char *string,
+    RGBA8_T *rgb,
+    IMAGE_T *image);
 
 //-------------------------------------------------------------------------
 

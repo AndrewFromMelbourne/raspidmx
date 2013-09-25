@@ -38,6 +38,8 @@
 #include "bcm_host.h"
 
 #include "backgroundLayer.h"
+#include "font.h"
+#include "imageLayer.h"
 #include "key.h"
 #include "life.h"
 
@@ -84,6 +86,17 @@ int main(int argc, char *argv[])
     LIFE_T life;
     newLife(&life, size);
 
+    IMAGE_LAYER_T fpsLayer;
+    RGBA8_T fpsBgColour = { 0, 0, 0, 0 };
+    RGBA8_T fpsFgColour = { 255, 255, 0, 255 };
+    char fpsBuffer[20];
+
+    initImageLayer(&fpsLayer, 80, 16, VC_IMAGE_RGBA16);
+    clearImage(&(fpsLayer.image), &fpsBgColour);
+    snprintf(fpsBuffer, sizeof(fpsBuffer), "fps: --.-");
+    drawString(0, 0, fpsBuffer, &fpsFgColour, &(fpsLayer.image));
+    createResourceImageLayer(&fpsLayer, 10);
+
     //---------------------------------------------------------------------
 
     DISPMANX_DISPLAY_HANDLE_T display = vc_dispmanx_display_open(0);
@@ -105,6 +118,7 @@ int main(int argc, char *argv[])
 
     addElementBackgroundLayer(&bg, display, update);
     addElementLife(&life, &info, display, update);
+    addElementImageLayerOffset(&fpsLayer, 16, 16, display, update);
 
     //---------------------------------------------------------------------
 
@@ -113,49 +127,109 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
+    bool paused = false;
+    bool step = false;
+
+    uint32_t frame = 0;
+
     struct timeval start_time;
+    struct timeval end_time;
+
     gettimeofday(&start_time, NULL);
 
-    //---------------------------------------------------------------------
-
     int c = 0;
-    uint32_t frame = 0;
     while (c != 27)
     {
-        keyPressed(&c);
+        if (keyPressed(&c))
+        {
+            switch (c)
+            {
+            case 'p':
+
+                if (paused)
+                {
+                    frame = 0;
+                    gettimeofday(&start_time, NULL);
+                }
+                else
+                {
+                    clearImage(&(fpsLayer.image), &fpsBgColour);
+                    snprintf(fpsBuffer, sizeof(fpsBuffer), "fps: --.-");
+                    drawString(0,
+                               0,
+                               fpsBuffer,
+                               &fpsFgColour,
+                               &(fpsLayer.image));
+                    step = true;
+                }
+
+                paused = !paused;
+                break;
+
+            case ' ':
+
+                if (paused)
+                {
+                    step = true;
+                }
+            }
+        }
 
         //-----------------------------------------------------------------
 
-        iterateLife(&life);
         ++frame;
 
+        if ((frame == 50) && (paused == false))
+        {
+            frame = 0;
+            gettimeofday(&end_time, NULL);
+
+            struct timeval diff;
+            timersub(&end_time, &start_time, &diff);
+            int32_t time_taken = (diff.tv_sec * 1000000) + diff.tv_usec;
+            double frames_per_second = 50000000.0 / time_taken;
+            snprintf(fpsBuffer,
+                     sizeof(fpsBuffer),
+                     "fps: %0.1f\n",
+                     frames_per_second);
+            clearImage(&(fpsLayer.image), &fpsBgColour);
+            drawString(0, 0, fpsBuffer, &fpsFgColour, &(fpsLayer.image));
+
+            memcpy(&start_time, &end_time, sizeof(start_time));
+        }
+
         //-----------------------------------------------------------------
 
-        update = vc_dispmanx_update_start(0);
-        assert(update != 0);
+        if ((paused == false) || step)
+        {
+            iterateLife(&life);
 
-        changeSourceLife(&life, update);
+            //-------------------------------------------------------------
 
-        result = vc_dispmanx_update_submit_sync(update);
-        assert(result == 0);
+            update = vc_dispmanx_update_start(0);
+            assert(update != 0);
+
+            changeSourceLife(&life, update);
+
+            if ((frame == 0) || step)
+            {
+                changeSourceImageLayer(&fpsLayer, update);
+            }
+
+            result = vc_dispmanx_update_submit_sync(update);
+            assert(result == 0);
+
+            //-------------------------------------------------------------
+
+            step = false;
+        }
     }
-
-    //---------------------------------------------------------------------
-
-    struct timeval end_time;
-    gettimeofday(&end_time, NULL);
-
-    struct timeval total_time;
-    timersub(&end_time, &start_time, &total_time);
-    int32_t time_taken = (total_time.tv_sec * 1000000) + total_time.tv_usec;
-    double frames_per_second = (frame * 1000000.0) / time_taken;
-
-    printf("%0.1f frames per second\n", frames_per_second);
 
     //---------------------------------------------------------------------
 
     destroyBackgroundLayer(&bg);
     destroyLife(&life);
+    destroyImageLayer(&fpsLayer);
 
     //---------------------------------------------------------------------
 

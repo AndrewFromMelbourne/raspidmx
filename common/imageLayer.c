@@ -30,29 +30,29 @@
 
 #include "element_change.h"
 #include "image.h"
-#include "loadpng.h"
 #include "imageLayer.h"
 
 //-------------------------------------------------------------------------
 
-void initImageLayer(
+void
+initImageLayer(
     IMAGE_LAYER_T *il,
-    const char *file,
+    int32_t width,
+    int32_t height,
+    VC_IMAGE_TYPE_T type)
+{
+    initImage(&(il->image), type, width, height);
+}
+
+//-------------------------------------------------------------------------
+
+void
+createResourceImageLayer(
+    IMAGE_LAYER_T *il,
     int32_t layer)
 {
-    int result = 0;
-
-    bool loaded = loadPng(&(il->image), file);
-
-    if (loaded == false)
-    {
-        fprintf(stderr, "sprite: unable to load %s\n", file);
-        exit(EXIT_FAILURE);
-    }
-
-    //---------------------------------------------------------------------
-
     uint32_t vc_image_ptr;
+    int result = 0;
 
     il->layer = layer;
 
@@ -83,6 +83,31 @@ void initImageLayer(
 //-------------------------------------------------------------------------
 
 void
+addElementImageLayerOffset(
+    IMAGE_LAYER_T *il,
+    int32_t xOffset,
+    int32_t yOffset,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update)
+{
+    vc_dispmanx_rect_set(&(il->srcRect),
+                         0 << 16,
+                         0 << 16,
+                         il->image.width << 16,
+                         il->image.height << 16);
+
+    vc_dispmanx_rect_set(&(il->dstRect),
+                         xOffset,
+                         yOffset,
+                         il->image.width,
+                         il->image.height);
+
+    addElementImageLayer(il, display, update);
+}
+
+//-------------------------------------------------------------------------
+
+void
 addElementImageLayerCentered(
     IMAGE_LAYER_T *il,
     DISPMANX_MODEINFO_T *info,
@@ -102,6 +127,12 @@ addElementImageLayerCentered(
                          il->image.height);
 
     addElementImageLayer(il, display, update);
+
+    vc_dispmanx_rect_set(&(il->dstRect),
+                         0,
+                         0,
+                         il->image.width,
+                         il->image.height);
 }
 
 //-------------------------------------------------------------------------
@@ -133,6 +164,33 @@ addElementImageLayer(
                                 NULL, // clamp
                                 DISPMANX_NO_ROTATE);
     assert(il->element != 0);
+
+    vc_dispmanx_rect_set(&(il->dstRect),
+                         0,
+                         0,
+                         il->image.width,
+                         il->image.height);
+}
+
+//-------------------------------------------------------------------------
+
+void
+changeSourceImageLayer(
+    IMAGE_LAYER_T *il,
+    DISPMANX_UPDATE_HANDLE_T update)
+{
+    int result = vc_dispmanx_resource_write_data(il->resource,
+                                                 il->image.type,
+                                                 il->image.pitch,
+                                                 il->image.buffer,
+                                                 &(il->dstRect));
+    assert(result == 0);
+
+    result = vc_dispmanx_element_change_source(update,
+                                               il->element,
+                                               il->resource);
+    assert(result == 0);
+
 }
 
 //-------------------------------------------------------------------------

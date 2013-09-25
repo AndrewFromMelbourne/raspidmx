@@ -35,6 +35,7 @@
 #include "element_change.h"
 #include "image.h"
 #include "imageLayer.h"
+#include "loadpng.h"
 #include "key.h"
 #include "scrollingLayer.h"
 #include "spriteLayer.h"
@@ -60,7 +61,14 @@ int main(void)
     initScrollingLayer(&sl, "texture.png", 1);
 
     IMAGE_LAYER_T spotlight;
-    initImageLayer(&spotlight, "spotlight.png", 2);
+
+    if (loadPng(&(spotlight.image), "spotlight.png") == false)
+    {
+        fprintf(stderr, "unable to load spotlight\n");
+        exit(EXIT_FAILURE);
+    }
+
+    createResourceImageLayer(&spotlight, 2);
 
     SPRITE_LAYER_T sprite;
     initSpriteLayer(&sprite, 12, 1, "sprite.png", 3);

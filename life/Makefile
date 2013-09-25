@@ -1,4 +1,5 @@
-OBJS=main.o life.o ../common/backgroundLayer.o ../common/key.o
+OBJS=main.o life.o ../common/backgroundLayer.o ../common/key.o \
+	 ../common/imageLayer.o ../common/image.o ../common/font.o
 BIN=life
 
 CFLAGS+=-Wall -g -O3 -I../common

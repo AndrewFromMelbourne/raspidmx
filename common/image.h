@@ -87,6 +87,11 @@ initImage(
     int32_t width,
     int32_t height);
 
+void
+clearImage(
+    IMAGE_T *image,
+    RGBA8_T *rgb);
+
 void destroyImage(IMAGE_T *image);
 
 //-------------------------------------------------------------------------

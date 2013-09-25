@@ -115,7 +115,11 @@ int main(int argc, char *argv[])
     initBackgroundLayer(&backgroundLayer, background, 0);
 
     IMAGE_LAYER_T imageLayer;
-    initImageLayer(&imageLayer, argv[optind], 1);
+    if (loadPng(&(imageLayer.image), argv[optind]) == false)
+    {
+        fprintf(stderr, "unable to load %s\n", argv[optind]);
+    }
+    createResourceImageLayer(&imageLayer, 1);
 
     //---------------------------------------------------------------------
 

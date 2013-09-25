@@ -121,6 +121,24 @@ bool initImage(
 //-------------------------------------------------------------------------
 
 void
+clearImage(
+    IMAGE_T *image,
+    RGBA8_T *rgb)
+{
+    int j;
+    for (j = 0 ; j < image->height ; j++)
+    {
+        int i;
+        for (i = 0 ; i < image->width ; i++)
+        {
+            image->setPixel(image, i, j, rgb);
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void
 destroyImage(
     IMAGE_T *image)
 {

@@ -100,7 +100,7 @@ newLife(
 
     //---------------------------------------------------------------------
 
-    VC_IMAGE_TYPE_T type = VC_IMAGE_RGB565;
+    VC_IMAGE_TYPE_T type = VC_IMAGE_RGBA16;
     uint32_t vc_image_ptr;
     int result = 0;
 
@@ -143,7 +143,7 @@ addElementLife(
 {
     VC_DISPMANX_ALPHA_T alpha =
     {
-        DISPMANX_FLAGS_ALPHA_FIXED_ALL_PIXELS, 
+        DISPMANX_FLAGS_ALPHA_FROM_SOURCE, 
         255, /*alpha 0->255*/
         0
     };
@@ -613,7 +613,7 @@ iterateLife(
     //---------------------------------------------------------------------
 
     int result = 0;
-    VC_IMAGE_TYPE_T type = VC_IMAGE_RGB565;
+    VC_IMAGE_TYPE_T type = VC_IMAGE_RGBA16;
 
     result = vc_dispmanx_resource_write_data(life->backResource,
                                              type,
