@@ -91,9 +91,9 @@ int main(int argc, char *argv[])
     RGBA8_T fpsFgColour = { 255, 255, 0, 255 };
     char fpsBuffer[20];
 
-    initImageLayer(&fpsLayer, 80, 16, VC_IMAGE_RGBA16);
+    initImageLayer(&fpsLayer, 64, 16, VC_IMAGE_RGBA16);
     clearImage(&(fpsLayer.image), &fpsBgColour);
-    snprintf(fpsBuffer, sizeof(fpsBuffer), "fps: --.-");
+    snprintf(fpsBuffer, sizeof(fpsBuffer), "fps: --");
     drawString(0, 0, fpsBuffer, &fpsFgColour, &(fpsLayer.image));
     createResourceImageLayer(&fpsLayer, 10);
 
@@ -116,9 +116,28 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
+    int32_t fpsXoffset = 0;
+    int32_t fpsYoffset = 0;
+
+    if (((info.width - size) / 2) > fpsLayer.image.width)
+    {
+        fpsXoffset = (((info.width - size) / 2) - fpsLayer.image.width) / 2;
+    }
+
+    if (((info.height - size) / 2) > fpsLayer.image.height)
+    {
+        fpsYoffset = ((info.height - size) / 2);
+    }
+
+    //---------------------------------------------------------------------
+
     addElementBackgroundLayer(&bg, display, update);
     addElementLife(&life, &info, display, update);
-    addElementImageLayerOffset(&fpsLayer, 16, 16, display, update);
+    addElementImageLayerOffset(&fpsLayer,
+                               fpsXoffset,
+                               fpsYoffset,
+                               display,
+                               update);
 
     //---------------------------------------------------------------------
 
@@ -154,7 +173,7 @@ int main(int argc, char *argv[])
                 else
                 {
                     clearImage(&(fpsLayer.image), &fpsBgColour);
-                    snprintf(fpsBuffer, sizeof(fpsBuffer), "fps: --.-");
+                    snprintf(fpsBuffer, sizeof(fpsBuffer), "fps: --");
                     drawString(0,
                                0,
                                fpsBuffer,
@@ -179,18 +198,18 @@ int main(int argc, char *argv[])
 
         ++frame;
 
-        if ((frame == 50) && (paused == false))
+        if ((frame == 500) && (paused == false))
         {
             frame = 0;
             gettimeofday(&end_time, NULL);
 
             struct timeval diff;
             timersub(&end_time, &start_time, &diff);
-            int32_t time_taken = (diff.tv_sec * 1000000) + diff.tv_usec;
-            double frames_per_second = 50000000.0 / time_taken;
+            int32_t time_taken = (diff.tv_sec * 1000)+(diff.tv_usec / 1000);
+            double frames_per_second = 5.0e5 / time_taken;
             snprintf(fpsBuffer,
                      sizeof(fpsBuffer),
-                     "fps: %0.1f\n",
+                     "fps: %.0f\n",
                      frames_per_second);
             clearImage(&(fpsLayer.image), &fpsBgColour);
             drawString(0, 0, fpsBuffer, &fpsFgColour, &(fpsLayer.image));
