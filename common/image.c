@@ -138,6 +138,46 @@ clearImage(
 
 //-------------------------------------------------------------------------
 
+bool
+setPixel(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    RGBA8_T *rgb)
+{
+    bool result = false;
+
+    if ((x >= 0) && (x < image->width) && (y >= 0) && (y < image->height))
+    {
+        result = true;
+        image->setPixel(image, x, y, rgb);
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------
+
+bool
+getPixel(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    RGBA8_T *rgb)
+{
+    bool result = false;
+
+    if ((x >= 0) && (x < image->width) && (y >= 0) && (y < image->height))
+    {
+        result = true;
+        image->setPixel(image, x, y, rgb);
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------
+
 void
 destroyImage(
     IMAGE_T *image)
@@ -151,10 +191,12 @@ destroyImage(
     image->width = 0;
     image->height = 0;
     image->pitch = 0;
+    image->alignedHeight = 0;
     image->bytesPerPixel = 0;
-    image->type = VC_IMAGE_MIN;
     image->size = 0;
     image->buffer = NULL;
+    image->setPixel = 0;
+    image->getPixel = 0;
 }
 
 //-----------------------------------------------------------------------
@@ -327,7 +369,7 @@ findImageType(
     bool found = false;
 
     size_t i = 0;
-    for (i = 0; i < imageTypeInfoEntries; i++)
+    for (i = 0 ; i < imageTypeInfoEntries ; i++)
     {
         if (strcasecmp(name, imageTypeInfo[i].name) == 0)
         {
@@ -370,7 +412,7 @@ printImageTypes(
     IMAGE_TYPE_INFO_T *entry = NULL;
 
     size_t i = 0;
-    for (i = 0; i < imageTypeInfoEntries; i++)
+    for (i = 0 ; i < imageTypeInfoEntries ; i++)
     {
         entry = &(imageTypeInfo[i]);
 

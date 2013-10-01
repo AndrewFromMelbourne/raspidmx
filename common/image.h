@@ -58,8 +58,8 @@ typedef struct IMAGE_T_
     uint16_t bytesPerPixel;
     uint32_t size;
     void *buffer;
-    void (*setPixel)(struct IMAGE_T_*, int, int, RGBA8_T*);
-    void (*getPixel)(struct IMAGE_T_*, int, int, RGBA8_T*);
+    void (*setPixel)(struct IMAGE_T_*, int32_t, int32_t, RGBA8_T*);
+    void (*getPixel)(struct IMAGE_T_*, int32_t, int32_t, RGBA8_T*);
 } IMAGE_T;
 
 //-------------------------------------------------------------------------
@@ -92,7 +92,23 @@ clearImage(
     IMAGE_T *image,
     RGBA8_T *rgb);
 
-void destroyImage(IMAGE_T *image);
+bool
+setPixel(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    RGBA8_T *rgb);
+
+bool
+getPixel(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    RGBA8_T *rgb);
+
+void
+destroyImage(
+    IMAGE_T *image);
 
 //-------------------------------------------------------------------------
 

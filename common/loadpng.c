@@ -152,7 +152,7 @@ loadPng(
     png_bytepp row_pointers = malloc(image->height * sizeof(png_bytep));
 
     png_uint_32 j = 0;
-    for (j = 0; j < image->height; ++j)
+    for (j = 0 ; j < image->height ; ++j)
     {
         row_pointers[j] = image->buffer + (j * image->pitch);
     }

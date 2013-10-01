@@ -4658,16 +4658,14 @@ drawChar(
     {
         uint8_t byte = font[c][j];
 
-        if (((y + j) >= 0) && ((y + j) < image->height) && (byte != 0))
+        if (byte != 0)
         {
             int i;
             for (i = 0 ; i < FONT_WIDTH ; ++i)
             {
-                if (((x + i) >= 0) &&
-                    ((x + i) < image->width) &&
-                    ((byte >> (FONT_WIDTH - i - 1)) & 1 ))
+                if ((byte >> (FONT_WIDTH - i - 1)) & 1 )
                 {
-                    image->setPixel(image, x + i, y + j, rgb);
+                    setPixel(image, x + i, y + j, rgb);
                 }
             }
         }
