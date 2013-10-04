@@ -148,7 +148,12 @@ addElementLife(
         0
     };
 
-    int32_t dst_size = info->height - (info->height % life->height);
+    int32_t dst_size = life->height;
+
+    if (dst_size < info->height)
+    {
+        dst_size = info->height - (info->height % life->height);
+    }
 
     //---------------------------------------------------------------------
 

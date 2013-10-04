@@ -118,15 +118,21 @@ int main(int argc, char *argv[])
 
     int32_t fpsXoffset = 0;
     int32_t fpsYoffset = 0;
-
-    if (((info.width - size) / 2) > fpsLayer.image.width)
+    int32_t dst_size = size;
+    
+    if (dst_size < info.height)
     {
-        fpsXoffset = (((info.width - size) / 2) - fpsLayer.image.width) / 2;
+        dst_size = info.height - (info.height % size);
     }
 
-    if (((info.height - size) / 2) > fpsLayer.image.height)
+    if (((info.width - dst_size) / 2) > fpsLayer.image.width)
     {
-        fpsYoffset = ((info.height - size) / 2);
+        fpsXoffset = ((info.width - dst_size) / 2) - fpsLayer.image.width;
+    }
+
+    if (((info.height - dst_size) / 2) > fpsLayer.image.height)
+    {
+        fpsYoffset = ((info.height - dst_size) / 2);
     }
 
     //---------------------------------------------------------------------

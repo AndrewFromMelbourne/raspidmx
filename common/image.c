@@ -57,8 +57,6 @@ bool initImage(
     int32_t width,
     int32_t height)
 {
-    image->type = type;
-
     switch (type)
     {
     case VC_IMAGE_RGB565:
@@ -95,12 +93,13 @@ bool initImage(
 
     default:
 
-        fprintf(stderr, "image: unknown type\n");
+        fprintf(stderr, "image: unknown type (%d)\n", type);
         return false;
 
         break;
     }
 
+    image->type = type;
     image->width = width;
     image->height = height;
     image->pitch = ALIGN_TO_16(width) * image->bytesPerPixel;
