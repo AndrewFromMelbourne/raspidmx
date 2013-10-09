@@ -122,6 +122,10 @@ int main(void)
 
     //---------------------------------------------------------------------
 
+    keyboardReset();
+
+    //---------------------------------------------------------------------
+
     destroyBackgroundLayer(&bg);
     destroyScrollingLayer(&sl);
     destroyImageLayer(&spotlight);

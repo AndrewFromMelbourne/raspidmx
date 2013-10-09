@@ -192,6 +192,10 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
+    keyboardReset();
+
+    //---------------------------------------------------------------------
+
     destroyBackgroundLayer(&bg);
     destroySpriteLayer(&sprite);
 

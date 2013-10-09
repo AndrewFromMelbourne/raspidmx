@@ -182,6 +182,10 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
+    keyboardReset();
+
+    //---------------------------------------------------------------------
+
     destroyBackgroundLayer(&backgroundLayer);
     destroyImageLayer(&imageLayer);
 

@@ -27,6 +27,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 #include <termio.h>
 #include <unistd.h>
 
@@ -34,17 +35,21 @@
 
 //-------------------------------------------------------------------------
 
+int stdin_fd = -1;
+struct termios original;
+
+//-------------------------------------------------------------------------
+
 bool keyPressed(int *character)
 {
-    static int stdin_fd = -1;
-
     if (stdin_fd == -1)
     {
         struct termios term;
 
         stdin_fd = fileno(stdin);
 
-        tcgetattr(stdin_fd, &term);
+        tcgetattr(stdin_fd, &original);
+        memcpy(&term, &original, sizeof(term));
         term.c_lflag &= ~(ICANON|ECHO);
         tcsetattr(stdin_fd, TCSANOW, &term);
 
@@ -77,3 +82,12 @@ bool keyPressed(int *character)
     return pressed;
 }
 
+//-------------------------------------------------------------------------
+
+void keyboardReset(void)
+{
+    if (stdin_fd != -1)
+    {
+        tcsetattr(stdin_fd, TCSANOW, &original);
+    }
+}
