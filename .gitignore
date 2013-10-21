@@ -10,6 +10,7 @@ core
 
 game/game
 life/life
+mandelbrot/mandelbrot
 pngview/pngview
 rgb_triangle/rgb_triangle
 spriteview/spriteview
