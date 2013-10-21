@@ -28,6 +28,7 @@
 #define _GNU_SOURCE
 
 #include <assert.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -167,6 +168,8 @@ int main(int argc, char *argv[])
     {
         if (keyPressed(&c))
         {
+            c = tolower(c);
+
             switch (c)
             {
             case 'p':

@@ -329,6 +329,8 @@ int main(int argc, char *argv[])
     {
         if (keyPressed(&c))
         {
+            c = tolower(c);
+
             switch (tolower(c))
             {
             case 'a':
