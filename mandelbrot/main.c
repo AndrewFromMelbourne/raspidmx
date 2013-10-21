@@ -56,25 +56,25 @@ zoom(
     MANDELBROT_COORDS_T *coords,
     IMAGE_LAYER_T *zoomLayer)
 {
-	bool changed = false;
+    bool changed = false;
 
-	RGBA8_T maskColour = { 127, 127, 127, 127 };
-	RGBA8_T clearColour = { 0, 0, 0, 0 };
+    RGBA8_T maskColour = { 127, 127, 127, 127 };
+    RGBA8_T clearColour = { 0, 0, 0, 0 };
 
-	int32_t width = zoomLayer->image.width / 4;
-	int32_t height = zoomLayer->image.height / 4;
-	int32_t x = (zoomLayer->image.width - width) / 2;
-	int32_t y = (zoomLayer->image.height - height) / 2;
-	int32_t step = 1;
+    int32_t width = zoomLayer->image.width / 4;
+    int32_t height = zoomLayer->image.height / 4;
+    int32_t x = (zoomLayer->image.width - width) / 2;
+    int32_t y = (zoomLayer->image.height - height) / 2;
+    int32_t step = 1;
 
-	clearImage(&(zoomLayer->image), &maskColour);
-	imageBoxFilled(&(zoomLayer->image),
-				   x,
-				   y,
-				   x + width - 1,
-				   y + height - 1,
-				   &clearColour);
-	changeSourceAndUpdateImageLayer(zoomLayer);
+    clearImage(&(zoomLayer->image), &maskColour);
+    imageBoxFilled(&(zoomLayer->image),
+                   x,
+                   y,
+                   x + width - 1,
+                   y + height - 1,
+                   &clearColour);
+    changeSourceAndUpdateImageLayer(zoomLayer);
 
     int c = 0;
     while ((c != 27) && (changed == false))
@@ -83,77 +83,77 @@ zoom(
         {
             c = tolower(c);
 
-			bool update = false;
+            bool update = false;
 
             switch (c)
             {
-			case 10:
+            case 10:
 
-				changed = true;
-				break;
+                changed = true;
+                break;
 
             case 'a':
 
-				if ((x - step) >= 0)
-				{
-					x -= step;
-					update = true;
-				}
-				break;
+                if ((x - step) >= 0)
+                {
+                    x -= step;
+                    update = true;
+                }
+                break;
 
             case 'd':
 
-				if ((x + width + step) <= zoomLayer->image.width)
-				{
-					x += step;
-					update = true;
-				}
-				break;
+                if ((x + width + step) <= zoomLayer->image.width)
+                {
+                    x += step;
+                    update = true;
+                }
+                break;
 
             case 'w':
 
-				if ((y - step) >= 0)
-				{
-					y -= step;
-					update = true;
-				}
-				break;
+                if ((y - step) >= 0)
+                {
+                    y -= step;
+                    update = true;
+                }
+                break;
 
             case 's':
 
-				if ((y + height + step) <= zoomLayer->image.height)
-				{
-					y += step;
-					update = true;
-				}
-				break;
+                if ((y + height + step) <= zoomLayer->image.height)
+                {
+                    y += step;
+                    update = true;
+                }
+                break;
             }
 
-			if (update)
-			{
-				clearImage(&(zoomLayer->image), &maskColour);
-				imageBoxFilled(&(zoomLayer->image),
-							   x,
-							   y,
-							   x + width - 1,
-							   y + height - 1,
-							   &clearColour);
-				changeSourceAndUpdateImageLayer(zoomLayer);
-			}
+            if (update)
+            {
+                clearImage(&(zoomLayer->image), &maskColour);
+                imageBoxFilled(&(zoomLayer->image),
+                               x,
+                               y,
+                               x + width - 1,
+                               y + height - 1,
+                               &clearColour);
+                changeSourceAndUpdateImageLayer(zoomLayer);
+            }
         }
     }
 
-	clearImage(&(zoomLayer->image), &clearColour);
-	changeSourceAndUpdateImageLayer(zoomLayer);
+    clearImage(&(zoomLayer->image), &clearColour);
+    changeSourceAndUpdateImageLayer(zoomLayer);
 
-	if (changed)
-	{
-		coords->x0 += (coords->side * x) / zoomLayer->image.width;
-		coords->y0 += (coords->side * y) / zoomLayer->image.height;
-		coords->side *=  (double)width / zoomLayer->image.width;
-	}
+    if (changed)
+    {
+        coords->x0 += (coords->side * x) / zoomLayer->image.width;
+        coords->y0 += (coords->side * y) / zoomLayer->image.height;
+        coords->side *=  (double)width / zoomLayer->image.width;
+    }
 
-	return changed;
+    return changed;
 }
 
 //-------------------------------------------------------------------------
@@ -227,11 +227,11 @@ int main(int argc, char *argv[])
             {
             case 'z':
 
-				if (zoom(&coords, &zoomLayer))
-				{
-					mandelbrotImage(&mandelbrotLayer, &coords);
-				}
-				break;
+                if (zoom(&coords, &zoomLayer))
+                {
+                    mandelbrotImage(&mandelbrotLayer, &coords);
+                }
+                break;
             }
         }
     }

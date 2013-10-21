@@ -206,16 +206,16 @@ changeSourceAndUpdateImageLayer(
                                                  &(il->dstRect));
     assert(result == 0);
 
-	DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
-	assert(update != 0);
+    DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
+    assert(update != 0);
 
     result = vc_dispmanx_element_change_source(update,
                                                il->element,
                                                il->resource);
     assert(result == 0);
 
-	result = vc_dispmanx_update_submit_sync(update);
-	assert(result == 0);
+    result = vc_dispmanx_update_submit_sync(update);
+    assert(result == 0);
 
 }
 
