@@ -4650,7 +4650,7 @@ drawChar(
     int x,
     int y,
     uint8_t c,
-    RGBA8_T *rgb,
+    const RGBA8_T *rgb,
     IMAGE_T *image)
 {
     int j;
@@ -4679,7 +4679,7 @@ drawString(
     int x,
     int y,
     const char *string,
-    RGBA8_T *rgb,
+    const RGBA8_T *rgb,
     IMAGE_T *image)
 {
     if (string == NULL)

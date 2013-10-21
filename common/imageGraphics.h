@@ -1,4 +1,3 @@
-
 //-------------------------------------------------------------------------
 //
 // The MIT License (MIT)
@@ -26,35 +25,55 @@
 //
 //-------------------------------------------------------------------------
 
-#ifndef FONT_H
-#define FONT_H
-
-//-------------------------------------------------------------------------
+#ifndef IMAGE_GRAPHICS_H
+#define IMAGE_GRAPHICS_H
 
 #include "image.h"
 
 //-------------------------------------------------------------------------
 
-#define FONT_WIDTH 8
-#define FONT_HEIGHT 16
-
-//-------------------------------------------------------------------------
+void
+imageBox(
+    IMAGE_T *image,
+    int32_t x1,
+    int32_t y1,
+    int32_t x2,
+    int32_t y2,
+    const RGBA8_T *rgb);
 
 void
-drawChar(
-    int x,
-    int y,
-    uint8_t c,
-    const RGBA8_T *rgb,
-    IMAGE_T *image);
+imageBoxFilled(
+    IMAGE_T *image,
+    int32_t x1,
+    int32_t y1,
+    int32_t x2,
+    int32_t y2,
+    const RGBA8_T *rgb);
 
 void
-drawString(
-    int x,
-    int y,
-    const char *string,
-    const RGBA8_T *rgb,
-    IMAGE_T *image);
+imageLine(
+    IMAGE_T *image,
+    int32_t x1,
+    int32_t y1,
+    int32_t x2,
+    int32_t y2,
+    const RGBA8_T *rgb);
+
+void
+imageHorizontalLine(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y1,
+    int32_t y2,
+    const RGBA8_T *rgb);
+
+void
+imageVerticalLine(
+    IMAGE_T *image,
+    int32_t x1,
+    int32_t x2,
+    int32_t y,
+    const RGBA8_T *rgb);
 
 //-------------------------------------------------------------------------
 

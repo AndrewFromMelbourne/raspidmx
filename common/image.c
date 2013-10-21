@@ -39,10 +39,10 @@
 
 //-------------------------------------------------------------------------
 
-void setPixelRGB565(IMAGE_T *image, int32_t x, int32_t y, RGBA8_T *rgba);
-void setPixelRGB888(IMAGE_T *image, int32_t x, int32_t y, RGBA8_T *rgba);
-void setPixelRGBA16(IMAGE_T *image, int32_t x, int32_t y, RGBA8_T *rgba);
-void setPixelRGBA32(IMAGE_T *image, int32_t x, int32_t y, RGBA8_T *rgba);
+void setPixelRGB565(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
+void setPixelRGB888(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
+void setPixelRGBA16(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
+void setPixelRGBA32(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
 
 void getPixelRGB565(IMAGE_T *image, int32_t x, int32_t y, RGBA8_T *rgba);
 void getPixelRGB888(IMAGE_T *image, int32_t x, int32_t y, RGBA8_T *rgba);
@@ -122,7 +122,7 @@ bool initImage(
 void
 clearImage(
     IMAGE_T *image,
-    RGBA8_T *rgb)
+    const RGBA8_T *rgb)
 {
     int j;
     for (j = 0 ; j < image->height ; j++)
@@ -142,7 +142,7 @@ setPixel(
     IMAGE_T *image,
     int32_t x,
     int32_t y,
-    RGBA8_T *rgb)
+    const RGBA8_T *rgb)
 {
     bool result = false;
 
@@ -205,7 +205,7 @@ setPixelRGB565(
     IMAGE_T *image,
     int32_t x,
     int32_t y,
-    RGBA8_T *rgba)
+    const RGBA8_T *rgba)
 {
     uint8_t r5 = rgba->red >> 3;
     uint8_t g6 = rgba->green >> 2;
@@ -222,7 +222,7 @@ setPixelRGB888(
     IMAGE_T *image,
     int32_t x,
     int32_t y,
-    RGBA8_T *rgba)
+    const RGBA8_T *rgba)
 {
     uint8_t *line = (uint8_t *)(image->buffer) + (y*image->pitch) + (3*x);
     line[0] = rgba->red;
@@ -237,7 +237,7 @@ setPixelRGBA16(
     IMAGE_T *image,
     int32_t x,
     int32_t y,
-    RGBA8_T *rgba)
+    const RGBA8_T *rgba)
 {
     uint8_t r4 = rgba->red  >> 4;
     uint8_t g4 = rgba->green >> 4;
@@ -255,7 +255,7 @@ setPixelRGBA32(
     IMAGE_T *image,
     int32_t x,
     int32_t y,
-    RGBA8_T *rgba)
+    const RGBA8_T *rgba)
 {
     uint8_t *line = (uint8_t *)(image->buffer) + (y*image->pitch) + (4*x);
 

@@ -1,4 +1,5 @@
 TARGETS=	life \
+			mandelbrot \
 			pngview \
 			rgb_triangle \
 			game \

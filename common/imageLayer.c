@@ -196,6 +196,32 @@ changeSourceImageLayer(
 //-------------------------------------------------------------------------
 
 void
+changeSourceAndUpdateImageLayer(
+    IMAGE_LAYER_T *il)
+{
+    int result = vc_dispmanx_resource_write_data(il->resource,
+                                                 il->image.type,
+                                                 il->image.pitch,
+                                                 il->image.buffer,
+                                                 &(il->dstRect));
+    assert(result == 0);
+
+	DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
+	assert(update != 0);
+
+    result = vc_dispmanx_element_change_source(update,
+                                               il->element,
+                                               il->resource);
+    assert(result == 0);
+
+	result = vc_dispmanx_update_submit_sync(update);
+	assert(result == 0);
+
+}
+
+//-------------------------------------------------------------------------
+
+void
 destroyImageLayer(
     IMAGE_LAYER_T *il)
 {

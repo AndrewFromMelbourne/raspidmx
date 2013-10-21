@@ -60,6 +60,11 @@ game
 Demonstrates a seamless background image that can be scolled in any
 direction. As well as animated sprites.
 
+mandelbrot
+----------
+
+The famous (in the 1990s) Mandelbrot set.
+
 common
 ------
 

@@ -1,4 +1,3 @@
-
 //-------------------------------------------------------------------------
 //
 // The MIT License (MIT)
@@ -26,35 +25,26 @@
 //
 //-------------------------------------------------------------------------
 
-#ifndef FONT_H
-#define FONT_H
+#ifndef MANDELBROT_H
+#define MANDELBROT_H
+
+#include "imageLayer.h"
 
 //-------------------------------------------------------------------------
 
-#include "image.h"
-
-//-------------------------------------------------------------------------
-
-#define FONT_WIDTH 8
-#define FONT_HEIGHT 16
+typedef struct
+{
+    double x0;
+    double y0;
+    double side;
+} MANDELBROT_COORDS_T;
 
 //-------------------------------------------------------------------------
 
 void
-drawChar(
-    int x,
-    int y,
-    uint8_t c,
-    const RGBA8_T *rgb,
-    IMAGE_T *image);
-
-void
-drawString(
-    int x,
-    int y,
-    const char *string,
-    const RGBA8_T *rgb,
-    IMAGE_T *image);
+mandelbrotImage(
+    IMAGE_LAYER_T *imageLayer,
+    MANDELBROT_COORDS_T *coord);
 
 //-------------------------------------------------------------------------
 

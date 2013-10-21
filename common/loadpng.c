@@ -49,7 +49,7 @@ loadPng(
 
     if (fpin == NULL)
     {
-        printf("loadpng: can't open file for reading\n");
+        fprintf(stderr, "loadpng: can't open file for reading\n");
         return false;
     }
 

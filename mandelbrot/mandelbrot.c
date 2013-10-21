@@ -1,4 +1,3 @@
-
 //-------------------------------------------------------------------------
 //
 // The MIT License (MIT)
@@ -26,36 +25,66 @@
 //
 //-------------------------------------------------------------------------
 
-#ifndef FONT_H
-#define FONT_H
+#include <assert.h>
+#include <complex.h>
 
-//-------------------------------------------------------------------------
+#include "bcm_host.h"
 
+#include "hsv2rgb.h"
 #include "image.h"
-
-//-------------------------------------------------------------------------
-
-#define FONT_WIDTH 8
-#define FONT_HEIGHT 16
+#include "mandelbrot.h"
 
 //-------------------------------------------------------------------------
 
 void
-drawChar(
-    int x,
-    int y,
-    uint8_t c,
-    const RGBA8_T *rgb,
-    IMAGE_T *image);
+mandelbrotImage(
+    IMAGE_LAYER_T *imageLayer,
+    MANDELBROT_COORDS_T *coords)
+{
+    IMAGE_T *image = &(imageLayer->image);
+    RGBA8_T colours[256];
 
-void
-drawString(
-    int x,
-    int y,
-    const char *string,
-    const RGBA8_T *rgb,
-    IMAGE_T *image);
+    size_t numberOfColours = (sizeof(colours) / sizeof(colours[0]));
+    size_t colour = 0;
 
-//-------------------------------------------------------------------------
+    for (colour = 0 ; colour < numberOfColours ; colour++)
+    {
+        hsv2rgb((numberOfColours - 1 - colour) * (2400 / numberOfColours),
+                1000,
+                1000,
+                &(colours[colour]));
+    }
 
-#endif
+    double dx = (coords->side / (image->width - 1));
+    double dy = (coords->side / (image->height - 1));
+
+    RGBA8_T black = {0, 0, 0, 0};
+    clearImage(image, &black);
+
+    int32_t j;
+    for (j = 0 ; j < image->height ; j++)
+    {
+        int32_t i;
+        for (i = 0 ; i < image->width ; i++)
+        {
+            double complex c = (coords->x0 + dx * i)
+                             + I * (coords->y0 + dy * j);
+            double complex z = 0.0;
+            size_t n = 0;
+
+            while ((cabs(z) < 2.0) && (n < numberOfColours))
+            {
+                z = z * z + c;
+                n++;
+            }
+
+            if (n < numberOfColours)
+            {
+                setPixel(image, i, j, &(colours[n]));
+            }
+        }
+
+        changeSourceAndUpdateImageLayer(imageLayer);
+    }
+}
+

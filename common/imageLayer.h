@@ -84,6 +84,10 @@ changeSourceImageLayer(
     IMAGE_LAYER_T *il,
     DISPMANX_UPDATE_HANDLE_T update);
 
+void
+changeSourceAndUpdateImageLayer(
+    IMAGE_LAYER_T *il);
+
 void destroyImageLayer(IMAGE_LAYER_T *il);
 
 //-------------------------------------------------------------------------
