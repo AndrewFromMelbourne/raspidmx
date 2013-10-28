@@ -26,7 +26,6 @@
 //-------------------------------------------------------------------------
 
 #include <assert.h>
-#include <complex.h>
 
 #include "bcm_host.h"
 
@@ -42,8 +41,8 @@ mandelbrotImage(
     MANDELBROT_COORDS_T *coords)
 {
     IMAGE_T *image = &(imageLayer->image);
-    RGBA8_T colours[256];
 
+    RGBA8_T colours[256];
     size_t numberOfColours = (sizeof(colours) / sizeof(colours[0]));
     size_t colour = 0;
 
@@ -67,14 +66,26 @@ mandelbrotImage(
         int32_t i;
         for (i = 0 ; i < image->width ; i++)
         {
-            double complex c = (coords->x0 + dx * i)
-                             + I * (coords->y0 + dy * j);
-            double complex z = 0.0;
+            double x0 = coords->x0 + dx * i;
+            double y0 = coords->y0 + dy * j;
+
+            double x = 0.0;
+            double y = 0.0;
+
+            double x2 = x * x;
+            double y2 = y * y;
+
             size_t n = 0;
 
-            while ((cabs(z) < 2.0) && (n < numberOfColours))
+            while ((x2 + y2 < 4.0) && (n < numberOfColours))
             {
-                z = z * z + c;
+                double xtemp = x2 - y2 + x0;
+                y = 2 * x * y + y0;
+                x = xtemp;
+
+                x2 = x * x;
+                y2 = y * y;
+
                 n++;
             }
 
@@ -83,8 +94,8 @@ mandelbrotImage(
                 setPixel(image, i, j, &(colours[n]));
             }
         }
-
-        changeSourceAndUpdateImageLayer(imageLayer);
     }
+
+    changeSourceAndUpdateImageLayer(imageLayer);
 }
 
