@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <termio.h>
+#include <time.h>
 #include <unistd.h>
 #include <sys/time.h>
 
@@ -44,6 +45,7 @@
 #include "imageLayer.h"
 #include "key.h"
 #include "mandelbrot.h"
+#include "savepng.h"
 
 //-------------------------------------------------------------------------
 
@@ -225,6 +227,27 @@ int main(int argc, char *argv[])
 
             switch (c)
             {
+            case 's':
+			{
+				time_t now;
+				time(&now);
+
+				struct tm *tm = localtime(&now);
+
+				char filename[128];
+				snprintf(filename,
+						 sizeof(filename),
+						 "mandelbrot_%4d%02d%02d_%2d%02d%02d.png",
+						 tm->tm_year + 1900,
+						 tm->tm_mon,
+						 tm->tm_mday,
+						 tm->tm_hour,
+						 tm->tm_min,
+						 tm->tm_sec);
+
+				savePng(&(mandelbrotLayer.image), filename);
+                break;
+			}
             case 'z':
 
                 if (zoom(&coords, &zoomLayer))
