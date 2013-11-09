@@ -39,11 +39,15 @@
 
 //-------------------------------------------------------------------------
 
+void setPixel4BPP(IMAGE_T *image, int32_t x, int32_t y, int8_t index);
+void setPixel8BPP(IMAGE_T *image, int32_t x, int32_t y, int8_t index);
 void setPixelRGB565(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
 void setPixelRGB888(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
 void setPixelRGBA16(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
 void setPixelRGBA32(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
 
+void getPixel4BPP(IMAGE_T *image, int32_t x, int32_t y, int8_t *index);
+void getPixel8BPP(IMAGE_T *image, int32_t x, int32_t y, int8_t *index);
 void getPixelRGB565(IMAGE_T *image, int32_t x, int32_t y, RGBA8_T *rgba);
 void getPixelRGB888(IMAGE_T *image, int32_t x, int32_t y, RGBA8_T *rgba);
 void getPixelRGBA16(IMAGE_T *image, int32_t x, int32_t y, RGBA8_T *rgba);
@@ -59,35 +63,63 @@ bool initImage(
 {
     switch (type)
     {
+    case VC_IMAGE_4BPP:
+
+        image->bitsPerPixel = 4;
+        image->setPixelDirect = NULL;
+        image->getPixelDirect = NULL;
+        image->setPixelIndexed = setPixel4BPP;
+        image->getPixelIndexed = getPixel4BPP;
+
+        break;
+
+    case VC_IMAGE_8BPP:
+
+        image->bitsPerPixel = 8;
+        image->setPixelDirect = NULL;
+        image->getPixelDirect = NULL;
+        image->setPixelIndexed = setPixel8BPP;
+        image->getPixelIndexed = getPixel8BPP;
+
+        break;
+
     case VC_IMAGE_RGB565:
 
-        image->bytesPerPixel = 2;
-        image->setPixel = setPixelRGB565;
-        image->getPixel = getPixelRGB565;
+        image->bitsPerPixel = 16;
+        image->setPixelDirect = setPixelRGB565;
+        image->getPixelDirect = getPixelRGB565;
+        image->setPixelIndexed = NULL;
+        image->getPixelIndexed = NULL;
 
         break;
 
     case VC_IMAGE_RGB888:
 
-        image->bytesPerPixel = 3;
-        image->setPixel = setPixelRGB888;
-        image->getPixel = getPixelRGB888;
+        image->bitsPerPixel = 24;
+        image->setPixelDirect = setPixelRGB888;
+        image->getPixelDirect = getPixelRGB888;
+        image->setPixelIndexed = NULL;
+        image->getPixelIndexed = NULL;
 
         break;
 
     case VC_IMAGE_RGBA16:
 
-        image->bytesPerPixel = 2;
-        image->setPixel = setPixelRGBA16;
-        image->getPixel = getPixelRGBA16;
+        image->bitsPerPixel = 16;
+        image->setPixelDirect = setPixelRGBA16;
+        image->getPixelDirect = getPixelRGBA16;
+        image->setPixelIndexed = NULL;
+        image->getPixelIndexed = NULL;
 
         break;
 
     case VC_IMAGE_RGBA32:
 
-        image->bytesPerPixel = 4;
-        image->setPixel = setPixelRGBA32;
-        image->getPixel = getPixelRGBA32;
+        image->bitsPerPixel = 32;
+        image->setPixelDirect = setPixelRGBA32;
+        image->getPixelDirect = getPixelRGBA32;
+        image->setPixelIndexed = NULL;
+        image->getPixelIndexed = NULL;
 
         break;
 
@@ -102,7 +134,7 @@ bool initImage(
     image->type = type;
     image->width = width;
     image->height = height;
-    image->pitch = ALIGN_TO_16(width) * image->bytesPerPixel;
+    image->pitch = (ALIGN_TO_16(width) * image->bitsPerPixel) / 8;
     image->alignedHeight = ALIGN_TO_16(height);
     image->size = image->pitch * image->alignedHeight;
 
@@ -120,17 +152,41 @@ bool initImage(
 //-------------------------------------------------------------------------
 
 void
-clearImage(
+clearImageIndexed(
+    IMAGE_T *image,
+    int8_t index)
+{
+    if (image->setPixelIndexed != NULL)
+    {
+        int j;
+        for (j = 0 ; j < image->height ; j++)
+        {
+            int i;
+            for (i = 0 ; i < image->width ; i++)
+            {
+                image->setPixelIndexed(image, i, j, index);
+            }
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void
+clearImageRGB(
     IMAGE_T *image,
     const RGBA8_T *rgb)
 {
-    int j;
-    for (j = 0 ; j < image->height ; j++)
+    if (image->setPixelDirect != NULL)
     {
-        int i;
-        for (i = 0 ; i < image->width ; i++)
+        int j;
+        for (j = 0 ; j < image->height ; j++)
         {
-            image->setPixel(image, i, j, rgb);
+            int i;
+            for (i = 0 ; i < image->width ; i++)
+            {
+                image->setPixelDirect(image, i, j, rgb);
+            }
         }
     }
 }
@@ -138,18 +194,20 @@ clearImage(
 //-------------------------------------------------------------------------
 
 bool
-setPixel(
+setPixelIndexed(
     IMAGE_T *image,
     int32_t x,
     int32_t y,
-    const RGBA8_T *rgb)
+    int8_t index)
 {
     bool result = false;
 
-    if ((x >= 0) && (x < image->width) && (y >= 0) && (y < image->height))
+    if ((image->setPixelIndexed != NULL) &&
+        (x >= 0) && (x < image->width) &&
+        (y >= 0) && (y < image->height))
     {
         result = true;
-        image->setPixel(image, x, y, rgb);
+        image->setPixelIndexed(image, x, y, index);
     }
 
     return result;
@@ -158,7 +216,51 @@ setPixel(
 //-------------------------------------------------------------------------
 
 bool
-getPixel(
+setPixelRGB(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    const RGBA8_T *rgb)
+{
+    bool result = false;
+
+    if ((image->setPixelDirect != NULL) &&
+        (x >= 0) && (x < image->width) &&
+        (y >= 0) && (y < image->height))
+    {
+        result = true;
+        image->setPixelDirect(image, x, y, rgb);
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------
+
+bool
+getPixelIndexed(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    int8_t *index)
+{
+    bool result = false;
+
+    if ((image->getPixelIndexed != NULL) && 
+        (x >= 0) && (x < image->width) &&
+        (y >= 0) && (y < image->height))
+    {
+        result = true;
+        image->getPixelIndexed(image, x, y, index);
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------
+
+bool
+getPixelRGB(
     IMAGE_T *image,
     int32_t x,
     int32_t y,
@@ -166,10 +268,12 @@ getPixel(
 {
     bool result = false;
 
-    if ((x >= 0) && (x < image->width) && (y >= 0) && (y < image->height))
+    if ((image->getPixelDirect != NULL) &&
+        (x >= 0) && (x < image->width) &&
+        (y >= 0) && (y < image->height))
     {
         result = true;
-        image->setPixel(image, x, y, rgb);
+        image->getPixelDirect(image, x, y, rgb);
     }
 
     return result;
@@ -191,11 +295,48 @@ destroyImage(
     image->height = 0;
     image->pitch = 0;
     image->alignedHeight = 0;
-    image->bytesPerPixel = 0;
+    image->bitsPerPixel = 0;
     image->size = 0;
     image->buffer = NULL;
-    image->setPixel = 0;
-    image->getPixel = 0;
+    image->setPixelDirect = NULL;
+    image->getPixelDirect = NULL;
+    image->setPixelIndexed = NULL;
+    image->getPixelIndexed = NULL;
+}
+
+//-----------------------------------------------------------------------
+
+void
+setPixel4BPP(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    int8_t index)
+{
+    index &= 0x0F;
+
+    uint8_t *value = (uint8_t*)(image->buffer + (x/2) + (y *image->pitch));
+
+    if (x % 2)
+    {
+        *value = (*value & 0xF0) | (index);
+    }
+    else
+    {
+        *value = (*value & 0x0F) | (index << 4);
+    }
+}
+
+//-----------------------------------------------------------------------
+
+void
+setPixel8BPP(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    int8_t index)
+{
+    *(uint8_t*)(image->buffer + x + (y * image->pitch)) = index;
 }
 
 //-----------------------------------------------------------------------
@@ -263,6 +404,39 @@ setPixelRGBA32(
     line[1] = rgba->green;
     line[2] = rgba->blue;
     line[3] = rgba->alpha;
+}
+
+//-----------------------------------------------------------------------
+
+void
+getPixel4BPP(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    int8_t *index)
+{
+    uint8_t *value = (uint8_t*)(image->buffer + (x/2) + (y *image->pitch));
+
+    if (x % 2)
+    {
+        *index = (*value) & 0x0F;
+    }
+    else
+    {
+        *index = (*value) >> 4;
+    }
+}
+
+//-----------------------------------------------------------------------
+
+void
+getPixel8BPP(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    int8_t *index)
+{
+    *index = *(uint8_t*)(image->buffer + x + (y * image->pitch));
 }
 
 //-----------------------------------------------------------------------
@@ -340,17 +514,20 @@ getPixelRGBA32(
 
 //-----------------------------------------------------------------------
 
-#define IMAGE_INFO_ENTRY(t, ha) \
+#define IMAGE_INFO_ENTRY(t, ha, ii) \
     { .name=(#t), \
       .type=(VC_IMAGE_ ## t), \
-      .hasAlpha=(ha) }
+      .hasAlpha=(ha), \
+      .isIndexed=(ii) }
 
 IMAGE_TYPE_INFO_T imageTypeInfo[] =
 {
-    IMAGE_INFO_ENTRY(RGB565, false),
-    IMAGE_INFO_ENTRY(RGB888, false),
-    IMAGE_INFO_ENTRY(RGBA16, true),
-    IMAGE_INFO_ENTRY(RGBA32, true)
+    IMAGE_INFO_ENTRY(4BPP, false, true),
+    IMAGE_INFO_ENTRY(8BPP, false, true),
+    IMAGE_INFO_ENTRY(RGB565, false, false),
+    IMAGE_INFO_ENTRY(RGB888, false, false),
+    IMAGE_INFO_ENTRY(RGBA16, true, false),
+    IMAGE_INFO_ENTRY(RGBA32, true, false)
 };
 
 static size_t imageTypeInfoEntries = sizeof(imageTypeInfo)/
@@ -379,19 +556,34 @@ findImageType(
 
     if (entry != NULL)
     {
+        bool matchedAlpha = false;
+        bool matchedColour = false;
+
         if ((selector & IMAGE_TYPES_WITH_ALPHA) &&
             (entry->hasAlpha == true))
         {
-            found = true;
+            matchedAlpha = true;
         }
         else if ((selector & IMAGE_TYPES_WITHOUT_ALPHA) &&
                  (entry->hasAlpha == false))
         {
-            found = true;
+            matchedAlpha = true;
         }
 
-        if (found)
+        if ((selector & IMAGE_TYPES_DIRECT_COLOUR) &&
+                 (entry->isIndexed == false))
         {
+            matchedColour = true;
+        }
+        else if ((selector & IMAGE_TYPES_INDEXED_COLOUR) &&
+                 (entry->isIndexed == true))
+        {
+            matchedColour = true;
+        }
+
+        if (matchedAlpha && matchedColour)
+        {
+            found = true;
             memcpy(typeInfo, entry, sizeof(IMAGE_TYPE_INFO_T));
         }
     }
@@ -414,14 +606,32 @@ printImageTypes(
     for (i = 0 ; i < imageTypeInfoEntries ; i++)
     {
         entry = &(imageTypeInfo[i]);
+        bool matchedAlpha = false;
+        bool matchedColour = false;
 
         if ((selector & IMAGE_TYPES_WITH_ALPHA) &&
             (entry->hasAlpha == true))
         {
-            fprintf(fp, "%s%s%s", before, entry->name, after);
+            matchedAlpha = true;
         }
         else if ((selector & IMAGE_TYPES_WITHOUT_ALPHA) &&
                  (entry->hasAlpha == false))
+        {
+            matchedAlpha = true;
+        }
+
+        if ((selector & IMAGE_TYPES_DIRECT_COLOUR) &&
+                 (entry->isIndexed == false))
+        {
+            matchedColour = true;
+        }
+        else if ((selector & IMAGE_TYPES_INDEXED_COLOUR) &&
+                 (entry->isIndexed == true))
+        {
+            matchedColour = true;
+        }
+
+        if (matchedAlpha && matchedColour)
         {
             fprintf(fp, "%s%s%s", before, entry->name, after);
         }

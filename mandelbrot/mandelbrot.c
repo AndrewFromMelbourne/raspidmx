@@ -58,7 +58,7 @@ mandelbrotImage(
     double dy = (coords->side / (image->height - 1));
 
     RGBA8_T black = {0, 0, 0, 0};
-    clearImage(image, &black);
+    clearImageRGB(image, &black);
 
     int32_t j;
     for (j = 0 ; j < image->height ; j++)
@@ -91,7 +91,7 @@ mandelbrotImage(
 
             if (n < numberOfColours)
             {
-                setPixel(image, i, j, &(colours[n]));
+                setPixelRGB(image, i, j, &(colours[n]));
             }
         }
     }

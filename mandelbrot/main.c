@@ -69,13 +69,13 @@ zoom(
     int32_t y = (zoomLayer->image.height - height) / 2;
     int32_t step = 1;
 
-    clearImage(&(zoomLayer->image), &maskColour);
-    imageBoxFilled(&(zoomLayer->image),
-                   x,
-                   y,
-                   x + width - 1,
-                   y + height - 1,
-                   &clearColour);
+    clearImageRGB(&(zoomLayer->image), &maskColour);
+    imageBoxFilledRGB(&(zoomLayer->image),
+                      x,
+                      y,
+                      x + width - 1,
+                      y + height - 1,
+                      &clearColour);
     changeSourceAndUpdateImageLayer(zoomLayer);
 
     int c = 0;
@@ -133,19 +133,19 @@ zoom(
 
             if (update)
             {
-                clearImage(&(zoomLayer->image), &maskColour);
-                imageBoxFilled(&(zoomLayer->image),
-                               x,
-                               y,
-                               x + width - 1,
-                               y + height - 1,
-                               &clearColour);
+                clearImageRGB(&(zoomLayer->image), &maskColour);
+                imageBoxFilledRGB(&(zoomLayer->image),
+                                  x,
+                                  y,
+                                  x + width - 1,
+                                  y + height - 1,
+                                  &clearColour);
                 changeSourceAndUpdateImageLayer(zoomLayer);
             }
         }
     }
 
-    clearImage(&(zoomLayer->image), &clearColour);
+    clearImageRGB(&(zoomLayer->image), &clearColour);
     changeSourceAndUpdateImageLayer(zoomLayer);
 
     if (changed)

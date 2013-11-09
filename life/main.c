@@ -93,9 +93,9 @@ int main(int argc, char *argv[])
     char fpsBuffer[20];
 
     initImageLayer(&fpsLayer, 64, 16, VC_IMAGE_RGBA16);
-    clearImage(&(fpsLayer.image), &fpsBgColour);
+    clearImageRGB(&(fpsLayer.image), &fpsBgColour);
     snprintf(fpsBuffer, sizeof(fpsBuffer), "fps: --");
-    drawString(0, 0, fpsBuffer, &fpsFgColour, &(fpsLayer.image));
+    drawStringRGB(0, 0, fpsBuffer, &fpsFgColour, &(fpsLayer.image));
     createResourceImageLayer(&fpsLayer, 10);
 
     //---------------------------------------------------------------------
@@ -181,13 +181,13 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    clearImage(&(fpsLayer.image), &fpsBgColour);
+                    clearImageRGB(&(fpsLayer.image), &fpsBgColour);
                     snprintf(fpsBuffer, sizeof(fpsBuffer), "fps: --");
-                    drawString(0,
-                               0,
-                               fpsBuffer,
-                               &fpsFgColour,
-                               &(fpsLayer.image));
+                    drawStringRGB(0,
+                                  0,
+                                  fpsBuffer,
+                                  &fpsFgColour,
+                                  &(fpsLayer.image));
                     step = true;
                 }
 
@@ -220,8 +220,8 @@ int main(int argc, char *argv[])
                      sizeof(fpsBuffer),
                      "fps: %.0f\n",
                      frames_per_second);
-            clearImage(&(fpsLayer.image), &fpsBgColour);
-            drawString(0, 0, fpsBuffer, &fpsFgColour, &(fpsLayer.image));
+            clearImageRGB(&(fpsLayer.image), &fpsBgColour);
+            drawStringRGB(0, 0, fpsBuffer, &fpsFgColour, &(fpsLayer.image));
 
             memcpy(&start_time, &end_time, sizeof(start_time));
         }

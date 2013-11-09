@@ -332,7 +332,7 @@ loadScrollingLayerPng(
 
         if (extendX)
         {
-            int32_t rowLength = baseImage.width * baseImage.bytesPerPixel;
+            int32_t rowLength = (baseImage.width*baseImage.bitsPerPixel)/8;
 
             int32_t baseOffset = 0;
             int32_t offset = 0;

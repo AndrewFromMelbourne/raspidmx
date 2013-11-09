@@ -4646,7 +4646,36 @@ uint8_t font[256][FONT_HEIGHT] =
 //-------------------------------------------------------------------------
 
 void
-drawChar(
+drawCharIndexed(
+    int x,
+    int y,
+    uint8_t c,
+    int8_t index,
+    IMAGE_T *image)
+{
+    int j;
+    for (j = 0 ; j < FONT_HEIGHT ; j++)
+    {
+        uint8_t byte = font[c][j];
+
+        if (byte != 0)
+        {
+            int i;
+            for (i = 0 ; i < FONT_WIDTH ; ++i)
+            {
+                if ((byte >> (FONT_WIDTH - i - 1)) & 1 )
+                {
+                    setPixelIndexed(image, x + i, y + j, index);
+                }
+            }
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void
+drawCharRGB(
     int x,
     int y,
     uint8_t c,
@@ -4665,7 +4694,7 @@ drawChar(
             {
                 if ((byte >> (FONT_WIDTH - i - 1)) & 1 )
                 {
-                    setPixel(image, x + i, y + j, rgb);
+                    setPixelRGB(image, x + i, y + j, rgb);
                 }
             }
         }
@@ -4675,7 +4704,40 @@ drawChar(
 //-------------------------------------------------------------------------
 
 void
-drawString(
+drawStringIndexed(
+    int x,
+    int y,
+    const char *string,
+    int8_t index,
+    IMAGE_T *image)
+{
+    if (string == NULL)
+    {
+        return;
+    }
+
+    int x_first = x;
+
+    while (*string != '\0')
+    {
+        if (*string == '\n')
+        {
+            x = x_first;
+            y += FONT_HEIGHT;
+        }
+        else
+        {
+            drawCharIndexed(x, y, *string, index, image);
+            x += FONT_WIDTH;
+        }
+        ++string;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void
+drawStringRGB(
     int x,
     int y,
     const char *string,
@@ -4698,7 +4760,7 @@ drawString(
         }
         else
         {
-            drawChar(x, y, *string, rgb, image);
+            drawCharRGB(x, y, *string, rgb, image);
             x += FONT_WIDTH;
         }
         ++string;

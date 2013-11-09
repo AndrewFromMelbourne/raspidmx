@@ -143,10 +143,10 @@ drawWorm(
     uint16_t i = 0;
     for (i = 0 ; i < worm->size ; i++)
     {
-        setPixel(image,
-                 (int32_t)floor(worm->body[i].x),
-                 (int32_t)floor(worm->body[i].y),
-                 &(worm->colour));
+        setPixelRGB(image,
+                    (int32_t)floor(worm->body[i].x),
+                    (int32_t)floor(worm->body[i].y),
+                    &(worm->colour));
     }
 }
 
@@ -162,10 +162,10 @@ undrawWorm(
     uint32_t i = 0;
     for (i = 0 ; i < worm->size ; i++)
     {
-        setPixel(image,
-                 (int32_t)floor(worm->body[i].x),
-                 (int32_t)floor(worm->body[i].y),
-                 &colour);
+        setPixelRGB(image,
+                    (int32_t)floor(worm->body[i].x),
+                    (int32_t)floor(worm->body[i].y),
+                    &colour);
     }
 }
 

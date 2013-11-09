@@ -61,7 +61,7 @@ pngWriteImageRGB565(
         {
             uint16_t pixels = *(uint16_t*)(image->buffer +
                                           (y * image->pitch) +
-                                          (x * image->bytesPerPixel));
+                                          ((x * image->bitsPerPixel) / 8));
             int32_t index = x * 3;
 
             uint8_t r5 = (pixels >> 11) & 0x1F;
@@ -123,7 +123,7 @@ pngWriteImageRGBA16(
         {
             uint16_t pixels = *(uint16_t*)(image->buffer +
                                            (y * image->pitch) +
-                                           (x * image->bytesPerPixel));
+                                           ((x * image->bitsPerPixel) / 8));
             int32_t index = x * 4;
 
             uint8_t r4 = (pixels >> 12) & 0xF;

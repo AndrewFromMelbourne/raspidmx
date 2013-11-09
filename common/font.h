@@ -41,7 +41,15 @@
 //-------------------------------------------------------------------------
 
 void
-drawChar(
+drawCharIndexed(
+    int x,
+    int y,
+    uint8_t c,
+    int8_t index,
+    IMAGE_T *image);
+
+void
+drawCharRGB(
     int x,
     int y,
     uint8_t c,
@@ -49,7 +57,15 @@ drawChar(
     IMAGE_T *image);
 
 void
-drawString(
+drawStringIndexed(
+    int x,
+    int y,
+    const char *string,
+    int8_t index,
+    IMAGE_T *image);
+
+void
+drawStringRGB(
     int x,
     int y,
     const char *string,

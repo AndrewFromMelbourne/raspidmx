@@ -16,9 +16,9 @@ a single place with detailed information on DispmanX.  Hopefully these
 programs can be used as a starting point for anyone wanting to make use of
 DispmanX.
 
-The programs demonstrate layers with the following types: RGB565 (16 bit),
-RGB888 (24 bit), RGBA16 (16 bit with transparency) and RGBA32
-(32 bit with transparency)
+The programs demonstrate layers with the following types: 4BPP (4 bit
+indexed), 8BPP (8 bit indexed), RGB565 (16 bit), RGB888 (24 bit), RGBA16
+(16 bit with transparency) and RGBA32 (32 bit with transparency)
 
 test_pattern
 ------------

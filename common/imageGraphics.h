@@ -33,7 +33,16 @@
 //-------------------------------------------------------------------------
 
 void
-imageBox(
+imageBoxIndexed(
+    IMAGE_T *image,
+    int32_t x1,
+    int32_t y1,
+    int32_t x2,
+    int32_t y2,
+    int8_t index);
+
+void
+imageBoxRGB(
     IMAGE_T *image,
     int32_t x1,
     int32_t y1,
@@ -42,7 +51,16 @@ imageBox(
     const RGBA8_T *rgb);
 
 void
-imageBoxFilled(
+imageBoxFilledIndexed(
+    IMAGE_T *image,
+    int32_t x1,
+    int32_t y1,
+    int32_t x2,
+    int32_t y2,
+    int8_t index);
+
+void
+imageBoxFilledRGB(
     IMAGE_T *image,
     int32_t x1,
     int32_t y1,
@@ -51,7 +69,16 @@ imageBoxFilled(
     const RGBA8_T *rgb);
 
 void
-imageLine(
+imageLineIndexed(
+    IMAGE_T *image,
+    int32_t x1,
+    int32_t y1,
+    int32_t x2,
+    int32_t y2,
+    int8_t index);
+
+void
+imageLineRGB(
     IMAGE_T *image,
     int32_t x1,
     int32_t y1,
@@ -60,19 +87,35 @@ imageLine(
     const RGBA8_T *rgb);
 
 void
-imageHorizontalLine(
-    IMAGE_T *image,
-    int32_t x,
-    int32_t y1,
-    int32_t y2,
-    const RGBA8_T *rgb);
-
-void
-imageVerticalLine(
+imageHorizontalLineIndexed(
     IMAGE_T *image,
     int32_t x1,
     int32_t x2,
     int32_t y,
+    int8_t index);
+
+void
+imageHorizontalLineRGB(
+    IMAGE_T *image,
+    int32_t x1,
+    int32_t x2,
+    int32_t y,
+    const RGBA8_T *rgb);
+
+void
+imageVerticalLineIndexed(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y1,
+    int32_t y2,
+    int8_t index);
+
+void
+imageVerticalLineRGB(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y1,
+    int32_t y2,
     const RGBA8_T *rgb);
 
 //-------------------------------------------------------------------------

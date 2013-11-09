@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
             fprintf(stderr, "    -s - size of triangle to draw\n");
             fprintf(stderr, "    -t - type of image to create\n");
             fprintf(stderr, "         can be one of the following:");
-            printImageTypes(stderr, " ", "", ALL_IMAGE_TYPES);
+            printImageTypes(stderr, " ", "", IMAGE_TYPES_ALL_DIRECT_COLOUR);
             fprintf(stderr, "\n");
 
             exit(EXIT_FAILURE);
@@ -111,7 +111,9 @@ int main(int argc, char *argv[])
 
     IMAGE_TYPE_INFO_T typeInfo;
 
-    if (findImageType(&typeInfo, imageTypeName, ALL_IMAGE_TYPES))
+    if (findImageType(&typeInfo,
+                      imageTypeName,
+                      IMAGE_TYPES_ALL_DIRECT_COLOUR))
     {
         imageType = typeInfo.type;
     }
@@ -220,7 +222,7 @@ int main(int argc, char *argv[])
                 rgba.alpha = 255;
             }
 
-            image.setPixel(&image, x, y, &rgba);
+            setPixelRGB(&image, x, y, &rgba);
         }
     }
 

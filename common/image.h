@@ -48,19 +48,23 @@ typedef struct
 
 //-------------------------------------------------------------------------
 
-typedef struct IMAGE_T_
+typedef struct IMAGE_T_ IMAGE_T;
+
+struct IMAGE_T_
 {
     VC_IMAGE_TYPE_T type;
     int32_t width;
     int32_t height;
     int32_t pitch;
     int32_t alignedHeight;
-    uint16_t bytesPerPixel;
+    uint16_t bitsPerPixel;
     uint32_t size;
     void *buffer;
-    void (*setPixel)(struct IMAGE_T_*, int32_t, int32_t, const RGBA8_T*);
-    void (*getPixel)(struct IMAGE_T_*, int32_t, int32_t, RGBA8_T*);
-} IMAGE_T;
+    void (*setPixelDirect)(IMAGE_T*, int32_t, int32_t, const RGBA8_T*);
+    void (*getPixelDirect)(IMAGE_T*, int32_t, int32_t, RGBA8_T*);
+    void (*setPixelIndexed)(IMAGE_T*, int32_t, int32_t, int8_t);
+    void (*getPixelIndexed)(IMAGE_T*, int32_t, int32_t, int8_t*);
+};
 
 //-------------------------------------------------------------------------
 
@@ -69,13 +73,25 @@ typedef struct
     const char *name;
     VC_IMAGE_TYPE_T type;
     bool hasAlpha;
+    bool isIndexed;
 } IMAGE_TYPE_INFO_T;
 
 typedef enum
 {
     IMAGE_TYPES_WITH_ALPHA = 1,
-    IMAGE_TYPES_WITHOUT_ALPHA = 2,
-    ALL_IMAGE_TYPES = 3
+    IMAGE_TYPES_WITHOUT_ALPHA = 1 << 1,
+    IMAGE_TYPES_ALPHA_DONT_CARE = IMAGE_TYPES_WITH_ALPHA
+                                | IMAGE_TYPES_WITHOUT_ALPHA,
+    IMAGE_TYPES_DIRECT_COLOUR = 1 << 2,
+    IMAGE_TYPES_ALL_DIRECT_COLOUR = IMAGE_TYPES_ALPHA_DONT_CARE
+                                  | IMAGE_TYPES_DIRECT_COLOUR,
+    IMAGE_TYPES_INDEXED_COLOUR = 1 << 3,
+    IMAGE_TYPES_ALL_INDEXED_COLOUR = IMAGE_TYPES_ALPHA_DONT_CARE
+                                   | IMAGE_TYPES_INDEXED_COLOUR,
+    IMAGE_TYPES_COLOUR_DONT_CARE = IMAGE_TYPES_DIRECT_COLOUR
+                                 | IMAGE_TYPES_INDEXED_COLOUR,
+    IMAGE_TYPES_ALL = IMAGE_TYPES_ALPHA_DONT_CARE
+                    | IMAGE_TYPES_COLOUR_DONT_CARE
 } IMAGE_TYPE_SELECTOR_T;
 
 //-------------------------------------------------------------------------
@@ -88,19 +104,38 @@ initImage(
     int32_t height);
 
 void
-clearImage(
+clearImageIndexed(
+    IMAGE_T *image,
+    int8_t index);
+
+void
+clearImageRGB(
     IMAGE_T *image,
     const RGBA8_T *rgb);
 
 bool
-setPixel(
+setPixelIndexed(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    int8_t index);
+
+bool
+setPixelRGB(
     IMAGE_T *image,
     int32_t x,
     int32_t y,
     const RGBA8_T *rgb);
 
 bool
-getPixel(
+getPixelIndexed(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    int8_t *index);
+
+bool
+getPixelRGB(
     IMAGE_T *image,
     int32_t x,
     int32_t y,
