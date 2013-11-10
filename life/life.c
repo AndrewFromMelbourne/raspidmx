@@ -43,9 +43,9 @@
 
 //-------------------------------------------------------------------------
 
-#define LIVE 0xFFFF
-#define LIVE2 0x1FFFE
-#define LIVE3 0x2FFFD
+#define LIVE 215
+#define LIVE2 430
+#define LIVE3 645
 #define DEAD 0x0
 
 //-------------------------------------------------------------------------
@@ -59,7 +59,7 @@ newLife(
     life->height = size;
     life->alignedWidth = ALIGN_TO_16(life->width);
     life->alignedHeight = ALIGN_TO_16(life->height);
-    life->pitch = ALIGN_TO_16(life->width) * 2;
+    life->pitch = ALIGN_TO_16(life->width);
 
     life->buffer = calloc(1, life->pitch * life->alignedHeight);
 
@@ -100,7 +100,7 @@ newLife(
 
     //---------------------------------------------------------------------
 
-    VC_IMAGE_TYPE_T type = VC_IMAGE_RGBA16;
+    VC_IMAGE_TYPE_T type = VC_IMAGE_8BPP;
     uint32_t vc_image_ptr;
     int result = 0;
 
@@ -195,8 +195,8 @@ iterateLife(
 {
     // swap buffer;
 
-    uint16_t *lastBuffer = life->buffer;
-    uint16_t *imageBuffer = life->last;
+    uint8_t *lastBuffer = life->buffer;
+    uint8_t *imageBuffer = life->last;
 
     life->last = lastBuffer;
     life->buffer = imageBuffer;

@@ -41,8 +41,8 @@ typedef struct
     int32_t height;
     int32_t alignedHeight;
     int32_t pitch;
-    uint16_t *buffer;
-    uint16_t *last;
+    uint8_t *buffer;
+    uint8_t *last;
     VC_RECT_T srcRect;
     VC_RECT_T dstRect;
     DISPMANX_RESOURCE_HANDLE_T frontResource;
