@@ -65,6 +65,10 @@ mandelbrot
 
 The famous (in the 1990s) Mandelbrot set.
 
+radar_sweep
+-----------
+An animation of a 'radar sweep' using palette animation.
+
 common
 ------
 

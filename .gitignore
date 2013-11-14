@@ -12,6 +12,7 @@ game/game
 life/life
 mandelbrot/mandelbrot
 pngview/pngview
+radar_sweep/radar_sweep
 rgb_triangle/rgb_triangle
 spriteview/spriteview
 test_pattern/test_pattern
