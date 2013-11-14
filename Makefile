@@ -1,6 +1,7 @@
 TARGETS=	life \
 			mandelbrot \
 			pngview \
+			radar_sweep \
 			rgb_triangle \
 			game \
 			spriteview \
