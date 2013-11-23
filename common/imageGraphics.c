@@ -121,61 +121,72 @@ imageLineIndexed(
     int32_t y2,
     int8_t index)
 {
-    int32_t dx = abs(x2 - x1);
-    int32_t dy = abs(y2 - y1);
-
-    int32_t sign_x = (x1 <= x2) ? 1 : -1;
-    int32_t sign_y = (y1 <= y2) ? 1 : -1;
-
-    int32_t x = x1;
-    int32_t y = y1;
-
-    setPixelIndexed(image, x, y, index);
-
-    if (dx > dy)
+    if (y1 == y2)
     {
-        int32_t d = 2 * dy - dx;
-        int32_t incrE = 2 * dy;
-        int32_t incrNE = 2 * (dy - dx);
-
-        while (x != x2)
-        {
-            x += sign_x;
-
-            if (d <= 0)
-            {
-                d += incrE;
-            }
-            else
-            {
-                d += incrNE;
-                y += sign_y;
-            }
-
-            setPixelIndexed(image, x, y, index);
-        }
+        imageHorizontalLineIndexed(image, x1, x2, y1, index);
+    }
+    else if (x1 == x2)
+    {
+        imageVerticalLineIndexed(image, x1, y1, y2, index);
     }
     else
     {
-        int32_t d = 2 * dx - dy;
-        int32_t incrN = 2 * dx;
-        int32_t incrNE = 2 * (dx - dy);
+        int32_t dx = abs(x2 - x1);
+        int32_t dy = abs(y2 - y1);
 
-        while (y != y2)
+        int32_t sign_x = (x1 <= x2) ? 1 : -1;
+        int32_t sign_y = (y1 <= y2) ? 1 : -1;
+
+        int32_t x = x1;
+        int32_t y = y1;
+
+        setPixelIndexed(image, x, y, index);
+
+        if (dx > dy)
         {
-            y += sign_y;
+            int32_t d = 2 * dy - dx;
+            int32_t incrE = 2 * dy;
+            int32_t incrNE = 2 * (dy - dx);
 
-            if (d <= 0)
+            while (x != x2)
             {
-                d += incrN;
-            }
-            else
-            {
-                d += incrNE;
                 x += sign_x;
-            }
 
-            setPixelIndexed(image, x, y, index);
+                if (d <= 0)
+                {
+                    d += incrE;
+                }
+                else
+                {
+                    d += incrNE;
+                    y += sign_y;
+                }
+
+                setPixelIndexed(image, x, y, index);
+            }
+        }
+        else
+        {
+            int32_t d = 2 * dx - dy;
+            int32_t incrN = 2 * dx;
+            int32_t incrNE = 2 * (dx - dy);
+
+            while (y != y2)
+            {
+                y += sign_y;
+
+                if (d <= 0)
+                {
+                    d += incrN;
+                }
+                else
+                {
+                    d += incrNE;
+                    x += sign_x;
+                }
+
+                setPixelIndexed(image, x, y, index);
+            }
         }
     }
 }
@@ -191,61 +202,72 @@ imageLineRGB(
     int32_t y2,
     const RGBA8_T *rgb)
 {
-    int32_t dx = abs(x2 - x1);
-    int32_t dy = abs(y2 - y1);
-
-    int32_t sign_x = (x1 <= x2) ? 1 : -1;
-    int32_t sign_y = (y1 <= y2) ? 1 : -1;
-
-    int32_t x = x1;
-    int32_t y = y1;
-
-    setPixelRGB(image, x, y, rgb);
-
-    if (dx > dy)
+    if (y1 == y2)
     {
-        int32_t d = 2 * dy - dx;
-        int32_t incrE = 2 * dy;
-        int32_t incrNE = 2 * (dy - dx);
-
-        while (x != x2)
-        {
-            x += sign_x;
-
-            if (d <= 0)
-            {
-                d += incrE;
-            }
-            else
-            {
-                d += incrNE;
-                y += sign_y;
-            }
-
-            setPixelRGB(image, x, y, rgb);
-        }
+        imageHorizontalLineRGB(image, x1, x2, y1, rgb);
+    }
+    else if (x1 == x2)
+    {
+        imageVerticalLineRGB(image, x1, y1, y2, rgb);
     }
     else
     {
-        int32_t d = 2 * dx - dy;
-        int32_t incrN = 2 * dx;
-        int32_t incrNE = 2 * (dx - dy);
+        int32_t dx = abs(x2 - x1);
+        int32_t dy = abs(y2 - y1);
 
-        while (y != y2)
+        int32_t sign_x = (x1 <= x2) ? 1 : -1;
+        int32_t sign_y = (y1 <= y2) ? 1 : -1;
+
+        int32_t x = x1;
+        int32_t y = y1;
+
+        setPixelRGB(image, x, y, rgb);
+
+        if (dx > dy)
         {
-            y += sign_y;
+            int32_t d = 2 * dy - dx;
+            int32_t incrE = 2 * dy;
+            int32_t incrNE = 2 * (dy - dx);
 
-            if (d <= 0)
+            while (x != x2)
             {
-                d += incrN;
-            }
-            else
-            {
-                d += incrNE;
                 x += sign_x;
-            }
 
-            setPixelRGB(image, x, y, rgb);
+                if (d <= 0)
+                {
+                    d += incrE;
+                }
+                else
+                {
+                    d += incrNE;
+                    y += sign_y;
+                }
+
+                setPixelRGB(image, x, y, rgb);
+            }
+        }
+        else
+        {
+            int32_t d = 2 * dx - dy;
+            int32_t incrN = 2 * dx;
+            int32_t incrNE = 2 * (dx - dy);
+
+            while (y != y2)
+            {
+                y += sign_y;
+
+                if (d <= 0)
+                {
+                    d += incrN;
+                }
+                else
+                {
+                    d += incrNE;
+                    x += sign_x;
+                }
+
+                setPixelRGB(image, x, y, rgb);
+            }
         }
     }
 }

@@ -84,7 +84,11 @@ int main(int argc, char *argv[])
             fprintf(stderr, "         e.g. 0x000F is opaque black\n");
             fprintf(stderr, "    -t - type of image to create\n");
             fprintf(stderr, "         can be one of the following:");
-            printImageTypes(stderr, " ", "", IMAGE_TYPES_WITH_ALPHA);
+            printImageTypes(stderr,
+                            " ",
+                            "",
+                            IMAGE_TYPES_WITH_ALPHA |
+                            IMAGE_TYPES_DIRECT_COLOUR);
             fprintf(stderr, "\n");
 
             exit(EXIT_FAILURE);
@@ -96,7 +100,9 @@ int main(int argc, char *argv[])
 
     IMAGE_TYPE_INFO_T typeInfo;
 
-    if (findImageType(&typeInfo, imageTypeName, IMAGE_TYPES_WITH_ALPHA))
+    if (findImageType(&typeInfo,
+                      imageTypeName,
+                      IMAGE_TYPES_WITH_ALPHA | IMAGE_TYPES_DIRECT_COLOUR))
     {
         imageType = typeInfo.type;
     }
