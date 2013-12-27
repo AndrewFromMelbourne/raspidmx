@@ -196,8 +196,10 @@ int main(int argc, char *argv[])
     struct timeval end_time;
     gettimeofday(&end_time, NULL);
 
-    int32_t time_taken = ((end_time.tv_sec - start_time.tv_sec) * 1000000) +
-                     (end_time.tv_usec - start_time.tv_usec);
+    struct timeval diff;
+    timersub(&end_time, &start_time, &diff);
+
+    int32_t time_taken = (diff.tv_sec * 1000000) + diff.tv_usec;
     double frames_per_second = (frame * 1000000.0) / time_taken;
 
     printf("%0.1f frames per second\n", frames_per_second);
