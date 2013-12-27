@@ -48,18 +48,9 @@ initScrollingLayer(SCROLLING_LAYER_T *sl,
     //---------------------------------------------------------------------
     if (loadScrollingLayerPng(&sl->image, file, true, true) == false)
     {
-        fprintf(stderr, "seamlessBg: unable to load %s\n", file);
+        fprintf(stderr, "scrollingBgLayer: unable to load %s\n", file);
         exit(EXIT_FAILURE);
     }
-
-    sl->viewWidth = sl->image.width / 2;
-    sl->viewHeight = sl->image.height / 2;
-
-    sl->xOffsetMax = sl->viewWidth - 1;
-    sl->xOffset = sl->xOffsetMax / 2;
-
-    sl->yOffsetMax = sl->viewHeight - 1;
-    sl->yOffset = sl->yOffsetMax / 2;
 
     sl->direction = 0;
     sl->directionMax = 7;
@@ -136,6 +127,25 @@ addElementScrollingLayerCentered(
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update)
 {
+    sl->viewWidth = sl->image.width / 2;
+    sl->viewHeight = sl->image.height / 2;
+
+    sl->xOffsetMax = sl->viewWidth - 1;
+    sl->xOffset = sl->xOffsetMax / 2;
+
+    sl->yOffsetMax = sl->viewHeight - 1;
+    sl->yOffset = sl->yOffsetMax / 2;
+
+    if (sl->viewWidth > info->width)
+    {
+        sl->viewWidth = info->width;
+    }
+
+    if (sl->viewHeight > info->height)
+    {
+        sl->viewHeight = info->height;
+    }
+
     vc_dispmanx_rect_set(&sl->srcRect,
                          sl->xOffset << 16,
                          sl->yOffset << 16,
