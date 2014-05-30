@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
 
         ++frame;
 
-        if ((frame == 500) && (paused == false))
+        if ((frame == 200) && (paused == false))
         {
             frame = 0;
             gettimeofday(&end_time, NULL);
@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
             struct timeval diff;
             timersub(&end_time, &start_time, &diff);
             int32_t time_taken = (diff.tv_sec * 1000)+(diff.tv_usec / 1000);
-            double frames_per_second = 5.0e5 / time_taken;
+            double frames_per_second = 2.0e5 / time_taken;
             snprintf(fpsBuffer,
                      sizeof(fpsBuffer),
                      "fps: %.0f\n",

@@ -43,10 +43,72 @@
 
 //-------------------------------------------------------------------------
 
-#define LIVE 215
-#define LIVE2 430
-#define LIVE3 645
-#define DEAD 0x0
+#define LIVE 210
+#define DEAD 3
+
+//-------------------------------------------------------------------------
+
+static void
+setCell(
+    LIFE_T *life,
+    int32_t col,
+    int32_t row)
+{
+    life->buffer[col + (row * life->alignedWidth)] = LIVE;
+
+    int32_t width = life->width;
+    int32_t height = life->height;
+    int32_t fieldLength = life->fieldLength;
+
+    uint8_t *cell = life->fieldNext + col + (row * width);
+
+    uint32_t left = (col == 0) ? width - 1 :  -1;
+    uint32_t right = (col == width - 1) ?  -(width - 1) : 1;
+    uint32_t above = (row == 0) ? fieldLength - width : -width;
+    uint32_t below = (row == height - 1) ? -(fieldLength - width) : width;
+
+    *(cell) |= 0x01;
+    *(cell + above + left) += 2;
+    *(cell + above) += 2;
+    *(cell + above + right) += 2;
+    *(cell + left) += 2;
+    *(cell + right) += 2;
+    *(cell + below + left) += 2;
+    *(cell + below) += 2;
+    *(cell + below + right) += 2;
+}
+
+//-------------------------------------------------------------------------
+
+static void
+clearCell(
+    LIFE_T *life,
+    int32_t col,
+    int32_t row)
+{
+    life->buffer[col + (row * life->alignedWidth)] = DEAD;
+
+    int32_t width = life->width;
+    int32_t height = life->height;
+    int32_t fieldLength = life->fieldLength;
+
+    uint8_t *cell = life->fieldNext + col + (row * width);
+
+    uint32_t left = (col == 0) ? width - 1 :  -1;
+    uint32_t right = (col == width - 1) ?  -(width - 1) : 1;
+    uint32_t above = (row == 0) ? fieldLength - width : -width;
+    uint32_t below = (row == height - 1) ? -(fieldLength - width) : width;
+
+    *(cell) &= ~0x01;
+    *(cell + above + left) -= 2;
+    *(cell + above) -= 2;
+    *(cell + above + right) -= 2;
+    *(cell + left) -= 2;
+    *(cell + right) -= 2;
+    *(cell + below + left) -= 2;
+    *(cell + below) -= 2;
+    *(cell + below + right) -= 2;
+}
 
 //-------------------------------------------------------------------------
 
@@ -69,9 +131,19 @@ newLife(
         exit(EXIT_FAILURE);
     }
 
-    life->last = calloc(1, life->pitch * life->alignedHeight);
+    life->fieldLength = life->width * life->height;
 
-    if (life->last == NULL)
+    life->field = calloc(1, life->fieldLength);
+
+    if (life->field == NULL)
+    {
+        fprintf(stderr, "life: memory exhausted\n");
+        exit(EXIT_FAILURE);
+    }
+
+    life->fieldNext = calloc(1, life->fieldLength);
+
+    if (life->fieldNext == NULL)
     {
         fprintf(stderr, "life: memory exhausted\n");
         exit(EXIT_FAILURE);
@@ -89,7 +161,7 @@ newLife(
         {
             if (rand() > (RAND_MAX / 2))
             {
-                life->buffer[col + (row * life->alignedWidth)] = LIVE;
+                setCell(life, col, row);
             }
             else
             {
@@ -193,425 +265,36 @@ void
 iterateLife(
     LIFE_T *life)
 {
-    // swap buffer;
-
-    uint8_t *lastBuffer = life->buffer;
-    uint8_t *imageBuffer = life->last;
-
-    life->last = lastBuffer;
-    life->buffer = imageBuffer;
-
-    //
-    // +---+---+---+
-    // | 0 | 1 | 2 |
-    // +---+---+---+
-    // | 3 |   | 4 |
-    // +---+---+---+
-    // | 5 | 6 | 7 |
-    // +---+---+---+
-    //
-
-    int32_t nOff0;
-    int32_t nOff1;
-    int32_t nOff2;
-    int32_t nOff3;
-    int32_t nOff4;
-    int32_t nOff5;
-    int32_t nOff6;
-    int32_t nOff7;
-
-    int32_t nYoff0;
-    int32_t nYoff1;
-    int32_t nYoff2;
-    int32_t nYoff3;
-    int32_t nYoff4;
-    int32_t nYoff5;
-    int32_t nYoff6;
-    int32_t nYoff7;
-
-    int32_t off = 0;
-    int32_t yOff = 0;
-
-    uint32_t n = 0;
-    int32_t alignedWidth = life->alignedWidth;
-
-    int32_t row = 0;
-    int32_t col = 0;
+    memcpy(life->field, life->fieldNext, life->fieldLength);
 
     //---------------------------------------------------------------------
-    // first row
 
-    nYoff0 = nYoff1 = nYoff2 = (life->height - 1) * alignedWidth;
-    nYoff3 = nYoff4 = 0;
-    nYoff5 = nYoff6 = nYoff7 = alignedWidth;
+    uint8_t *cell = life->field;
 
-    yOff = 0;
-
+    int32_t row;
+    for (row = 0 ; row < life->height ; row++)
     {
-        //-----------------------------------------------------------------
-        // first column
-
-        nOff0 = nYoff0 + life->width - 1;
-        nOff1 = nYoff1 + 0;
-        nOff2 = nYoff2 + 1;
-        nOff3 = nYoff3 + life->width - 1;
-        nOff4 = nYoff4 + 1;
-        nOff5 = nYoff5 + life->width - 1;
-        nOff6 = nYoff6 + 0;
-        nOff7 = nYoff7 + 1;
-
-        off = yOff;
-
-        n = lastBuffer[nOff0]
-          + lastBuffer[nOff1]
-          + lastBuffer[nOff2]
-          + lastBuffer[nOff3]
-          + lastBuffer[nOff4]
-          + lastBuffer[nOff5]
-          + lastBuffer[nOff6]
-          + lastBuffer[nOff7];
-
-        if (((lastBuffer[off] == LIVE) && (n == LIVE2)) || (n == LIVE3))
+        int32_t col;
+        for (col = 0 ; col < life->width ; col++)
         {
-            imageBuffer[off] = LIVE;
-        }
-        else
-        {
-            imageBuffer[off] = DEAD;
-        }
+            uint8_t neighbours = *cell >> 1;
 
-        //-----------------------------------------------------------------
-        // other columns
-
-        nOff0 = nYoff0 + 0;
-        nOff1 = nYoff1 + 1;
-        nOff2 = nYoff2 + 2;
-        nOff3 = nYoff3 + 0;
-        nOff4 = nYoff4 + 2;
-        nOff5 = nYoff5 + 0;
-        nOff6 = nYoff6 + 1;
-        nOff7 = nYoff7 + 2;
-
-        off = yOff + 1;
-
-        for (col = 1 ; col < (life->width - 1) ; col++)
-        {
-            n = lastBuffer[nOff0]
-              + lastBuffer[nOff1]
-              + lastBuffer[nOff2]
-              + lastBuffer[nOff3]
-              + lastBuffer[nOff4]
-              + lastBuffer[nOff5]
-              + lastBuffer[nOff6]
-              + lastBuffer[nOff7];
-
-            if (((lastBuffer[off] == LIVE) && (n == LIVE2)) || (n == LIVE3))
+            if (*cell & 0x01)
             {
-                imageBuffer[off] = LIVE;
+                if ((neighbours != 2) && (neighbours != 3))
+                {
+                    clearCell(life, col, row);
+                }
             }
             else
             {
-                imageBuffer[off] = DEAD;
+                if (neighbours == 3)
+                {
+                    setCell(life, col, row);
+                }
             }
 
-            nOff0 += 1;
-            nOff1 += 1;
-            nOff2 += 1;
-            nOff3 += 1;
-            nOff4 += 1;
-            nOff5 += 1;
-            nOff6 += 1;
-            nOff7 += 1;
-
-            off += 1;
-        }
-
-        //-----------------------------------------------------------------
-        // last column
-
-        nOff0 = nYoff0 + life->width - 2;
-        nOff1 = nYoff1 + life->width - 1;
-        nOff2 = nYoff2 + 0;
-        nOff3 = nYoff3 + life->width - 2;
-        nOff4 = nYoff4 + 0;
-        nOff5 = nYoff5 + life->width - 2;
-        nOff6 = nYoff6 + life->width - 1;
-        nOff7 = nYoff7 + 0;
-
-        off = yOff + life->width - 1;
-
-        n = lastBuffer[nOff0]
-          + lastBuffer[nOff1]
-          + lastBuffer[nOff2]
-          + lastBuffer[nOff3]
-          + lastBuffer[nOff4]
-          + lastBuffer[nOff5]
-          + lastBuffer[nOff6]
-          + lastBuffer[nOff7];
-
-        if (((lastBuffer[off] == LIVE) && (n == LIVE2)) || (n == LIVE3))
-        {
-            imageBuffer[off] = LIVE;
-        }
-        else
-        {
-            imageBuffer[off] = DEAD;
-        }
-    }
-
-    //---------------------------------------------------------------------
-    // other rows
-
-    nYoff0 = nYoff1 = nYoff2 = 0;
-    nYoff3 = nYoff4 = alignedWidth;
-    nYoff5 = nYoff6 = nYoff7 = 2 * alignedWidth;
-
-    yOff = alignedWidth;
-
-    for (row = 1 ; row < (life->height - 1) ; row++)
-    {
-        //-----------------------------------------------------------------
-        // first column
-
-        nOff0 = nYoff0 + life->width - 1;
-        nOff1 = nYoff1 + 0;
-        nOff2 = nYoff2 + 1;
-        nOff3 = nYoff3 + life->width - 1;
-        nOff4 = nYoff4 + 1;
-        nOff5 = nYoff5 + life->width - 1;
-        nOff6 = nYoff6 + 0;
-        nOff7 = nYoff7 + 1;
-
-        off = yOff + 0;
-
-        n = lastBuffer[nOff0]
-          + lastBuffer[nOff1]
-          + lastBuffer[nOff2]
-          + lastBuffer[nOff3]
-          + lastBuffer[nOff4]
-          + lastBuffer[nOff5]
-          + lastBuffer[nOff6]
-          + lastBuffer[nOff7];
-
-        if (((lastBuffer[off] == LIVE) && (n == LIVE2)) || (n == LIVE3))
-        {
-            imageBuffer[off] = LIVE;
-        }
-        else
-        {
-            imageBuffer[off] = DEAD;
-        }
-
-        //-----------------------------------------------------------------
-        // other columns
-
-        nOff0 = nYoff0 + 0;
-        nOff1 = nYoff1 + 1;
-        nOff2 = nYoff2 + 2;
-        nOff3 = nYoff3 + 0;
-        nOff4 = nYoff4 + 2;
-        nOff5 = nYoff5 + 0;
-        nOff6 = nYoff6 + 1;
-        nOff7 = nYoff7 + 2;
-
-        off = yOff + 1;
-
-        for (col = 1 ; col < (life->width - 1) ; col++)
-        {
-            n = lastBuffer[nOff0]
-              + lastBuffer[nOff1]
-              + lastBuffer[nOff2]
-              + lastBuffer[nOff3]
-              + lastBuffer[nOff4]
-              + lastBuffer[nOff5]
-              + lastBuffer[nOff6]
-              + lastBuffer[nOff7];
-
-            if (((lastBuffer[off] == LIVE) && (n == LIVE2)) || (n == LIVE3))
-            {
-                imageBuffer[off] = LIVE;
-            }
-            else
-            {
-                imageBuffer[off] = DEAD;
-            }
-
-            nOff0 += 1;
-            nOff1 += 1;
-            nOff2 += 1;
-            nOff3 += 1;
-            nOff4 += 1;
-            nOff5 += 1;
-            nOff6 += 1;
-            nOff7 += 1;
-
-            off += 1;
-        }
-
-        //-----------------------------------------------------------------
-        // last column
-
-        nOff0 = nYoff0 + life->width - 2;
-        nOff1 = nYoff1 + life->width - 1;
-        nOff2 = nYoff2 + 0;
-        nOff3 = nYoff3 + life->width - 2;
-        nOff4 = nYoff4 + 0;
-        nOff5 = nYoff5 + life->width - 2;
-        nOff6 = nYoff6 + life->width - 1;
-        nOff7 = nYoff7 + 0;
-
-        off = yOff + life->width - 1;
-
-        n = lastBuffer[nOff0]
-          + lastBuffer[nOff1]
-          + lastBuffer[nOff2]
-          + lastBuffer[nOff3]
-          + lastBuffer[nOff4]
-          + lastBuffer[nOff5]
-          + lastBuffer[nOff6]
-          + lastBuffer[nOff7];
-
-        if (((lastBuffer[off] == LIVE) && (n == LIVE2)) || (n == LIVE3))
-        {
-            imageBuffer[off] = LIVE;
-        }
-        else
-        {
-            imageBuffer[off] = DEAD;
-        }
-
-        //-----------------------------------------------------------------
-
-        nYoff0 += alignedWidth;
-        nYoff1 += alignedWidth;
-        nYoff2 += alignedWidth;
-        nYoff3 += alignedWidth;
-        nYoff4 += alignedWidth;
-        nYoff5 += alignedWidth;
-        nYoff6 += alignedWidth;
-        nYoff7 += alignedWidth;
-
-        yOff += alignedWidth;
-    }
-
-    //---------------------------------------------------------------------
-    // last row
-
-    nYoff0 = nYoff1 = nYoff2 = (life->height - 2) * alignedWidth;
-    nYoff3 = nYoff4 = (life->height - 1) * alignedWidth;
-    nYoff5 = nYoff6 = nYoff7 = 0;
-
-    yOff = (life->height - 1) * alignedWidth;
-
-    {
-        //-----------------------------------------------------------------
-        // first column
-
-        nOff0 = nYoff0 + life->width - 1;
-        nOff1 = nYoff1 + 0;
-        nOff2 = nYoff2 + 1;
-        nOff3 = nYoff3 + life->width - 1;
-        nOff4 = nYoff4 + 1;
-        nOff5 = nYoff5 + life->width - 1;
-        nOff6 = nYoff6 + 0;
-        nOff7 = nYoff7 + 1;
-
-        off = yOff + 0;
-
-        n = lastBuffer[nOff0]
-          + lastBuffer[nOff1]
-          + lastBuffer[nOff2]
-          + lastBuffer[nOff3]
-          + lastBuffer[nOff4]
-          + lastBuffer[nOff5]
-          + lastBuffer[nOff6]
-          + lastBuffer[nOff7];
-
-        if (((lastBuffer[off] == LIVE) && (n == LIVE2)) || (n == LIVE3))
-        {
-            imageBuffer[off] = LIVE;
-        }
-        else
-        {
-            imageBuffer[off] = DEAD;
-        }
-
-        //-----------------------------------------------------------------
-        // other columns
-
-        nOff0 = nYoff0 + 0;
-        nOff1 = nYoff1 + 1;
-        nOff2 = nYoff2 + 2;
-        nOff3 = nYoff3 + 0;
-        nOff4 = nYoff4 + 2;
-        nOff5 = nYoff5 + 0;
-        nOff6 = nYoff6 + 1;
-        nOff7 = nYoff7 + 2;
-
-        off += 1;
-
-        for (col = 1 ; col < (life->width - 1) ; col++)
-        {
-            n = lastBuffer[nOff0]
-              + lastBuffer[nOff1]
-              + lastBuffer[nOff2]
-              + lastBuffer[nOff3]
-              + lastBuffer[nOff4]
-              + lastBuffer[nOff5]
-              + lastBuffer[nOff6]
-              + lastBuffer[nOff7];
-
-            if (((lastBuffer[off] == LIVE) && (n == LIVE2)) || (n == LIVE3))
-            {
-                imageBuffer[off] = LIVE;
-            }
-            else
-            {
-                imageBuffer[off] = DEAD;
-            }
-
-            nOff0 += 1;
-            nOff1 += 1;
-            nOff2 += 1;
-            nOff3 += 1;
-            nOff4 += 1;
-            nOff5 += 1;
-            nOff6 += 1;
-            nOff7 += 1;
-
-            off += 1;
-        }
-
-        //-----------------------------------------------------------------
-        // last column
-
-        nOff0 = nYoff0 + life->width - 2;
-        nOff1 = nYoff1 + life->width - 1;
-        nOff2 = nYoff2 + 0;
-        nOff3 = nYoff3 + life->width - 2;
-        nOff4 = nYoff4 + 0;
-        nOff5 = nYoff5 + life->width - 2;
-        nOff6 = nYoff6 + life->width - 1;
-        nOff7 = nYoff7 + 0;
-
-        off = yOff + life->width - 1;
-
-        n = lastBuffer[nOff0]
-          + lastBuffer[nOff1]
-          + lastBuffer[nOff2]
-          + lastBuffer[nOff3]
-          + lastBuffer[nOff4]
-          + lastBuffer[nOff5]
-          + lastBuffer[nOff6]
-          + lastBuffer[nOff7];
-
-        if (((lastBuffer[off] == LIVE) && (n == LIVE2)) || (n == LIVE3))
-        {
-            imageBuffer[off] = LIVE;
-        }
-        else
-        {
-            imageBuffer[off] = DEAD;
+            ++cell;
         }
     }
 
@@ -650,22 +333,32 @@ changeSourceLife(
 
 void
 destroyLife(
-    LIFE_T* life)
+    LIFE_T *life)
 {
     if (life->buffer)
     {
         free(life->buffer);
+        life->buffer = NULL;
     }
 
-    if (life->last)
+    if (life->field)
     {
-        free(life->last);
+        free(life->field);
+        life->field = NULL;
+    }
+
+    if (life->fieldNext)
+    {
+        free(life->fieldNext);
+        life->fieldNext = NULL;
     }
 
     life->width = 0;
     life->alignedWidth = 0;
     life->height = 0;
+    life->alignedHeight = 0;
     life->pitch = 0;
+    life->fieldLength = 0;
 
     //---------------------------------------------------------------------
 

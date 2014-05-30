@@ -42,7 +42,9 @@ typedef struct
     int32_t alignedHeight;
     int32_t pitch;
     uint8_t *buffer;
-    uint8_t *last;
+    int32_t fieldLength;
+    uint8_t *field;
+    uint8_t *fieldNext;
     VC_RECT_T srcRect;
     VC_RECT_T dstRect;
     DISPMANX_RESOURCE_HANDLE_T frontResource;
