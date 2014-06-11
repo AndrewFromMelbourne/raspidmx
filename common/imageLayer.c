@@ -41,7 +41,7 @@ initImageLayer(
     int32_t height,
     VC_IMAGE_TYPE_T type)
 {
-    initImage(&(il->image), type, width, height);
+    initImage(&(il->image), type, width, height, false);
 }
 
 //-------------------------------------------------------------------------

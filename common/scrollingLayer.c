@@ -338,7 +338,7 @@ loadScrollingLayerPng(
         int32_t width = (extendX) ? baseImage.width*2 : baseImage.width;
         int32_t height = (extendY) ? baseImage.height*2 : baseImage.height;
 
-        initImage(image, baseImage.type, width, height);
+        initImage(image, baseImage.type, width, height, false);
 
         if (extendX)
         {

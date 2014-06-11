@@ -100,7 +100,8 @@ loadPng(
     initImage(image,
               type,
               png_get_image_width(png_ptr, info_ptr),
-              png_get_image_height(png_ptr, info_ptr));
+              png_get_image_height(png_ptr, info_ptr),
+              false);
 
     //---------------------------------------------------------------------
 

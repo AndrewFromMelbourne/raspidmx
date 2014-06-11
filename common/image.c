@@ -42,8 +42,10 @@
 void setPixel4BPP(IMAGE_T *image, int32_t x, int32_t y, int8_t index);
 void setPixel8BPP(IMAGE_T *image, int32_t x, int32_t y, int8_t index);
 void setPixelRGB565(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
+void setPixelDitheredRGB565(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
 void setPixelRGB888(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
 void setPixelRGBA16(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
+void setPixelDitheredRGBA16(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
 void setPixelRGBA32(IMAGE_T *image, int32_t x, int32_t y, const RGBA8_T *rgba);
 
 void getPixel4BPP(IMAGE_T *image, int32_t x, int32_t y, int8_t *index);
@@ -59,7 +61,8 @@ bool initImage(
     IMAGE_T *image,
     VC_IMAGE_TYPE_T type,
     int32_t width,
-    int32_t height)
+    int32_t height,
+    bool dither)
 {
     switch (type)
     {
@@ -86,7 +89,15 @@ bool initImage(
     case VC_IMAGE_RGB565:
 
         image->bitsPerPixel = 16;
-        image->setPixelDirect = setPixelRGB565;
+
+        if (dither)
+        {
+            image->setPixelDirect = setPixelDitheredRGB565;
+        }
+        else
+        {
+            image->setPixelDirect = setPixelRGB565;
+        }
         image->getPixelDirect = getPixelRGB565;
         image->setPixelIndexed = NULL;
         image->getPixelIndexed = NULL;
@@ -106,7 +117,14 @@ bool initImage(
     case VC_IMAGE_RGBA16:
 
         image->bitsPerPixel = 16;
-        image->setPixelDirect = setPixelRGBA16;
+        if (dither)
+        {
+            image->setPixelDirect = setPixelDitheredRGBA16;
+        }
+        else
+        {
+            image->setPixelDirect = setPixelRGBA16;
+        }
         image->getPixelDirect = getPixelRGBA16;
         image->setPixelIndexed = NULL;
         image->getPixelIndexed = NULL;
@@ -356,6 +374,67 @@ setPixelRGB565(
     *(uint16_t*)(image->buffer + (x * 2) + (y *image->pitch)) = pixel;
 }
 
+//-----------------------------------------------------------------------
+
+void
+setPixelDitheredRGB565(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    const RGBA8_T *rgba)
+{
+    static int16_t dither8[64] =
+    {
+        1, 6, 2, 7, 1, 6, 2, 7,
+        4, 2, 5, 4, 4, 3, 6, 4,
+        1, 7, 1, 6, 2, 7, 1, 7,
+        5, 3, 5, 3, 5, 4, 5, 3,
+        1, 6, 2, 7, 1, 6, 2, 7,
+        4, 3, 6, 4, 4, 2, 6, 4,
+        2, 7, 1, 7, 2, 7, 1, 6,
+        5, 3, 5, 3, 5, 3, 5, 3,
+    };
+
+    static int16_t dither4[64] =
+    {
+        1, 3, 1, 3, 1, 3, 1, 3,
+        2, 1, 3, 2, 2, 1, 3, 2,
+        1, 3, 1, 3, 1, 3, 1, 3,
+        2, 2, 2, 1, 3, 2, 2, 2,
+        1, 3, 1, 3, 1, 3, 1, 3,
+        2, 1, 3, 2, 2, 1, 3, 2,
+        1, 3, 1, 3, 1, 3, 1, 3,
+        3, 2, 2, 2, 2, 2, 2, 2,
+    };
+
+    int32_t index = (x & 7) | ((y & 7) << 3);
+
+    int16_t r = rgba->red + dither8[index];
+
+    if (r > 255)
+    {
+        r = 255;
+    }
+
+    int16_t g = rgba->green + dither4[index];
+
+    if (g > 255)
+    {
+        g = 255;
+    }
+
+    int16_t b = rgba->blue + dither8[index];
+
+    if (b > 255)
+    {
+        b = 255;
+    }
+
+    RGBA8_T dithered = { r, g, b, rgba->alpha };
+
+    setPixelRGB565(image, x, y, &dithered);
+}
+
 //-------------------------------------------------------------------------
 
 void
@@ -387,6 +466,62 @@ setPixelRGBA16(
 
     uint16_t pixel = (r4 << 12) | (g4 << 8) | (b4 << 4) | a4;
     *(uint16_t*)(image->buffer + (x * 2) + (y *image->pitch)) = pixel;
+}
+
+//-----------------------------------------------------------------------
+
+void
+setPixelDitheredRGBA16(
+    IMAGE_T *image,
+    int32_t x,
+    int32_t y,
+    const RGBA8_T *rgba)
+{
+    static int16_t dither16[64] =
+    {
+         1,  12,   4,  15,   1,  13,   4,  15,
+         8,   4,  11,   7,   9,   5,  12,   8,
+         3,  14,   2,  13,   3,  15,   2,  14,
+        10,   6,   9,   5,  11,   7,  10,   6,
+         1,  12,   4,  15,   1,  12,   4,  15,
+         9,   5,  12,   8,   8,   5,  11,   8,
+         3,  14,   2,  13,   3,  14,   2,  13,
+        11,   7,  10,   6,  10,   7,   9,   6,
+    };
+
+    int32_t index = (x & 7) | ((y & 7) << 3);
+
+    int16_t r = rgba->red + dither16[index];
+
+    if (r > 255)
+    {
+        r = 255;
+    }
+
+    int16_t g = rgba->green + dither16[index];
+
+    if (g > 255)
+    {
+        g = 255;
+    }
+
+    int16_t b = rgba->blue + dither16[index];
+
+    if (b > 255)
+    {
+        b = 255;
+    }
+
+    int16_t a = rgba->alpha + dither16[index];
+
+    if (b > 255)
+    {
+        b = 255;
+    }
+
+    RGBA8_T dithered = { r, g, b, a };
+
+    setPixelRGBA16(image, x, y, &dithered);
 }
 
 //-----------------------------------------------------------------------

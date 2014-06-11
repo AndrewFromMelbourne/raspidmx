@@ -61,8 +61,9 @@ int main(int argc, char *argv[])
 {
     int opt = 0;
 
-    int32_t requestedSize = 0;
+    int32_t requestedSize = 256;
     bool animate = false;
+    bool dither = false;
     const char* imageTypeName = "RGB888";
     VC_IMAGE_TYPE_T imageType = VC_IMAGE_MIN;
 
@@ -72,13 +73,18 @@ int main(int argc, char *argv[])
 
     //-------------------------------------------------------------------
 
-    while ((opt = getopt(argc, argv, "as:t:")) != -1)
+    while ((opt = getopt(argc, argv, "ads:t:")) != -1)
     {
         switch (opt)
         {
         case 'a':
 
             animate = true;
+            break;
+
+        case 'd':
+
+            dither = true;
             break;
 
         case 's':
@@ -96,6 +102,7 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Usage: %s ", program);
             fprintf(stderr, "[-a] [-s <size>] [-t <type>]\n");
             fprintf(stderr, "    -a - animate\n");
+            fprintf(stderr, "    -d - dither\n");
             fprintf(stderr, "    -s - size of triangle to draw\n");
             fprintf(stderr, "    -t - type of image to create\n");
             fprintf(stderr, "         can be one of the following:");
@@ -130,7 +137,7 @@ int main(int argc, char *argv[])
     //-------------------------------------------------------------------
 
     IMAGE_T image;
-    initImage(&image, imageType, 256, 256);
+    initImage(&image, imageType, 256, 256, dither);
 
     //-------------------------------------------------------------------
 

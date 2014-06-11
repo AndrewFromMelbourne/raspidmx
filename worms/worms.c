@@ -192,7 +192,7 @@ initWorms(
     VC_IMAGE_TYPE_T imageType,
     DISPMANX_MODEINFO_T *info)
 {
-    initImage(&(worms->image), imageType, info->width, info->height);
+    initImage(&(worms->image), imageType, info->width, info->height, false);
     srand(time(NULL));
 
     worms->size = number;

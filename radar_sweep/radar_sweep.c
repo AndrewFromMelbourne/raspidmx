@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     }
 
     IMAGE_T image;
-    initImage(&image, imageType, size, size);
+    initImage(&image, imageType, size, size, false);
 
     int32_t xOffset = (modeInfo.width - image.width) / 2;
     int32_t yOffset = (modeInfo.height - image.height) / 2;

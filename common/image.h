@@ -101,7 +101,8 @@ initImage(
     IMAGE_T *image,
     VC_IMAGE_TYPE_T type,
     int32_t width,
-    int32_t height);
+    int32_t height,
+    bool dither);
 
 void
 clearImageIndexed(
