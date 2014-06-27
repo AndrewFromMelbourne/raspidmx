@@ -39,8 +39,8 @@
 //-------------------------------------------------------------------------
 
 bool
-initImagePalette(
-    IMAGE_PALETTE_T *palette,
+initImagePalette16(
+    IMAGE_PALETTE16_T *palette,
     int16_t length)
 {
     palette->palette = calloc(1, length * sizeof(uint16_t));
@@ -48,18 +48,18 @@ initImagePalette(
 
     if (palette->palette == NULL)
     {
-        fprintf(stderr, "imagePalette: memory exhausted\n");
+        fprintf(stderr, "imagePalette16: memory exhausted\n");
         exit(EXIT_FAILURE);
     }
 
-    return false;
+    return true;
 }
 
 //-------------------------------------------------------------------------
 
 bool
-setPaletteEntryRGB(
-    IMAGE_PALETTE_T *palette,
+setPalette16EntryRgb(
+    IMAGE_PALETTE16_T *palette,
     int16_t index,
     const RGBA8_T *rgb)
 {
@@ -67,7 +67,7 @@ setPaletteEntryRGB(
 
     if ((index >= 0) && (index < palette->length))
     {
-        palette->palette[index] = rgbToPaletteEntry(rgb);
+        palette->palette[index] = rgbToPalette16Entry(rgb);
         result = true;
     }
 
@@ -77,8 +77,8 @@ setPaletteEntryRGB(
 //-------------------------------------------------------------------------
 
 bool
-getPaletteEntryRgb(
-    IMAGE_PALETTE_T *palette,
+getPalette16EntryRgb(
+    IMAGE_PALETTE16_T *palette,
     int16_t index,
     RGBA8_T *rgb)
 {
@@ -86,7 +86,7 @@ getPaletteEntryRgb(
 
     if ((index >= 0) && (index < palette->length))
     {
-        paletteEntryToRGB(palette->palette[index], rgb);
+        palette16EntryToRgb(palette->palette[index], rgb);
         result = true;
     }
 
@@ -96,7 +96,7 @@ getPaletteEntryRgb(
 //-------------------------------------------------------------------------
 
 void
-paletteEntryToRGB(
+palette16EntryToRgb(
     uint16_t entry,
     RGBA8_T *rgb)
 {
@@ -113,7 +113,7 @@ paletteEntryToRGB(
 //-------------------------------------------------------------------------
 
 uint16_t
-rgbToPaletteEntry(
+rgbToPalette16Entry(
     const RGBA8_T *rgb)
 {
     return ((rgb->red>>3)<<11) | ((rgb->green>>2)<<5) | (rgb->blue>>3);
@@ -122,8 +122,8 @@ rgbToPaletteEntry(
 //-------------------------------------------------------------------------
 
 bool
-setResourcePalette(
-    const IMAGE_PALETTE_T *palette,
+setResourcePalette16(
+    const IMAGE_PALETTE16_T *palette,
     int16_t offset,
     DISPMANX_RESOURCE_HANDLE_T resource,
     int16_t first,
@@ -147,8 +147,8 @@ setResourcePalette(
 //-------------------------------------------------------------------------
 
 void
-destroyImagePalette(
-    IMAGE_PALETTE_T *palette)
+destroyImagePalette16(
+    IMAGE_PALETTE16_T *palette)
 {
     if (palette->palette != NULL)
     {
@@ -161,3 +161,124 @@ destroyImagePalette(
 
 //-------------------------------------------------------------------------
 
+bool
+initImagePalette32(
+    IMAGE_PALETTE32_T *palette,
+    int16_t length)
+{
+    palette->palette = calloc(1, length * sizeof(uint32_t));
+    palette->length = length;
+
+    if (palette->palette == NULL)
+    {
+        fprintf(stderr, "imagePalette32: memory exhausted\n");
+        exit(EXIT_FAILURE);
+    }
+
+    return true;
+}
+
+//-------------------------------------------------------------------------
+
+bool
+setPalette32EntryRgba(
+    IMAGE_PALETTE32_T *palette,
+    int16_t index,
+    const RGBA8_T *rgba)
+{
+    bool result = false;
+
+    if ((index >= 0) && (index < palette->length))
+    {
+        palette->palette[index] = rgbaToPalette32Entry(rgba);
+        result = true;
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------
+
+bool
+getPalette32EntryRgba(
+    IMAGE_PALETTE32_T *palette,
+    int16_t index,
+    RGBA8_T *rgba)
+{
+    bool result = false;
+
+    if ((index >= 0) && (index < palette->length))
+    {
+        palette32EntryToRgba(palette->palette[index], rgba);
+        result = true;
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------
+
+void
+palette32EntryToRgba(
+    uint32_t entry,
+    RGBA8_T *rgba)
+{
+    rgba->alpha = (entry >> 24) & 0xFF;
+    rgba->red = (entry >> 16) & 0xFF;
+    rgba->green = (entry >> 8) & 0xFF;
+    rgba->blue = entry & 0xFF;
+}
+
+//-------------------------------------------------------------------------
+
+uint32_t
+rgbaToPalette32Entry(
+    const RGBA8_T *rgba)
+{
+    return (rgba->alpha << 24) |
+           (rgba->red << 16) |
+           (rgba->green << 8) |
+           rgba->blue;
+}
+
+//-------------------------------------------------------------------------
+
+bool
+setResourcePalette32(
+    const IMAGE_PALETTE32_T *palette,
+    int16_t offset,
+    DISPMANX_RESOURCE_HANDLE_T resource,
+    int16_t first,
+    int16_t last)
+{
+    bool result = false;
+
+    if ((first >= 0) && (last + offset < palette->length))
+    {
+        int status =
+            vc_dispmanx_resource_set_palette(resource,
+                                             &(palette->palette[offset]),
+                                             first * sizeof(uint32_t),
+                                             last * sizeof(uint32_t));
+        result = (status == 0);
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------
+
+void
+destroyImagePalette32(
+    IMAGE_PALETTE32_T *palette)
+{
+    if (palette->palette != NULL)
+    {
+        free(palette->palette);
+        palette->palette = NULL;
+    }
+
+    palette->length = 0;
+}
+
+//-------------------------------------------------------------------------

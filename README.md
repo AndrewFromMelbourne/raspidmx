@@ -67,7 +67,11 @@ The famous (in the 1990s) Mandelbrot set.
 
 radar_sweep
 -----------
-An animation of a 'radar sweep' using palette animation.
+An animation of a 'radar sweep' using 16 bit (rgb) palette animation.
+
+radar_sweep_alpha
+-----------------
+An animation of a 'radar sweep' using 32 bit (rgba) palette animation.
 
 common
 ------

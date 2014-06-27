@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2013 Andrew Duncan
+// Copyright (c) 2014 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -147,21 +147,21 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    IMAGE_PALETTE16_T palette;
-    initImagePalette16(&palette, 512);
+    IMAGE_PALETTE32_T palette;
+    initImagePalette32(&palette, 512);
 
     int p;
     for (p = 1 ; p < 64 ; p++)
     {
-        RGBA8_T rgb;
+        RGBA8_T rgba;
 
-        rgb.red = 0;
-        rgb.green = (p * 255) / 63;
-        rgb.blue = 0;
-        rgb.alpha = 255;
+        rgba.red = 0;
+        rgba.green = 255;
+        rgba.blue = 0;
+        rgba.alpha = (p * 255) / 63;
 
-        setPalette16EntryRgb(&palette, p, &rgb);
-        setPalette16EntryRgb(&palette, p + 254, &rgb);
+        setPalette32EntryRgba(&palette, p, &rgba);
+        setPalette32EntryRgba(&palette, p + 254, &rgba);
     }
 
     //---------------------------------------------------------------------
@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
 
     //-------------------------------------------------------------------
 
-    setResourcePalette16(&palette, 0, resource, 1, 256);
+    setResourcePalette32(&palette, 0, resource, 1, 256);
 
     //-------------------------------------------------------------------
 
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     VC_DISPMANX_ALPHA_T alpha;
-    alpha.flags = DISPMANX_FLAGS_ALPHA_FIXED_ALL_PIXELS;
+    alpha.flags = DISPMANX_FLAGS_ALPHA_FROM_SOURCE;
     alpha.opacity = 255;
     alpha.mask = 0;
 
@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
 
         //-----------------------------------------------------------
 
-        setResourcePalette16(&palette, offset, resource, 1, 256);
+        setResourcePalette32(&palette, offset, resource, 1, 256);
 
         offset--;
         if (offset < 1)
@@ -309,7 +309,7 @@ int main(int argc, char *argv[])
     //-------------------------------------------------------------------
 
     destroyImage(&image);
-    destroyImagePalette16(&palette);
+    destroyImagePalette32(&palette);
 
     //-------------------------------------------------------------------
 

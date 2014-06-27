@@ -43,47 +43,93 @@ typedef struct
 {
     uint16_t *palette;
     int16_t length;
-} IMAGE_PALETTE_T;
+} IMAGE_PALETTE16_T;
+
+typedef struct 
+{
+    uint32_t *palette;
+    int16_t length;
+} IMAGE_PALETTE32_T;
 
 //-------------------------------------------------------------------------
 
 bool
-initImagePalette(
-    IMAGE_PALETTE_T *palette,
+initImagePalette16(
+    IMAGE_PALETTE16_T *palette,
     int16_t length);
 
 bool
-setPaletteEntryRGB(
-    IMAGE_PALETTE_T *palette,
+setPalette16EntryRgb(
+    IMAGE_PALETTE16_T *palette,
     int16_t index,
     const RGBA8_T *rgb);
 
 bool
-getPaletteEntryRgb(
-    IMAGE_PALETTE_T *palette,
+getPalette16EntryRgb(
+    IMAGE_PALETTE16_T *palette,
     int16_t index,
     RGBA8_T *rgb);
 
 void
-paletteEntryToRGB(
+palette16EntryToRgb(
     uint16_t entry,
     RGBA8_T *rgb);
 
 uint16_t
-rgbToPaletteEntry(
+rgbToPalette16Entry(
     const RGBA8_T *rgb);
 
 bool
-setResourcePalette(
-    const IMAGE_PALETTE_T *palette,
+setResourcePalette16(
+    const IMAGE_PALETTE16_T *palette,
     int16_t offset,
     DISPMANX_RESOURCE_HANDLE_T resource,
     int16_t first,
     int16_t last);
 
 void
-destroyImagePalette(
-    IMAGE_PALETTE_T *palette);
+destroyImagePalette16(
+    IMAGE_PALETTE16_T *palette);
+
+//-------------------------------------------------------------------------
+
+bool
+initImagePalette32(
+    IMAGE_PALETTE32_T *palette,
+    int16_t length);
+
+bool
+setPalette32EntryRgba(
+    IMAGE_PALETTE32_T *palette,
+    int16_t index,
+    const RGBA8_T *rgba);
+
+bool
+getPalette32EntryRgba(
+    IMAGE_PALETTE32_T *palette,
+    int16_t index,
+    RGBA8_T *rgba);
+
+void
+palette32EntryToRgba(
+    uint32_t entry,
+    RGBA8_T *rgba);
+
+uint32_t
+rgbaToPalette32Entry(
+    const RGBA8_T *rgba);
+
+bool
+setResourcePalette32(
+    const IMAGE_PALETTE32_T *palette,
+    int16_t offset,
+    DISPMANX_RESOURCE_HANDLE_T resource,
+    int16_t first,
+    int16_t last);
+
+void
+destroyImagePalette32(
+    IMAGE_PALETTE32_T *palette);
 
 //-------------------------------------------------------------------------
 
