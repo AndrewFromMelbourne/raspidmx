@@ -81,6 +81,7 @@ zoom(
     int c = 0;
     while ((c != 27) && (changed == false))
     {
+        usleep(100000);
         if (keyPressed(&c))
         {
             c = tolower(c);
@@ -256,6 +257,10 @@ int main(int argc, char *argv[])
                 }
                 break;
             }
+        }
+        else
+        {
+            usleep(100000);
         }
     }
 

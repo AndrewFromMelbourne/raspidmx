@@ -173,7 +173,7 @@ int main(void)
 
     while (keyPressed(NULL) == false)
     {
-        // do nothing
+        usleep(100000);
     }
 
     //---------------------------------------------------------------------

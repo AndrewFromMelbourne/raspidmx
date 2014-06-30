@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
 
     while (keyPressed(NULL) == false)
     {
-        // do nothing
+        usleep(100000);
     }
 
     //---------------------------------------------------------------------
