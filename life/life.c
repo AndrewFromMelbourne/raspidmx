@@ -202,6 +202,90 @@ newLife(
                                              life->buffer,
                                              &(life->dstRect));
     assert(result == 0);
+
+    //---------------------------------------------------------------------
+
+    long cores = sysconf(_SC_NPROCESSORS_ONLN);
+
+    if (cores == -1)
+    {
+        cores = 1;
+    }
+
+    if (cores > LIFE_MAX_THREADS)
+    {
+        life->numberOfThreads = LIFE_MAX_THREADS;
+    }
+    else
+    {
+        life->numberOfThreads = cores;
+    }
+
+    if (cores > 1)
+    {
+        pthread_barrier_init(&(life->startIterationBarrier),
+                             NULL,
+                             life->numberOfThreads + 1);
+
+        pthread_barrier_init(&(life->finishedIterationBarrier),
+                             NULL,
+                             life->numberOfThreads + 1);
+
+        //-----------------------------------------------------------------
+
+        int32_t heightStep = life->height / life->numberOfThreads;
+        int32_t heightStart = 0;
+
+        int32_t thread;
+        for (thread = 0 ; thread < life->numberOfThreads ; thread++)
+        {
+            life->heightRange[thread].startHeight = heightStart;
+            life->heightRange[thread].endHeight = heightStart + heightStep;
+
+            heightStart += heightStep;
+
+            pthread_create(&(life->threads[thread]),
+                           NULL,
+                           workerLife,
+                           life);
+        }
+
+        thread = life->numberOfThreads - 1;
+        life->heightRange[thread].endHeight = life->height;
+    }
+    else
+    {
+        life->heightRange[0].startHeight = 0;
+        life->heightRange[0].endHeight = life->height;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void *
+workerLife(
+    void *arg)
+{
+    LIFE_T *life = arg;
+
+    int32_t thread = -1;
+    int32_t i;
+    for (i = 0 ; i < life->numberOfThreads ; i++)
+    {
+        if (pthread_equal(pthread_self(), life->threads[i]))
+        {
+            thread = i;
+        }
+    }
+
+    while (true)
+    {
+        pthread_barrier_wait(&(life->startIterationBarrier));
+        iterateLifeKernel(life, thread);
+        pthread_barrier_wait(&(life->finishedIterationBarrier));
+    }
+
+    return arg;
 }
 
 //-------------------------------------------------------------------------
@@ -262,17 +346,17 @@ addElementLife(
 //-------------------------------------------------------------------------
 
 void
-iterateLife(
-    LIFE_T *life)
+iterateLifeKernel(
+    LIFE_T *life,
+    int32_t thread)
 {
-    memcpy(life->field, life->fieldNext, life->fieldLength);
-
-    //---------------------------------------------------------------------
-
-    uint8_t *cell = life->field;
+    uint8_t *cell = life->field +
+                    (life->heightRange[thread].startHeight * life->width);
 
     int32_t row;
-    for (row = 0 ; row < life->height ; row++)
+    for (row = life->heightRange[thread].startHeight ;
+         row < life->heightRange[thread].endHeight ;
+         row++)
     {
         int32_t col;
         for (col = 0 ; col < life->width ; col++)
@@ -297,8 +381,25 @@ iterateLife(
             ++cell;
         }
     }
+}
 
-    //---------------------------------------------------------------------
+//-------------------------------------------------------------------------
+
+void
+iterateLife(
+    LIFE_T *life)
+{
+    memcpy(life->field, life->fieldNext, life->fieldLength);
+
+    if (life->numberOfThreads == 1)
+    {
+        iterateLifeKernel(life, 0);
+    }
+    else
+    {
+        pthread_barrier_wait(&(life->startIterationBarrier));
+        pthread_barrier_wait(&(life->finishedIterationBarrier));
+    }
 
     int result = 0;
     VC_IMAGE_TYPE_T type = VC_IMAGE_RGBA16;
@@ -310,6 +411,8 @@ iterateLife(
                                              &(life->dstRect));
     assert(result == 0);
 }
+
+//-------------------------------------------------------------------------
 
 void
 changeSourceLife(
@@ -377,5 +480,13 @@ destroyLife(
     assert(result == 0);
     result = vc_dispmanx_resource_delete(life->backResource);
     assert(result == 0);
+
+    //---------------------------------------------------------------------
+
+    int32_t thread;
+    for (thread = 0 ; thread < life->numberOfThreads ; thread++)
+    {
+        pthread_cancel(life->threads[thread]);
+    }
 }
 
