@@ -55,7 +55,8 @@ typedef struct
 
 //-------------------------------------------------------------------------
 
-void initSpriteLayer(
+void
+initSpriteLayer(
     SPRITE_LAYER_T *s,
     int columns,
     int rows,
