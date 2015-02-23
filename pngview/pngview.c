@@ -52,9 +52,12 @@ const char *program = NULL;
 
 void usage(void)
 {
-    fprintf(stderr, "Usage: %s [-b <RGBA>] <file.png>\n", program);
+    fprintf(stderr,
+            "Usage: %s [-b <RGBA>] [-l <layer>] <file.png>\n",
+            program);
     fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
     fprintf(stderr, "         e.g. 0x000F is opaque black\n");
+    fprintf(stderr, "    -l - DispmanX layer number\n");
 
     exit(EXIT_FAILURE);
 }
@@ -64,6 +67,7 @@ void usage(void)
 int main(int argc, char *argv[])
 {
     uint16_t background = 0x000F;
+    int32_t layer = 1;
 
     program = basename(argv[0]);
 
@@ -71,13 +75,18 @@ int main(int argc, char *argv[])
 
     int opt = 0;
 
-    while ((opt = getopt(argc, argv, "b:")) != -1)
+    while ((opt = getopt(argc, argv, "b:l:")) != -1)
     {
         switch(opt)
         {
         case 'b':
 
             background = strtol(optarg, NULL, 16);
+            break;
+
+        case 'l':
+
+            layer = strtol(optarg, NULL, 10);
             break;
 
         default:
@@ -119,7 +128,7 @@ int main(int argc, char *argv[])
     {
         fprintf(stderr, "unable to load %s\n", argv[optind]);
     }
-    createResourceImageLayer(&imageLayer, 1);
+    createResourceImageLayer(&imageLayer, layer);
 
     //---------------------------------------------------------------------
 
