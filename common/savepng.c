@@ -131,10 +131,10 @@ pngWriteImageRGBA16(
             uint8_t b4 = (pixels >> 4) & 0xF;
             uint8_t a4 = pixels & 0xF;
 
-            imageRow[index] =  (r4 << 4) | r4;
-            imageRow[index + 1] =  (g4 << 4) | g4;
-            imageRow[index + 2] =  (b4 << 4) | b4;
-            imageRow[index + 3] =  (a4 << 4) | a4;
+            imageRow[index] = (r4 << 4) | r4;
+            imageRow[index + 1] = (g4 << 4) | g4;
+            imageRow[index + 2] = (b4 << 4) | b4;
+            imageRow[index + 3] = (a4 << 4) | a4;
         }
         png_write_row(pngPtr, imageRow);
 
