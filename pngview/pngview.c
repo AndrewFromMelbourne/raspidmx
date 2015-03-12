@@ -158,7 +158,11 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     BACKGROUND_LAYER_T backgroundLayer;
-    initBackgroundLayer(&backgroundLayer, background, 0);
+
+    if (background > 0)
+    {
+        initBackgroundLayer(&backgroundLayer, background, 0);
+    }
 
     IMAGE_LAYER_T imageLayer;
     if (loadPng(&(imageLayer.image), argv[optind]) == false)
@@ -213,7 +217,11 @@ int main(int argc, char *argv[])
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
     assert(update != 0);
 
-    addElementBackgroundLayer(&backgroundLayer, display, update);
+    if (background > 0)
+    {
+        addElementBackgroundLayer(&backgroundLayer, display, update);
+    }
+
     addElementImageLayerCentered(&imageLayer, &info, display, update);
 
     result = vc_dispmanx_update_submit_sync(update);
@@ -240,7 +248,11 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    destroyBackgroundLayer(&backgroundLayer);
+    if (background > 0)
+    {
+        destroyBackgroundLayer(&backgroundLayer);
+    }
+
     destroyImageLayer(&imageLayer);
 
     //---------------------------------------------------------------------
