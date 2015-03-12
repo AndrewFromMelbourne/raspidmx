@@ -28,6 +28,7 @@
 #define _GNU_SOURCE
 
 #include <assert.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,6 +48,26 @@
 //-------------------------------------------------------------------------
 
 const char *program = NULL;
+
+//-------------------------------------------------------------------------
+
+volatile bool run = true;
+
+//-------------------------------------------------------------------------
+
+static void
+signalHandler(
+    int signalNumber)
+{
+    switch (signalNumber)
+    {
+    case SIGINT:
+    case SIGTERM:
+
+        run = false;
+        break;
+    };
+}
 
 //-------------------------------------------------------------------------
 
@@ -101,6 +122,22 @@ int main(int argc, char *argv[])
     if (optind >= argc)
     {
         usage();
+    }
+
+    //---------------------------------------------------------------------
+
+    if (signal(SIGINT, signalHandler) == SIG_ERR)
+    {
+        perror("installing SIGINT signal handler");
+        exit(EXIT_FAILURE);
+    }
+
+    //---------------------------------------------------------------------
+
+    if (signal(SIGTERM, signalHandler) == SIG_ERR)
+    {
+        perror("installing SIGTERM signal handler");
+        exit(EXIT_FAILURE);
     }
 
     //---------------------------------------------------------------------
@@ -184,9 +221,17 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    while (keyPressed(NULL) == false)
+    while (run)
     {
-        usleep(100000);
+
+        if (keyPressed(NULL))
+        {
+            run = false;
+        }
+        else
+        {
+            usleep(100000);
+        }
     }
 
     //---------------------------------------------------------------------
