@@ -58,18 +58,24 @@ int main(int argc, char *argv[])
     const char* imageTypeName = "RGBA32";
     VC_IMAGE_TYPE_T imageType = VC_IMAGE_MIN;
     uint16_t  background = 0x0000;
+    uint32_t displayNumber = 0;
 
     program = basename(argv[0]);
 
     //-------------------------------------------------------------------
 
-    while ((opt = getopt(argc, argv, "b:t:")) != -1)
+    while ((opt = getopt(argc, argv, "b:d:t:")) != -1)
     {
         switch (opt)
         {
         case 'b':
 
             background = strtol(optarg, NULL, 16);
+            break;
+
+        case 'd':
+
+            displayNumber = strtol(optarg, NULL, 10);
             break;
 
         case 't':
@@ -79,9 +85,11 @@ int main(int argc, char *argv[])
 
         default:
 
-            fprintf(stderr, "Usage: %s [-b <RGBA>] [-t <type>]\n", program);
+            fprintf(stderr, "Usage: %s \n", program);
+            fprintf(stderr, "[-b <RGBA>] [-d <number>] [-t <type>]\n");
             fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
             fprintf(stderr, "         e.g. 0x000F is opaque black\n");
+            fprintf(stderr, "    -d - Raspberry Pi display number\n");
             fprintf(stderr, "    -t - type of image to create\n");
             fprintf(stderr, "         can be one of the following:");
             printImageTypes(stderr,
@@ -122,7 +130,8 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    DISPMANX_DISPLAY_HANDLE_T display = vc_dispmanx_display_open(0);
+    DISPMANX_DISPLAY_HANDLE_T display
+        = vc_dispmanx_display_open(displayNumber);
     assert(display != 0);
 
     //---------------------------------------------------------------------

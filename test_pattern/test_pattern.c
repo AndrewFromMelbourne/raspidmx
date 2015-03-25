@@ -25,6 +25,8 @@
 //
 //-------------------------------------------------------------------------
 
+#define _GNU_SOURCE
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -41,8 +43,34 @@
 
 //-------------------------------------------------------------------------
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    uint32_t displayNumber = 0;
+
+    //-------------------------------------------------------------------
+
+    int opt;
+
+    while ((opt = getopt(argc, argv, "d:")) != -1)
+    {
+        switch (opt)
+        {
+        case 'd':
+
+            displayNumber = atoi(optarg);
+            break;
+
+        default:
+
+            fprintf(stderr, "Usage: %s [-d <number>]\n", basename(argv[0]));
+            fprintf(stderr, "    -d - Raspberry Pi display number\n");
+            exit(EXIT_FAILURE);
+            break;
+        }
+    }
+
+    //-------------------------------------------------------------------
+
     VC_IMAGE_TYPE_T type = VC_IMAGE_RGBA32;
 
     //---------------------------------------------------------------------
@@ -51,7 +79,8 @@ int main(void)
 
     //---------------------------------------------------------------------
 
-    DISPMANX_DISPLAY_HANDLE_T display = vc_dispmanx_display_open(0);
+    DISPMANX_DISPLAY_HANDLE_T display
+        = vc_dispmanx_display_open(displayNumber);
     assert(display != 0);
 
     //---------------------------------------------------------------------

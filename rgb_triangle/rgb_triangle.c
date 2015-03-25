@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
 {
     int opt = 0;
 
+    uint32_t displayNumber = 0;
     int32_t requestedSize = 256;
     bool animate = false;
     bool dither = false;
@@ -73,7 +74,7 @@ int main(int argc, char *argv[])
 
     //-------------------------------------------------------------------
 
-    while ((opt = getopt(argc, argv, "ads:t:")) != -1)
+    while ((opt = getopt(argc, argv, "adD:s:t:")) != -1)
     {
         switch (opt)
         {
@@ -85,6 +86,11 @@ int main(int argc, char *argv[])
         case 'd':
 
             dither = true;
+            break;
+
+        case 'D':
+
+            displayNumber = atoi(optarg);
             break;
 
         case 's':
@@ -100,9 +106,11 @@ int main(int argc, char *argv[])
         default:
 
             fprintf(stderr, "Usage: %s ", program);
-            fprintf(stderr, "[-a] [-s <size>] [-t <type>]\n");
+            fprintf(stderr, "[-a] [-d] [-D <number>] [-s <size>] ");
+            fprintf(stderr, "[-t <type>]\n");
             fprintf(stderr, "    -a - animate\n");
             fprintf(stderr, "    -d - dither\n");
+            fprintf(stderr, "    -D - Raspberry Pi display number\n");
             fprintf(stderr, "    -s - size of triangle to draw\n");
             fprintf(stderr, "    -t - type of image to create\n");
             fprintf(stderr, "         can be one of the following:");
@@ -143,7 +151,8 @@ int main(int argc, char *argv[])
 
     bcm_host_init();
 
-    DISPMANX_DISPLAY_HANDLE_T displayHandle = vc_dispmanx_display_open(0);
+    DISPMANX_DISPLAY_HANDLE_T displayHandle
+        = vc_dispmanx_display_open(displayNumber);
     assert(displayHandle != 0);
 
     DISPMANX_MODEINFO_T modeInfo;

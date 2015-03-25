@@ -54,13 +54,19 @@ int main(int argc, char *argv[])
 {
     int opt = 0;
     int32_t size = 350;
+    uint32_t displayNumber = 0;
 
     //-------------------------------------------------------------------
 
-    while ((opt = getopt(argc, argv, "s:")) != -1)
+    while ((opt = getopt(argc, argv, "d:s:")) != -1)
     {
         switch (opt)
         {
+        case 'd':
+
+            displayNumber = atoi(optarg);
+            break;
+
         case 's':
 
             size = atoi(optarg);
@@ -68,7 +74,11 @@ int main(int argc, char *argv[])
 
         default:
 
-            fprintf(stderr, "Usage: %s [-s size]\n", basename(argv[0]));
+            fprintf(stderr,
+                    "Usage: %s [-d <number>] [-s <size>]\n",
+                    basename(argv[0]));
+
+            fprintf(stderr, "    -d - Raspberry Pi display number\n");
             fprintf(stderr, "    -s - size of image to create\n");
             exit(EXIT_FAILURE);
             break;
@@ -100,7 +110,8 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    DISPMANX_DISPLAY_HANDLE_T display = vc_dispmanx_display_open(0);
+    DISPMANX_DISPLAY_HANDLE_T display
+        = vc_dispmanx_display_open(displayNumber);
     assert(display != 0);
 
     //---------------------------------------------------------------------

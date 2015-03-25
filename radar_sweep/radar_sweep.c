@@ -60,17 +60,44 @@ const char* program = NULL;
 
 int main(int argc, char *argv[])
 {
-    VC_IMAGE_TYPE_T imageType = VC_IMAGE_8BPP;
-
-    int result = 0;
+    uint32_t displayNumber = 0;
 
     program = basename(argv[0]);
 
     //-------------------------------------------------------------------
 
+    int opt;
+
+    while ((opt = getopt(argc, argv, "d:")) != -1)
+    {
+        switch (opt)
+        {
+        case 'd':
+
+            displayNumber = atoi(optarg);
+            break;
+
+        default:
+
+            fprintf(stderr, "Usage: %s [-d <number>]\n", program);
+            fprintf(stderr, "    -d - Raspberry Pi display number\n");
+            exit(EXIT_FAILURE);
+            break;
+        }
+    }
+
+    //-------------------------------------------------------------------
+
+    VC_IMAGE_TYPE_T imageType = VC_IMAGE_8BPP;
+
+    int result = 0;
+
+    //-------------------------------------------------------------------
+
     bcm_host_init();
 
-    DISPMANX_DISPLAY_HANDLE_T displayHandle = vc_dispmanx_display_open(0);
+    DISPMANX_DISPLAY_HANDLE_T displayHandle
+        = vc_dispmanx_display_open(displayNumber);
     assert(displayHandle != 0);
 
     DISPMANX_MODEINFO_T modeInfo;

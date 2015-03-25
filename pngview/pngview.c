@@ -74,10 +74,11 @@ signalHandler(
 void usage(void)
 {
     fprintf(stderr,
-            "Usage: %s [-b <RGBA>] [-l <layer>] <file.png>\n",
+            "Usage: %s [-b <RGBA>] [-d <number>] [-l <layer>] <file.png>\n",
             program);
     fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
     fprintf(stderr, "         e.g. 0x000F is opaque black\n");
+    fprintf(stderr, "    -d - Raspberry Pi display number\n");
     fprintf(stderr, "    -l - DispmanX layer number\n");
 
     exit(EXIT_FAILURE);
@@ -89,6 +90,7 @@ int main(int argc, char *argv[])
 {
     uint16_t background = 0x000F;
     int32_t layer = 1;
+	uint32_t displayNumber = 0;
 
     program = basename(argv[0]);
 
@@ -103,6 +105,11 @@ int main(int argc, char *argv[])
         case 'b':
 
             background = strtol(optarg, NULL, 16);
+            break;
+
+        case 'd':
+
+            displayNumber = strtol(optarg, NULL, 10);
             break;
 
         case 'l':
@@ -146,7 +153,8 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    DISPMANX_DISPLAY_HANDLE_T display = vc_dispmanx_display_open(0);
+    DISPMANX_DISPLAY_HANDLE_T display
+        = vc_dispmanx_display_open(displayNumber);
     assert(display != 0);
 
     //---------------------------------------------------------------------

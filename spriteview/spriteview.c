@@ -55,10 +55,12 @@ const char *program = NULL;
 void usage(void)
 {
     fprintf(stderr, "Usage: %s ", program);
-    fprintf(stderr, "[-b <RGBA>] [-c <columns>] [-r <rows>] <file.png>\n");
+    fprintf(stderr, "[-b <RGBA>] [-c <columns>] [-d <number> [-r <rows>] ");
+    fprintf(stderr, "<file.png>\n");
     fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
     fprintf(stderr, "         e.g. 0x000F is opaque black\n");
     fprintf(stderr, "    -c - number of columns in sprite\n");
+    fprintf(stderr, "    -d - Raspberry Pi display number\n");
     fprintf(stderr, "    -r - number of rows in sprite\n");
 
     exit(EXIT_FAILURE);
