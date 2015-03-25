@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 {
     uint16_t background = 0x000F;
     int32_t layer = 1;
-	uint32_t displayNumber = 0;
+    uint32_t displayNumber = 0;
 
     program = basename(argv[0]);
 
