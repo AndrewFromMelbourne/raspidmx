@@ -11,6 +11,7 @@ core
 game/game
 life/life
 mandelbrot/mandelbrot
+offscreen/pngresize
 pngview/pngview
 radar_sweep/radar_sweep
 radar_sweep_alpha/radar_sweep_alpha
