@@ -55,12 +55,13 @@ const char *program = NULL;
 void usage(void)
 {
     fprintf(stderr, "Usage: %s ", program);
-    fprintf(stderr, "[-b <RGBA>] [-c <columns>] [-d <number> [-r <rows>] ");
-    fprintf(stderr, "<file.png>\n");
+    fprintf(stderr, "[-b <RGBA>] [-c <columns>] [-d <number> ");
+    fprintf(stderr, "[-l <layer] [-r <row>] <file.png>\n");
     fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
     fprintf(stderr, "         e.g. 0x000F is opaque black\n");
     fprintf(stderr, "    -c - number of columns in sprite\n");
     fprintf(stderr, "    -d - Raspberry Pi display number\n");
+    fprintf(stderr, "    -l - DispmanX layer number\n");
     fprintf(stderr, "    -r - number of rows in sprite\n");
 
     exit(EXIT_FAILURE);
@@ -71,6 +72,8 @@ void usage(void)
 int main(int argc, char *argv[])
 {
     uint16_t background = 0x000F;
+    int32_t layer = 1;
+    uint32_t displayNumber = 0;
     int columns = 1;
     int rows = 1;
     const char *file = NULL;
@@ -81,7 +84,7 @@ int main(int argc, char *argv[])
 
     int opt = 0;
 
-    while ((opt = getopt(argc, argv, "b:c:r:")) != -1)
+    while ((opt = getopt(argc, argv, "b:c:d:l:r:")) != -1)
     {
         switch(opt)
         {
@@ -93,6 +96,16 @@ int main(int argc, char *argv[])
         case 'c':
 
             columns = atoi(optarg);
+            break;
+
+        case 'd':
+
+            displayNumber = atoi(optarg);
+            break;
+
+        case 'l':
+
+            layer = atoi(optarg);
             break;
 
         case 'r':
@@ -126,11 +139,12 @@ int main(int argc, char *argv[])
     initBackgroundLayer(&bg, background, 0);
 
     SPRITE_LAYER_T sprite;
-    initSpriteLayer(&sprite, columns, rows, file, 1);
+    initSpriteLayer(&sprite, columns, rows, file, layer);
 
     //---------------------------------------------------------------------
 
-    DISPMANX_DISPLAY_HANDLE_T display = vc_dispmanx_display_open(0);
+    DISPMANX_DISPLAY_HANDLE_T display
+        = vc_dispmanx_display_open(displayNumber);
     assert(display != 0);
 
     //---------------------------------------------------------------------
