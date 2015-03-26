@@ -1,5 +1,6 @@
 TARGETS=	life \
 			mandelbrot \
+			offscreen \
 			pngview \
 			radar_sweep \
 			radar_sweep_alpha \
