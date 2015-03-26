@@ -1,5 +1,4 @@
-test_pattern
-============
+# test_pattern
 
 This test pattern should be familiar to anyone who has used the Raspberry
 Pi. It is the same four colour square displayed when the Raspberry Pi boots.

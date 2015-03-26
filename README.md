@@ -1,5 +1,4 @@
-Dispmanx
-========
+# Dispmanx
 
 There are a number of APIs available for the Raspberry Pi that can make use
 of the computers GPU. These include OpenMAX, Open GL ES(1 and 2) and OpenVG.
@@ -20,67 +19,61 @@ The programs demonstrate layers with the following types: 4BPP (4 bit
 indexed), 8BPP (8 bit indexed), RGB565 (16 bit), RGB888 (24 bit), RGBA16
 (16 bit with transparency) and RGBA32 (32 bit with transparency)
 
-test_pattern
-------------
+## test_pattern
 
 This test pattern should be familiar to anyone who has used the Raspberry
 Pi. It is the same four colour square displayed when the Raspberry Pi boots.
 
-rgb_triangle
-------------
+## rgb_triangle
 
 Displays a triangle in a layer with red, green and blue gradients starting
 at each corner respectively. Blends to grey in the center. Demonstrates
 changing size of source and destination rectangles.
 
-life
-----
+## life
 
 Conway's game of life. Demonstrates double buffering.
 
-worms
------
+## worms
 
 The program raspiworms uses a single 16 or 32 bit RGBA layer to display a
 number of coloured worms on the screen of the Raspberry Pi.
 
-pngview
--------
+## pngview
 
 Load a png image file and display it as a Dispmanx layer.
 
-spriteview
-----------
+## spriteview
 
 Loads a sprite (png) image file and displays it as an animation.
 
-game
-----
+## game
 
 Demonstrates a seamless background image that can be scolled in any
 direction. As well as animated sprites.
 
-mandelbrot
-----------
+## mandelbrot
 
 The famous (in the 1990s) Mandelbrot set.
 
-radar_sweep
------------
+## radar_sweep
+
 An animation of a 'radar sweep' using 16 bit (rgb) palette animation.
 
-radar_sweep_alpha
------------------
+## radar_sweep_alpha
+
 An animation of a 'radar sweep' using 32 bit (rgba) palette animation.
 
-common
-------
+## offscreen
+
+An example of using an offscreen display to resize an image.
+
+## common
 
 Code that may be common to some of the demonstation programs is in this
 folder.
 
-building
---------
+## building
 
 If you type make in the top level directory, the make file will build all
 the different programs in this repository. Each program has it's own make

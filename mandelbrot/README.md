@@ -1,5 +1,4 @@
-mandelbrot
-==========
+# mandelbrot
 
 A program to view and zoom into the Mandelbrot set. Press 's' to save the
 current image as a PNG file. Press 'z' (once the current image has been

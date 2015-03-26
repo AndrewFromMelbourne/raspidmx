@@ -1,5 +1,4 @@
-Worms
-=====
+# Worms
 
 The idea for the worms came from an article in Scientific American
 (December 1987) called Computer Recreations: Simple special effects
