@@ -49,6 +49,7 @@ typedef struct
     int16_t directionMax;
     int32_t xDirections[8];
     int32_t yDirections[8];
+    VC_RECT_T bmpRect;
     VC_RECT_T srcRect;
     VC_RECT_T dstRect;
     int32_t layer;

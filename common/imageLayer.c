@@ -66,7 +66,7 @@ createResourceImageLayer(
 
     //---------------------------------------------------------------------
 
-    vc_dispmanx_rect_set(&(il->dstRect),
+    vc_dispmanx_rect_set(&(il->bmpRect),
                          0,
                          0,
                          il->image.width,
@@ -76,7 +76,7 @@ createResourceImageLayer(
                                              il->image.type,
                                              il->image.pitch,
                                              il->image.buffer,
-                                             &(il->dstRect));
+                                             &(il->bmpRect));
     assert(result == 0);
 }
 
@@ -127,12 +127,6 @@ addElementImageLayerCentered(
                          il->image.height);
 
     addElementImageLayer(il, display, update);
-
-    vc_dispmanx_rect_set(&(il->dstRect),
-                         0,
-                         0,
-                         il->image.width,
-                         il->image.height);
 }
 
 //-------------------------------------------------------------------------
@@ -150,8 +144,6 @@ addElementImageLayer(
         0
     };
 
-    //---------------------------------------------------------------------
-
     il->element =
         vc_dispmanx_element_add(update,
                                 display,
@@ -164,12 +156,6 @@ addElementImageLayer(
                                 NULL, // clamp
                                 DISPMANX_NO_ROTATE);
     assert(il->element != 0);
-
-    vc_dispmanx_rect_set(&(il->dstRect),
-                         0,
-                         0,
-                         il->image.width,
-                         il->image.height);
 }
 
 //-------------------------------------------------------------------------
@@ -183,7 +169,7 @@ changeSourceImageLayer(
                                                  il->image.type,
                                                  il->image.pitch,
                                                  il->image.buffer,
-                                                 &(il->dstRect));
+                                                 &(il->bmpRect));
     assert(result == 0);
 
     result = vc_dispmanx_element_change_source(update,
@@ -203,7 +189,7 @@ changeSourceAndUpdateImageLayer(
                                                  il->image.type,
                                                  il->image.pitch,
                                                  il->image.buffer,
-                                                 &(il->dstRect));
+                                                 &(il->bmpRect));
     assert(result == 0);
 
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
@@ -217,6 +203,34 @@ changeSourceAndUpdateImageLayer(
     result = vc_dispmanx_update_submit_sync(update);
     assert(result == 0);
 
+}
+
+//-------------------------------------------------------------------------
+
+void
+moveImageLayer(
+    IMAGE_LAYER_T *il,
+    int32_t xOffset,
+    int32_t yOffset,
+    DISPMANX_UPDATE_HANDLE_T update)
+{
+    vc_dispmanx_rect_set(&(il->dstRect),
+                         xOffset,
+                         yOffset,
+                         il->image.width,
+                         il->image.height);
+
+    int result =
+    vc_dispmanx_element_change_attributes(update,
+                                          il->element,
+                                          ELEMENT_CHANGE_DEST_RECT,
+                                          0,
+                                          255,
+                                          &(il->dstRect),
+                                          &(il->srcRect),
+                                          0,
+                                          DISPMANX_NO_ROTATE);
+    assert(result == 0);
 }
 
 //-------------------------------------------------------------------------

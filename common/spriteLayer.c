@@ -85,7 +85,7 @@ void initSpriteLayer(
 
     //---------------------------------------------------------------------
 
-    vc_dispmanx_rect_set(&(s->dstRect),
+    vc_dispmanx_rect_set(&(s->bmpRect),
                          0,
                          0,
                          s->image.width,
@@ -95,14 +95,14 @@ void initSpriteLayer(
                                              s->image.type,
                                              s->image.pitch,
                                              s->image.buffer,
-                                             &(s->dstRect));
+                                             &(s->bmpRect));
     assert(result == 0);
 
     result = vc_dispmanx_resource_write_data(s->backResource,
                                              s->image.type,
                                              s->image.pitch,
                                              s->image.buffer,
-                                             &(s->dstRect));
+                                             &(s->bmpRect));
     assert(result == 0);
 }
 

@@ -45,6 +45,7 @@ typedef struct
     int xOffset;
     int yOffsetMax;
     int yOffset;
+    VC_RECT_T bmpRect;
     VC_RECT_T srcRect;
     VC_RECT_T dstRect;
     int32_t layer;

@@ -193,29 +193,26 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    VC_RECT_T src_rect;
-    VC_RECT_T dst_rect;
+    VC_RECT_T bmp_rect;
 
-
-    vc_dispmanx_rect_set(&dst_rect, 0, 0, 1, 1);
+    vc_dispmanx_rect_set(&bmp_rect, 0, 0, 1, 1);
 
     result = vc_dispmanx_resource_write_data(bgResource,
                                              imageType,
                                              sizeof(background),
                                              &background,
-                                             &dst_rect);
+                                             &bmp_rect);
     assert(result == 0);
 
     //-------------------------------------------------------------------
 
-    VC_RECT_T srcRect;
-    vc_dispmanx_rect_set(&srcRect, 0, 0, image.width, image.height);
+    vc_dispmanx_rect_set(&bmp_rect, 0, 0, image.width, image.height);
 
     result = vc_dispmanx_resource_write_data(resource,
                                              image.type,
                                              image.pitch,
                                              image.buffer,
-                                             &srcRect);
+                                             &bmp_rect);
     assert(result == 0);
 
     //-------------------------------------------------------------------
@@ -236,6 +233,9 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
+    VC_RECT_T src_rect;
+    VC_RECT_T dst_rect;
+
     vc_dispmanx_rect_set(&src_rect, 0, 0, 1, 1);
     vc_dispmanx_rect_set(&dst_rect, 0, 0, 0, 0);
 
@@ -254,14 +254,13 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    vc_dispmanx_rect_set(&srcRect,
+    vc_dispmanx_rect_set(&src_rect,
                         0,
                         0,
                         image.width << 16,
                         image.height << 16);
 
-    VC_RECT_T dstRect;
-    vc_dispmanx_rect_set(&dstRect,
+    vc_dispmanx_rect_set(&dst_rect,
                          xOffset,
                          yOffset,
                          image.width,
@@ -271,9 +270,9 @@ int main(int argc, char *argv[])
         vc_dispmanx_element_add(update,
                                 displayHandle,
                                 2,
-                                &dstRect,
+                                &dst_rect,
                                 resource,
-                                &srcRect,
+                                &src_rect,
                                 DISPMANX_PROTECTION_NONE,
                                 &alpha,
                                 NULL,

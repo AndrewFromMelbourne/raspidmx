@@ -59,6 +59,7 @@ typedef struct
     uint8_t *field;
     uint8_t *fieldNext;
 
+    VC_RECT_T bmpRect;
     VC_RECT_T srcRect;
     VC_RECT_T dstRect;
     DISPMANX_RESOURCE_HANDLE_T frontResource;

@@ -37,6 +37,7 @@
 typedef struct
 {
     IMAGE_T image;
+    VC_RECT_T bmpRect;
     VC_RECT_T srcRect;
     VC_RECT_T dstRect;
     int32_t layer;
@@ -87,6 +88,14 @@ changeSourceImageLayer(
 void
 changeSourceAndUpdateImageLayer(
     IMAGE_LAYER_T *il);
+
+void
+moveImageLayer(
+    IMAGE_LAYER_T *il,
+    int32_t xOffset,
+    int32_t yOffset,
+    DISPMANX_UPDATE_HANDLE_T update);
+
 
 void destroyImageLayer(IMAGE_LAYER_T *il);
 

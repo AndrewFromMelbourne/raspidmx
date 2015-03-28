@@ -97,7 +97,7 @@ initScrollingLayer(SCROLLING_LAYER_T *sl,
 
     //---------------------------------------------------------------------
 
-    vc_dispmanx_rect_set(&(sl->dstRect),
+    vc_dispmanx_rect_set(&(sl->bmpRect),
                          0,
                          0,
                          sl->image.width,
@@ -107,14 +107,14 @@ initScrollingLayer(SCROLLING_LAYER_T *sl,
                                              sl->image.type,
                                              sl->image.pitch,
                                              sl->image.buffer,
-                                             &(sl->dstRect));
+                                             &(sl->bmpRect));
     assert(result == 0);
 
     result = vc_dispmanx_resource_write_data(sl->backResource,
                                              sl->image.type,
                                              sl->image.pitch,
                                              sl->image.buffer,
-                                             &(sl->dstRect));
+                                             &(sl->bmpRect));
     assert(result == 0);
 }
 

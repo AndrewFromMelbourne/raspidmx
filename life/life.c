@@ -194,13 +194,13 @@ newLife(
 
     //---------------------------------------------------------------------
 
-    vc_dispmanx_rect_set(&(life->dstRect), 0, 0, life->width, life->height);
+    vc_dispmanx_rect_set(&(life->bmpRect), 0, 0, life->width, life->height);
 
     result = vc_dispmanx_resource_write_data(life->frontResource,
                                              type,
                                              life->pitch,
                                              life->buffer,
-                                             &(life->dstRect));
+                                             &(life->bmpRect));
     assert(result == 0);
 
     //---------------------------------------------------------------------
@@ -337,10 +337,6 @@ addElementLife(
                                 NULL,
                                 DISPMANX_NO_ROTATE);
     assert(life->element != 0);
-
-    //---------------------------------------------------------------------
-
-    vc_dispmanx_rect_set(&(life->dstRect), 0, 0, life->width, life->height);
 }
 
 //-------------------------------------------------------------------------
@@ -408,7 +404,7 @@ iterateLife(
                                              type,
                                              life->pitch,
                                              life->buffer,
-                                             &(life->dstRect));
+                                             &(life->bmpRect));
     assert(result == 0);
 }
 
