@@ -28,6 +28,7 @@
 #define _GNU_SOURCE
 
 #include <assert.h>
+#include <ctype.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -181,47 +182,6 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    int32_t outWidth = imageLayer.image.width;
-    int32_t outHeight = imageLayer.image.height;
-
-    if ((imageLayer.image.width > info.width) &&
-        (imageLayer.image.height > info.height))
-    {
-    }
-    else
-    {
-        double imageAspect = (double)imageLayer.image.width
-                                     / imageLayer.image.height;
-        double screenAspect = (double)info.width / info.height;
-
-        if (imageAspect > screenAspect)
-        {
-            outWidth = info.width;
-            outHeight = (imageLayer.image.height * info.width)
-                         / imageLayer.image.width; 
-        }
-        else
-        {
-            outWidth = (imageLayer.image.width * info.height)
-                        / imageLayer.image.height; 
-            outHeight = info.height;
-        }
-    }
-
-    vc_dispmanx_rect_set(&(imageLayer.srcRect),
-                         0 << 16,
-                         0 << 16,
-                         imageLayer.image.width << 16,
-                         imageLayer.image.height << 16);
-
-    vc_dispmanx_rect_set(&(imageLayer.dstRect),
-                         (info.width - outWidth) / 2,
-                         (info.height - outHeight) / 2,
-                         outWidth,
-                         outHeight);
-
-    //---------------------------------------------------------------------
-
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
     assert(update != 0);
 
@@ -237,12 +197,93 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
+    int32_t step = 1;
+    int32_t xOffset = imageLayer.dstRect.x;
+    int32_t yOffset = imageLayer.dstRect.y;
+
     while (run)
     {
-
-        if (keyPressed(NULL))
+        int c = 0;
+        if (keyPressed(&c))
         {
-            run = false;
+            c = tolower(c);
+
+            bool moveLayer = false;
+
+            switch (c)
+            {
+            case 27:
+
+                run = false;
+                break;
+
+            case 'a':
+
+                xOffset -= step;
+                moveLayer = true;
+                break;
+
+            case 'd':
+
+                xOffset += step;
+                moveLayer = true;
+                break;
+
+            case 'w':
+
+                yOffset -= step;
+                moveLayer = true;
+                break;
+
+            case 's':
+
+                yOffset += step;
+                moveLayer = true;
+                break;
+
+            case '+':
+
+                if (step == 1)
+                {
+                    step = 5;
+                }
+                else if (step == 5)
+                {
+                    step = 10;
+                }
+                else if (step == 10)
+                {
+                    step = 20;
+                }
+                break;
+
+            case '-':
+
+                if (step == 20)
+                {
+                    step = 10;
+                }
+                else if (step == 10)
+                {
+                    step = 5;
+                }
+                else if (step == 5)
+                {
+                    step = 1;
+                }
+                break;
+            }
+
+            if (moveLayer)
+            {
+                update = vc_dispmanx_update_start(0);
+                assert(update != 0);
+
+                moveImageLayer(&imageLayer, xOffset, yOffset, update);
+
+                result = vc_dispmanx_update_submit_sync(update);
+                assert(result == 0);
+            }
         }
         else
         {
