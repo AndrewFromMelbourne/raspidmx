@@ -2,7 +2,7 @@
 
 There are a number of APIs available for the Raspberry Pi that can make use
 of the computers GPU. These include OpenMAX, Open GL ES(1 and 2) and OpenVG.
-The raspberrypi/firmware repository has short examples for theses and other
+The raspberrypi/firmware repository has short examples for these and other
 APIs. They can be found in /opt/vc/src/hello_pi/ on the Raspbian 'wheezy'
 image. Among these examples is a program called hello_dispmanx. It is a
 very small example of the Dispmanx windowing system. Apart from this:-
@@ -70,13 +70,13 @@ An example of using an offscreen display to resize an image.
 
 ## common
 
-Code that may be common to some of the demonstation programs is in this
+Code that may be common to some of the demonstration programs is in this
 folder.
 
 ## building
 
 If you type make in the top level directory, the make file will build all
-the different programs in this repository. Each program has it's own make
+the different programs in this repository. Each program has its own make
 file, so you can build them individually if you wish.
 
 You will need to install libpng before you build the program. On Raspbian
