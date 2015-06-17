@@ -212,7 +212,11 @@ newLife(
         cores = 1;
     }
 
-    if (cores > LIFE_MAX_THREADS)
+    if (cores == 1)
+    {
+        life->numberOfThreads = 0;
+    }
+    else if (cores > LIFE_MAX_THREADS)
     {
         life->numberOfThreads = LIFE_MAX_THREADS;
     }
@@ -387,7 +391,7 @@ iterateLife(
 {
     memcpy(life->field, life->fieldNext, life->fieldLength);
 
-    if (life->numberOfThreads == 1)
+    if (life->numberOfThreads == 0)
     {
         iterateLifeKernel(life, 0);
     }
