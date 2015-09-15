@@ -212,11 +212,7 @@ newLife(
         cores = 1;
     }
 
-    if (cores == 1)
-    {
-        life->numberOfThreads = 0;
-    }
-    else if (cores > LIFE_MAX_THREADS)
+    if (cores > LIFE_MAX_THREADS)
     {
         life->numberOfThreads = LIFE_MAX_THREADS;
     }
@@ -225,43 +221,40 @@ newLife(
         life->numberOfThreads = cores;
     }
 
-    if (cores > 1)
+    pthread_barrier_init(&(life->startIterationBarrier),
+                         NULL,
+                         life->numberOfThreads + 1);
+
+    pthread_barrier_init(&(life->finishedIterationBarrier),
+                         NULL,
+                         life->numberOfThreads + 1);
+
+    //---------------------------------------------------------------------
+
+    int32_t heightStep = life->height / life->numberOfThreads;
+    int32_t heightStart = 0;
+
+    int32_t thread;
+    for (thread = 0 ; thread < life->numberOfThreads ; thread++)
     {
-        pthread_barrier_init(&(life->startIterationBarrier),
-                             NULL,
-                             life->numberOfThreads + 1);
+        life->heightRange[thread].startHeight = heightStart;
+        life->heightRange[thread].endHeight = heightStart + heightStep;
 
-        pthread_barrier_init(&(life->finishedIterationBarrier),
-                             NULL,
-                             life->numberOfThreads + 1);
+        heightStart += heightStep;
 
-        //-----------------------------------------------------------------
-
-        int32_t heightStep = life->height / life->numberOfThreads;
-        int32_t heightStart = 0;
-
-        int32_t thread;
-        for (thread = 0 ; thread < life->numberOfThreads ; thread++)
-        {
-            life->heightRange[thread].startHeight = heightStart;
-            life->heightRange[thread].endHeight = heightStart + heightStep;
-
-            heightStart += heightStep;
-
-            pthread_create(&(life->threads[thread]),
-                           NULL,
-                           workerLife,
-                           life);
-        }
-
-        thread = life->numberOfThreads - 1;
-        life->heightRange[thread].endHeight = life->height;
+        pthread_create(&(life->threads[thread]),
+                       NULL,
+                       workerLife,
+                       life);
     }
-    else
-    {
-        life->heightRange[0].startHeight = 0;
-        life->heightRange[0].endHeight = life->height;
-    }
+
+    thread = life->numberOfThreads - 1;
+    life->heightRange[thread].endHeight = life->height;
+
+    //---------------------------------------------------------------------
+
+    memcpy(life->field, life->fieldNext, life->fieldLength);
+    pthread_barrier_wait(&(life->startIterationBarrier));
 }
 
 //-------------------------------------------------------------------------
@@ -389,17 +382,7 @@ void
 iterateLife(
     LIFE_T *life)
 {
-    memcpy(life->field, life->fieldNext, life->fieldLength);
-
-    if (life->numberOfThreads == 0)
-    {
-        iterateLifeKernel(life, 0);
-    }
-    else
-    {
-        pthread_barrier_wait(&(life->startIterationBarrier));
-        pthread_barrier_wait(&(life->finishedIterationBarrier));
-    }
+    pthread_barrier_wait(&(life->finishedIterationBarrier));
 
     int result = 0;
     VC_IMAGE_TYPE_T type = VC_IMAGE_RGBA16;
@@ -410,6 +393,9 @@ iterateLife(
                                              life->buffer,
                                              &(life->bmpRect));
     assert(result == 0);
+
+    memcpy(life->field, life->fieldNext, life->fieldLength);
+    pthread_barrier_wait(&(life->startIterationBarrier));
 }
 
 //-------------------------------------------------------------------------
