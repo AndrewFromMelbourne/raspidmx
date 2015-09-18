@@ -55,7 +55,7 @@ const char *program = NULL;
 void usage(void)
 {
     fprintf(stderr, "Usage: %s ", program);
-    fprintf(stderr, "[-b <RGBA>] [-c <columns>] [-d <number> ");
+    fprintf(stderr, "[-b <RGBA>] [-c <columns>] [-d <number>] ");
     fprintf(stderr, "[-l <layer] [-r <row>] <file.png>\n");
     fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
     fprintf(stderr, "         e.g. 0x000F is opaque black\n");
