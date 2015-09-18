@@ -74,13 +74,15 @@ signalHandler(
 
 void usage(void)
 {
-    fprintf(stderr,
-            "Usage: %s [-b <RGBA>] [-d <number>] [-l <layer>] <file.png>\n",
-            program);
+    fprintf(stderr, "Usage: %s ", program);
+    fprintf(stderr, "[-b <RGBA>] [-d <number>] [-l <layer>] ");
+    fprintf(stderr, "[-x <offset>] [-y <offset>] <file.png>\n");
     fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
     fprintf(stderr, "         e.g. 0x000F is opaque black\n");
     fprintf(stderr, "    -d - Raspberry Pi display number\n");
     fprintf(stderr, "    -l - DispmanX layer number\n");
+    fprintf(stderr, "    -x - offset (pixels from the left)\n");
+    fprintf(stderr, "    -y - offset (pixels from the top)\n");
 
     exit(EXIT_FAILURE);
 }
@@ -92,6 +94,10 @@ int main(int argc, char *argv[])
     uint16_t background = 0x000F;
     int32_t layer = 1;
     uint32_t displayNumber = 0;
+    int32_t xOffset = 0;
+    int32_t yOffset = 0;
+    bool xOffsetSet = false;
+    bool yOffsetSet = false;
 
     program = basename(argv[0]);
 
@@ -99,7 +105,7 @@ int main(int argc, char *argv[])
 
     int opt = 0;
 
-    while ((opt = getopt(argc, argv, "b:d:l:")) != -1)
+    while ((opt = getopt(argc, argv, "b:d:l:x:y:")) != -1)
     {
         switch(opt)
         {
@@ -116,6 +122,18 @@ int main(int argc, char *argv[])
         case 'l':
 
             layer = strtol(optarg, NULL, 10);
+            break;
+
+        case 'x':
+
+            xOffset = strtol(optarg, NULL, 10);
+            xOffsetSet = true;
+            break;
+
+        case 'y':
+
+            yOffset = strtol(optarg, NULL, 10);
+            yOffsetSet = true;
             break;
 
         default:
@@ -190,7 +208,21 @@ int main(int argc, char *argv[])
         addElementBackgroundLayer(&backgroundLayer, display, update);
     }
 
-    addElementImageLayerCentered(&imageLayer, &info, display, update);
+    if (xOffsetSet == false)
+    {
+        xOffset = (info.width - imageLayer.image.width) / 2;
+    }
+
+    if (yOffsetSet == false)
+    {
+        yOffset = (info.height - imageLayer.image.height) / 2;
+    }
+
+    addElementImageLayerOffset(&imageLayer,
+                               xOffset,
+                               yOffset,
+                               display,
+                               update);
 
     result = vc_dispmanx_update_submit_sync(update);
     assert(result == 0);
@@ -198,8 +230,6 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     int32_t step = 1;
-    int32_t xOffset = imageLayer.dstRect.x;
-    int32_t yOffset = imageLayer.dstRect.y;
 
     while (run)
     {
