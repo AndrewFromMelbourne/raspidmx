@@ -62,6 +62,7 @@ loadPng(
 
     if (png_ptr == NULL)
     {
+        fclose(fpin);
         return false;
     }
 
@@ -70,12 +71,14 @@ loadPng(
     if (info_ptr == NULL)
     {
         png_destroy_read_struct(&png_ptr, 0, 0);
+        fclose(fpin);
         return false;
     }
 
     if (setjmp(png_jmpbuf(png_ptr)))
     {
         png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+        fclose(fpin);
         return false;
     }
 
