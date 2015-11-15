@@ -13,8 +13,8 @@ TARGETS=	life \
 default :all
 
 all:
-	for target in $(TARGETS); do (make -C $$target); done
+	for target in $(TARGETS); do ($(MAKE) -C $$target); done
 
 clean:
-	for target in $(TARGETS); do (make -C $$target clean); done
+	for target in $(TARGETS); do ($(MAKE) -C $$target clean); done
 
