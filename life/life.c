@@ -272,7 +272,14 @@ workerLife(
         if (pthread_equal(pthread_self(), life->threads[i]))
         {
             thread = i;
+            break;
         }
+    }
+
+    if (thread == -1)
+    {
+        fprintf(stderr, "life: cannot find thread index\n");
+        return NULL;
     }
 
     while (true)
@@ -282,7 +289,7 @@ workerLife(
         pthread_barrier_wait(&(life->finishedIterationBarrier));
     }
 
-    return arg;
+    return NULL;
 }
 
 //-------------------------------------------------------------------------
