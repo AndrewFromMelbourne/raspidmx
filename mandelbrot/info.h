@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2013 Andrew Duncan
+// Copyright (c) 2015 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -25,76 +25,45 @@
 //
 //-------------------------------------------------------------------------
 
-#ifndef MANDELBROT_H
-#define MANDELBROT_H
+#ifndef INFO_H
+#define INFO_H
 
-#include <pthread.h>
 #include <stdint.h>
 
 #include "imageLayer.h"
 
 //-------------------------------------------------------------------------
 
-#define MANDELBROT_MAX_THREADS 4
-
-//-------------------------------------------------------------------------
-
 typedef struct
 {
-    double x0;
-    double y0;
-    double side;
-} MANDELBROT_COORDS_T;
+    int32_t width;
+    int32_t height;
+} KEY_DIMENSIONS_T;
 
 //-------------------------------------------------------------------------
 
-typedef struct
-{
-    int32_t startHeight;
-    int32_t endHeight;
-} MANDELBROT_HEIGHT_RANGE_T;
-
-//-------------------------------------------------------------------------
-
-typedef struct
-{
-    MANDELBROT_COORDS_T coords;
-    IMAGE_LAYER_T *imageLayer;
-
-    RGBA8_T colours[256];
-    size_t numberOfColours;
-
-    int32_t numberOfThreads;
-    pthread_t threads[MANDELBROT_MAX_THREADS];
-    MANDELBROT_HEIGHT_RANGE_T heightRange[MANDELBROT_MAX_THREADS];
-    pthread_barrier_t startBarrier;
-    pthread_barrier_t finishedBarrier;
-} MANDELBROT_T;
-
-//-------------------------------------------------------------------------
+KEY_DIMENSIONS_T
+drawKey(
+    IMAGE_LAYER_T *imageLayer,
+    int32_t x,
+    int32_t y,
+    const char *text,
+    const char *description);
 
 void
-newMandelbrot(
-    MANDELBROT_T *mbrot,
+calculatingInfo(
     IMAGE_LAYER_T *imageLayer);
-void
-destroyMandelbrot(
-    MANDELBROT_T *mbrot);
-
-void *
-workerMandelbrot(
-    void *arg);
 
 void
-mandelbrotImageKernel(
-    MANDELBROT_T *mbrot,
-    int32_t startHeight,
-    int32_t endHeight);
+mandelbrotInfo(
+    IMAGE_LAYER_T *imageLayer);
 
 void
-mandelbrotImage(
-    MANDELBROT_T *mbrot,
-    MANDELBROT_COORDS_T *coords);
+zoomInfo(
+    IMAGE_LAYER_T *imageLayer,
+    int32_t *steps,
+    int32_t numberOfSteps,
+    int32_t stepIndex);
 
 //-------------------------------------------------------------------------
 

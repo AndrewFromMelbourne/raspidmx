@@ -1,6 +1,7 @@
-OBJS=main.o mandelbrot.o ../common/backgroundLayer.o ../common/key.o \
-	 ../common/hsv2rgb.o ../common/imageGraphics.o ../common/imageLayer.o \
-	 ../common/image.o ../common/savepng.o
+OBJS=main.o mandelbrot.o info.o ../common/backgroundLayer.o \
+	  ../common/font.o ../common/key.o ../common/hsv2rgb.o \
+	  ../common/imageGraphics.o ../common/imageLayer.o \
+	  ../common/image.o ../common/savepng.o
 
 BIN=mandelbrot
 
@@ -16,7 +17,7 @@ all: $(BIN)
 	$(CC) $(CFLAGS) $(INCLUDES) -g -c $< -o $@ -Wno-deprecated-declarations
 
 $(BIN): $(OBJS)
-	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
+	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -pthread -Wl,--no-whole-archive -rdynamic
 
 clean:
 	@rm -f $(OBJS)
