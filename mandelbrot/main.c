@@ -235,13 +235,25 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
+    int32_t infoLayerWidth = 140;
+    int32_t infoLayerHeight = 212;
+
+    int32_t mandelbrotLayerSize = info.height;
+
+    if ((infoLayerWidth + mandelbrotLayerSize) > info.width)
+    {
+        mandelbrotLayerSize = info.width - infoLayerWidth;
+    }
+
+    //---------------------------------------------------------------------
+
     BACKGROUND_LAYER_T bg;
     initBackgroundLayer(&bg, 0x000F, 0);
 
     IMAGE_LAYER_T mandelbrotLayer;
     initImageLayer(&mandelbrotLayer,
-                   info.height,
-                   info.height,
+                   mandelbrotLayerSize,
+                   mandelbrotLayerSize,
                    VC_IMAGE_RGB888);
     createResourceImageLayer(&mandelbrotLayer, 1);
 
@@ -254,9 +266,9 @@ int main(int argc, char *argv[])
 
     IMAGE_LAYER_T infoLayer;
     initImageLayer(&infoLayer,
-                   140,
-                   212,
-                   VC_IMAGE_RGB888);
+                   infoLayerWidth,
+                   infoLayerHeight,
+                   VC_IMAGE_RGBA16);
     createResourceImageLayer(&infoLayer, 2);
 
     //---------------------------------------------------------------------
