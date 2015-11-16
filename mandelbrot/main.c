@@ -140,7 +140,7 @@ zoom(
                 }
                 break;
 
-            case '+':
+            case ']':
 
                 if (stepIndex < (numberOfSteps - 1))
                 {
@@ -150,7 +150,7 @@ zoom(
 
                 break;
 
-            case '-':
+            case '[':
 
                 if (stepIndex > 0)
                 {

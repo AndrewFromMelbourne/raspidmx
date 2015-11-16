@@ -239,13 +239,13 @@ zoomInfo(
 
     y += key_dimensions.height + INFO_TOP_PADDING;
 
-    key_dimensions = drawKey(imageLayer, x, y, "+", "increase step");
+    key_dimensions = drawKey(imageLayer, x, y, "[", "decrease step");
 
     //---------------------------------------------------------------------
 
     y += key_dimensions.height + INFO_TOP_PADDING;
 
-    key_dimensions = drawKey(imageLayer, x, y, "-", "decrease step");
+    key_dimensions = drawKey(imageLayer, x, y, "]", "increase step");
 
     //---------------------------------------------------------------------
 
