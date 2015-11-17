@@ -91,6 +91,36 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
+    DISPMANX_DISPLAY_HANDLE_T display
+        = vc_dispmanx_display_open(displayNumber);
+    assert(display != 0);
+
+    //---------------------------------------------------------------------
+
+    DISPMANX_MODEINFO_T info;
+
+    int result = vc_dispmanx_display_get_info(display, &info);
+    assert(result == 0);
+
+    //---------------------------------------------------------------------
+
+    if (size < 1)
+    {
+        size = info.height;
+    }
+
+    if (size > info.height)
+    {
+        size = info.height;
+    }
+
+    if (size > info.width)
+    {
+        size = info.width;
+    }
+
+    //---------------------------------------------------------------------
+
     BACKGROUND_LAYER_T bg;
     initBackgroundLayer(&bg, 0x000F, 0);
 
@@ -107,19 +137,6 @@ int main(int argc, char *argv[])
     snprintf(fpsBuffer, sizeof(fpsBuffer), "fps: --");
     drawStringRGB(0, 0, fpsBuffer, &fpsFgColour, &(fpsLayer.image));
     createResourceImageLayer(&fpsLayer, 10);
-
-    //---------------------------------------------------------------------
-
-    DISPMANX_DISPLAY_HANDLE_T display
-        = vc_dispmanx_display_open(displayNumber);
-    assert(display != 0);
-
-    //---------------------------------------------------------------------
-
-    DISPMANX_MODEINFO_T info;
-
-    int result = vc_dispmanx_display_get_info(display, &info);
-    assert(result == 0);
 
     //---------------------------------------------------------------------
 
