@@ -41,6 +41,7 @@
 #include "backgroundLayer.h"
 #include "font.h"
 #include "imageLayer.h"
+#include "info.h"
 #include "key.h"
 #include "life.h"
 
@@ -121,22 +122,23 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
+    int32_t infoLayerWidth = 96;
+    int32_t infoLayerHeight = 114;
+
+    IMAGE_LAYER_T infoLayer;
+    initImageLayer(&infoLayer,
+                   infoLayerWidth,
+                   infoLayerHeight,
+                   VC_IMAGE_RGBA16);
+    createResourceImageLayer(&infoLayer, 2);
+
+    //---------------------------------------------------------------------
+
     BACKGROUND_LAYER_T bg;
     initBackgroundLayer(&bg, 0x000F, 0);
 
     LIFE_T life;
     newLife(&life, size);
-
-    IMAGE_LAYER_T fpsLayer;
-    RGBA8_T fpsBgColour = { 0, 0, 0, 0 };
-    RGBA8_T fpsFgColour = { 255, 255, 0, 255 };
-    char fpsBuffer[20];
-
-    initImageLayer(&fpsLayer, 64, 16, VC_IMAGE_RGBA16);
-    clearImageRGB(&(fpsLayer.image), &fpsBgColour);
-    snprintf(fpsBuffer, sizeof(fpsBuffer), "fps: --");
-    drawStringRGB(0, 0, fpsBuffer, &fpsFgColour, &(fpsLayer.image));
-    createResourceImageLayer(&fpsLayer, 10);
 
     //---------------------------------------------------------------------
 
@@ -145,34 +147,27 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    int32_t fpsXoffset = 0;
-    int32_t fpsYoffset = 0;
-    int32_t dst_size = size;
+    int32_t dstSize = size;
     
-    if (dst_size < info.height)
+    if (dstSize < info.height)
     {
-        dst_size = info.height - (info.height % size);
-    }
-
-    if (((info.width - dst_size) / 2) > fpsLayer.image.width)
-    {
-        fpsXoffset = ((info.width - dst_size) / 2) - fpsLayer.image.width;
-    }
-
-    if (((info.height - dst_size) / 2) > fpsLayer.image.height)
-    {
-        fpsYoffset = ((info.height - dst_size) / 2);
+        dstSize = info.height - (info.height % size);
     }
 
     //---------------------------------------------------------------------
 
+    int32_t combinedWidth = dstSize + infoLayer.image.width;
+
+    int32_t offset = (info.width - combinedWidth) / 2;
+
     addElementBackgroundLayer(&bg, display, update);
-    addElementLife(&life, &info, display, update);
-    addElementImageLayerOffset(&fpsLayer,
-                               fpsXoffset,
-                               fpsYoffset,
-                               display,
-                               update);
+    addElementLife(&life, offset, 0, dstSize, display, update);
+
+    offset += dstSize;
+
+    addElementImageLayerOffset(&infoLayer, offset, 0, display, update);
+
+    lifeInfo(&infoLayer, size, false, 0.0);
 
     //---------------------------------------------------------------------
 
@@ -209,13 +204,7 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    clearImageRGB(&(fpsLayer.image), &fpsBgColour);
-                    snprintf(fpsBuffer, sizeof(fpsBuffer), "fps: --");
-                    drawStringRGB(0,
-                                  0,
-                                  fpsBuffer,
-                                  &fpsFgColour,
-                                  &(fpsLayer.image));
+                    lifeInfo(&infoLayer, size, false, 0.0);
                     step = true;
                 }
 
@@ -244,12 +233,8 @@ int main(int argc, char *argv[])
             timersub(&end_time, &start_time, &diff);
             int32_t time_taken = (diff.tv_sec * 1000)+(diff.tv_usec / 1000);
             double frames_per_second = 2.0e5 / time_taken;
-            snprintf(fpsBuffer,
-                     sizeof(fpsBuffer),
-                     "fps: %.0f\n",
-                     frames_per_second);
-            clearImageRGB(&(fpsLayer.image), &fpsBgColour);
-            drawStringRGB(0, 0, fpsBuffer, &fpsFgColour, &(fpsLayer.image));
+
+            lifeInfo(&infoLayer, size, true, frames_per_second);
 
             memcpy(&start_time, &end_time, sizeof(start_time));
         }
@@ -266,11 +251,6 @@ int main(int argc, char *argv[])
             assert(update != 0);
 
             changeSourceLife(&life, update);
-
-            if ((frame == 0) || step)
-            {
-                changeSourceImageLayer(&fpsLayer, update);
-            }
 
             result = vc_dispmanx_update_submit_sync(update);
             assert(result == 0);
@@ -289,7 +269,7 @@ int main(int argc, char *argv[])
 
     destroyBackgroundLayer(&bg);
     destroyLife(&life);
-    destroyImageLayer(&fpsLayer);
+    destroyImageLayer(&infoLayer);
 
     //---------------------------------------------------------------------
 

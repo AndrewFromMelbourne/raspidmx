@@ -80,7 +80,9 @@ void newLife(LIFE_T *life, int32_t size);
 void
 addElementLife(
     LIFE_T *life,
-    DISPMANX_MODEINFO_T *info,
+    int32_t xOffset,
+    int32_t yOffset,
+    int32_t dstSize,
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update);
 

@@ -297,7 +297,9 @@ workerLife(
 void
 addElementLife(
     LIFE_T *life,
-    DISPMANX_MODEINFO_T *info,
+    int32_t xOffset,
+    int32_t yOffset,
+    int32_t dstSize,
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update)
 {
@@ -308,13 +310,6 @@ addElementLife(
         0
     };
 
-    int32_t dst_size = life->height;
-
-    if (dst_size < info->height)
-    {
-        dst_size = info->height - (info->height % life->height);
-    }
-
     //---------------------------------------------------------------------
 
     vc_dispmanx_rect_set(&(life->srcRect),
@@ -324,10 +319,10 @@ addElementLife(
                          life->height << 16);
 
     vc_dispmanx_rect_set(&(life->dstRect),
-                         (info->width - dst_size) / 2,
-                         (info->height - dst_size) / 2,
-                         dst_size,
-                         dst_size);
+                         xOffset,
+                         yOffset,
+                         dstSize,
+                         dstSize);
 
     life->element =
         vc_dispmanx_element_add(update,
