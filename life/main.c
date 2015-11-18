@@ -158,14 +158,19 @@ int main(int argc, char *argv[])
 
     int32_t combinedWidth = dstSize + infoLayer.image.width;
 
-    int32_t offset = (info.width - combinedWidth) / 2;
+    int32_t xOffset = (info.width - combinedWidth) / 2;
+    int32_t yOffset = (info.height - dstSize) / 2;
 
     addElementBackgroundLayer(&bg, display, update);
-    addElementLife(&life, offset, 0, dstSize, display, update);
+    addElementLife(&life, xOffset, yOffset, dstSize, display, update);
 
-    offset += dstSize;
+    xOffset += dstSize;
 
-    addElementImageLayerOffset(&infoLayer, offset, 0, display, update);
+    addElementImageLayerOffset(&infoLayer,
+                               xOffset,
+                               yOffset,
+                               display,
+                               update);
 
     lifeInfo(&infoLayer, size, false, 0.0);
 
