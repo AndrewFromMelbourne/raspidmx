@@ -1,7 +1,8 @@
 OBJS=main.o mandelbrot.o info.o ../common/backgroundLayer.o \
 	  ../common/font.o ../common/key.o ../common/hsv2rgb.o \
-	  ../common/imageGraphics.o ../common/imageLayer.o \
-	  ../common/image.o ../common/savepng.o
+	  ../common/imageGraphics.o ../common/imageKey.o \
+	  ../common/imageLayer.o ../common/image.o \
+	  ../common/savepng.o
 
 BIN=mandelbrot
 
