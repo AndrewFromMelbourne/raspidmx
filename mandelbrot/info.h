@@ -34,22 +34,6 @@
 
 //-------------------------------------------------------------------------
 
-typedef struct
-{
-    int32_t width;
-    int32_t height;
-} KEY_DIMENSIONS_T;
-
-//-------------------------------------------------------------------------
-
-KEY_DIMENSIONS_T
-drawKey(
-    IMAGE_LAYER_T *imageLayer,
-    int32_t x,
-    int32_t y,
-    const char *text,
-    const char *description);
-
 void
 calculatingInfo(
     IMAGE_LAYER_T *imageLayer);

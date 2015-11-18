@@ -29,6 +29,7 @@
 
 #include "font.h"
 #include "imageGraphics.h"
+#include "imageKey.h"
 #include "imageLayer.h"
 #include "info.h"
 
@@ -36,66 +37,6 @@
 
 #define INFO_LEFT_PADDING 4
 #define INFO_TOP_PADDING 4
-
-#define KEY_BORDER_WIDTH 1
-#define KEY_LEFT_PADDING 5
-#define KEY_RIGHT_PADDING 5
-#define KEY_TOP_PADDING 1
-#define KEY_BOTTOM_PADDING 1
-
-//-------------------------------------------------------------------------
-
-KEY_DIMENSIONS_T
-drawKey(
-    IMAGE_LAYER_T *imageLayer,
-    int32_t x,
-    int32_t y,
-    const char *text,
-    const char *description)
-{
-    static RGBA8_T textColour = { 0, 0, 0, 255 };
-    static RGBA8_T borderColour = { 191, 191, 191, 255 };
-    static RGBA8_T backgroundColour = { 255, 255, 255, 255 };
-
-    size_t textLength = strlen(text);
-
-    int32_t width = (FONT_WIDTH * textLength)
-                  + (2 * KEY_BORDER_WIDTH)
-                  + KEY_LEFT_PADDING
-                  + KEY_RIGHT_PADDING;
-
-    int32_t height = FONT_HEIGHT
-                   + (2 * KEY_BORDER_WIDTH)
-                   + KEY_TOP_PADDING
-                   + KEY_BOTTOM_PADDING;
-
-    IMAGE_T *image = &(imageLayer->image);
-
-    imageBoxFilledRGB(image,
-                      x,
-                      y,
-                      x + width,
-                      y + height,
-                      &backgroundColour);
-
-    imageBoxRGB(image, x, y, x + width, y + height, &borderColour);
-
-    drawStringRGB(x + KEY_BORDER_WIDTH + KEY_LEFT_PADDING,
-                  y + KEY_BORDER_WIDTH + KEY_TOP_PADDING,
-                  text,
-                  &textColour,
-                  image);
-
-    drawStringRGB(x + width + KEY_RIGHT_PADDING,
-                  y + KEY_BORDER_WIDTH + KEY_TOP_PADDING,
-                  description,
-                  &textColour,
-                  image);
-
-    KEY_DIMENSIONS_T dimensions = { width, height };
-
-    return dimensions;
-}
 
 //-------------------------------------------------------------------------
 
@@ -108,12 +49,7 @@ calculatingInfo(
 
     IMAGE_T *image = &(imageLayer->image);
 
-    imageBoxFilledRGB(image,
-                      0,
-                      0,
-                      image->width,
-                      image->height,
-                      &backgroundColour);
+    clearImageRGB(image, &backgroundColour);
 
     drawStringRGB(INFO_LEFT_PADDING,
                   INFO_TOP_PADDING,
@@ -134,12 +70,7 @@ mandelbrotInfo(
 
     IMAGE_T *image = &(imageLayer->image);
 
-    imageBoxFilledRGB(image,
-                      0,
-                      0,
-                      image->width,
-                      image->height,
-                      &backgroundColour);
+    clearImageRGB(image, &backgroundColour);
 
     //---------------------------------------------------------------------
 
@@ -183,12 +114,7 @@ zoomInfo(
 
     IMAGE_T *image = &(imageLayer->image);
 
-    imageBoxFilledRGB(image,
-                      0,
-                      0,
-                      image->width,
-                      image->height,
-                      &backgroundColour);
+    clearImageRGB(image, &backgroundColour);
 
     //---------------------------------------------------------------------
 
@@ -206,7 +132,6 @@ zoomInfo(
 
     //---------------------------------------------------------------------
 
-    x = INFO_LEFT_PADDING;
     y += key_dimensions.height + INFO_TOP_PADDING;
 
     key_dimensions = drawKey(imageLayer, x, y, "Esc", "cancel zoom");
@@ -253,6 +178,10 @@ zoomInfo(
     static RGBA8_T highlightColour = { 0, 0, 0, 255 };
 
     y += key_dimensions.height + INFO_TOP_PADDING;
+
+    drawStringRGB(x, y, "step:", &highlightColour, image);
+
+    y += FONT_HEIGHT + INFO_TOP_PADDING;
 
     char buffer[128];
 

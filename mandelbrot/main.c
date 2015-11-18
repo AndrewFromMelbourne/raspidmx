@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     int32_t infoLayerWidth = 140;
-    int32_t infoLayerHeight = 212;
+    int32_t infoLayerHeight = 232;
 
     int32_t mandelbrotLayerSize = info.height;
 
