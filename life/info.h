@@ -38,6 +38,7 @@ void
 lifeInfo(
     IMAGE_LAYER_T *imageLayer,
     int32_t size,
+    bool paused,
     bool framesPerSecondValid,
     double framesPerSecond);
 

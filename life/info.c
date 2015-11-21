@@ -44,6 +44,7 @@ void
 lifeInfo(
     IMAGE_LAYER_T *imageLayer,
     int32_t size,
+    bool paused,
     bool framesPerSecondValid,
     double framesPerSecond)
 {
@@ -72,7 +73,11 @@ lifeInfo(
 
     y += key_dimensions.height + INFO_TOP_PADDING;
 
-    key_dimensions = drawKey(imageLayer, x, y, "P", "pause");
+    key_dimensions = drawKey(imageLayer,
+                             x,
+                             y,
+                             "P",
+                             paused ? "unpause" : "pause");
 
     //---------------------------------------------------------------------
 

@@ -158,8 +158,13 @@ int main(int argc, char *argv[])
 
     int32_t combinedWidth = dstSize + infoLayer.image.width;
 
-    int32_t xOffset = (info.width - combinedWidth) / 2;
+    int32_t xOffset = (info.width - dstSize) / 2;
     int32_t yOffset = (info.height - dstSize) / 2;
+
+    if (xOffset < infoLayer.image.width)
+    {
+        xOffset = (info.width - combinedWidth) / 2;
+    }
 
     addElementBackgroundLayer(&bg, display, update);
     addElementLife(&life, xOffset, yOffset, dstSize, display, update);
@@ -172,7 +177,7 @@ int main(int argc, char *argv[])
                                display,
                                update);
 
-    lifeInfo(&infoLayer, size, false, 0.0);
+    lifeInfo(&infoLayer, size, false, false, 0.0);
 
     //---------------------------------------------------------------------
 
@@ -209,11 +214,13 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    lifeInfo(&infoLayer, size, false, 0.0);
                     step = true;
                 }
 
                 paused = !paused;
+
+                lifeInfo(&infoLayer, size, paused, false, 0.0);
+
                 break;
 
             case ' ':
@@ -239,7 +246,7 @@ int main(int argc, char *argv[])
             int32_t time_taken = (diff.tv_sec * 1000)+(diff.tv_usec / 1000);
             double frames_per_second = 2.0e5 / time_taken;
 
-            lifeInfo(&infoLayer, size, true, frames_per_second);
+            lifeInfo(&infoLayer, size, paused, true, frames_per_second);
 
             memcpy(&start_time, &end_time, sizeof(start_time));
         }
