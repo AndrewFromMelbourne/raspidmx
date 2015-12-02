@@ -42,7 +42,8 @@
 
 void
 calculatingInfo(
-    IMAGE_LAYER_T *imageLayer)
+    IMAGE_LAYER_T *imageLayer,
+    int32_t threads)
 {
     static RGBA8_T textColour = { 0, 0, 0, 255 };
     static RGBA8_T backgroundColour = { 255, 255, 255, 255 };
@@ -51,9 +52,23 @@ calculatingInfo(
 
     clearImageRGB(image, &backgroundColour);
 
+    //---------------------------------------------------------------------
+
     drawStringRGB(INFO_LEFT_PADDING,
                   INFO_TOP_PADDING,
                   "Calculating ...",
+                  &textColour,
+                  image);
+
+    //---------------------------------------------------------------------
+
+    char buffer[128];
+
+    snprintf(buffer, sizeof(buffer), "threads: %d", threads);
+
+    drawStringRGB(INFO_LEFT_PADDING,
+                  (2 * INFO_TOP_PADDING) + FONT_HEIGHT,
+                  buffer,
                   &textColour,
                   image);
 

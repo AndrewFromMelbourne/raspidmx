@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
 
     MANDELBROT_COORDS_T coords = { -2.0, -1.5, 3.0 };
 
-    calculatingInfo(&infoLayer);
+    calculatingInfo(&infoLayer, mandelbrot.numberOfThreads);
     mandelbrotImage(&mandelbrot, &coords);
     mandelbrotInfo(&infoLayer);
 
@@ -351,7 +351,7 @@ int main(int argc, char *argv[])
 
                 if (zoom(&zoomLayer, &infoLayer, &coords))
                 {
-                    calculatingInfo(&infoLayer);
+                    calculatingInfo(&infoLayer, mandelbrot.numberOfThreads);
                     mandelbrotImage(&mandelbrot, &coords);
                 }
 

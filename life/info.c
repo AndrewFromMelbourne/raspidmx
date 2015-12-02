@@ -25,6 +25,7 @@
 //
 //-------------------------------------------------------------------------
 
+#include <inttypes.h>
 #include <stdint.h>
 
 #include "font.h"
@@ -45,6 +46,7 @@ lifeInfo(
     IMAGE_LAYER_T *imageLayer,
     int32_t size,
     bool paused,
+    int32_t threads,
     bool framesPerSecondValid,
     double framesPerSecond)
 {
@@ -92,6 +94,11 @@ lifeInfo(
     y += key_dimensions.height + INFO_TOP_PADDING;
 
     snprintf(buffer, sizeof(buffer), "size: %d", size);
+    drawStringRGB(x, y, buffer, &textColour, image);
+
+    y += FONT_HEIGHT + INFO_TOP_PADDING;
+
+    snprintf(buffer, sizeof(buffer), "threads: %d", threads);
     drawStringRGB(x, y, buffer, &textColour, image);
 
     y += FONT_HEIGHT + INFO_TOP_PADDING;

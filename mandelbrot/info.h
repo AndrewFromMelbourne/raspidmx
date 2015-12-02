@@ -36,7 +36,8 @@
 
 void
 calculatingInfo(
-    IMAGE_LAYER_T *imageLayer);
+    IMAGE_LAYER_T *imageLayer,
+    int32_t threads);
 
 void
 mandelbrotInfo(

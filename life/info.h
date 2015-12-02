@@ -39,6 +39,7 @@ lifeInfo(
     IMAGE_LAYER_T *imageLayer,
     int32_t size,
     bool paused,
+    int32_t threads,
     bool framesPerSecondValid,
     double framesPerSecond);
 

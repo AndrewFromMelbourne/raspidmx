@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     int32_t infoLayerWidth = 96;
-    int32_t infoLayerHeight = 114;
+    int32_t infoLayerHeight = 134;
 
     IMAGE_LAYER_T infoLayer;
     initImageLayer(&infoLayer,
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
                                display,
                                update);
 
-    lifeInfo(&infoLayer, size, false, false, 0.0);
+    lifeInfo(&infoLayer, size, false, life.numberOfThreads, false, 0.0);
 
     //---------------------------------------------------------------------
 
@@ -219,7 +219,12 @@ int main(int argc, char *argv[])
 
                 paused = !paused;
 
-                lifeInfo(&infoLayer, size, paused, false, 0.0);
+                lifeInfo(&infoLayer,
+                         size,
+                         paused,
+                         life.numberOfThreads,
+                         false,
+                         0.0);
 
                 break;
 
@@ -246,7 +251,12 @@ int main(int argc, char *argv[])
             int32_t time_taken = (diff.tv_sec * 1000)+(diff.tv_usec / 1000);
             double frames_per_second = 2.0e5 / time_taken;
 
-            lifeInfo(&infoLayer, size, paused, true, frames_per_second);
+            lifeInfo(&infoLayer,
+                     size,
+                     paused,
+                     life.numberOfThreads,
+                     true,
+                     frames_per_second);
 
             memcpy(&start_time, &end_time, sizeof(start_time));
         }
