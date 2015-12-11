@@ -54,7 +54,7 @@
 int main(int argc, char *argv[])
 {
     int opt = 0;
-    int32_t size = 350;
+    int32_t size = 0;
     uint32_t displayNumber = 0;
 
     //-------------------------------------------------------------------
