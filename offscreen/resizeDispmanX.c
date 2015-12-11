@@ -156,7 +156,7 @@ resizeDispmanX(
                                       DISPMANX_PROTECTION_NONE,
                                       &alpha,
                                       NULL,
-                                      VC_IMAGE_ROT0);
+                                      DISPMANX_NO_ROTATE);
 
     vc_dispmanx_update_submit_sync(update);
 
