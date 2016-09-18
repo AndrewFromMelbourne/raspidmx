@@ -63,6 +63,8 @@ void usage(void)
     fprintf(stderr, "    -d - Raspberry Pi display number\n");
     fprintf(stderr, "    -l - DispmanX layer number\n");
     fprintf(stderr, "    -r - number of rows in sprite\n");
+    fprintf(stderr, "    -x - offset (pixels from the left)\n");
+    fprintf(stderr, "    -y - offset (pixels from the top)\n");
 
     exit(EXIT_FAILURE);
 }
@@ -74,6 +76,10 @@ int main(int argc, char *argv[])
     uint16_t background = 0x000F;
     int32_t layer = 1;
     uint32_t displayNumber = 0;
+    int32_t xOffset = 0;
+    int32_t yOffset = 0;
+    bool xOffsetSet = false;
+    bool yOffsetSet = false;
     int columns = 1;
     int rows = 1;
     const char *file = NULL;
@@ -84,7 +90,7 @@ int main(int argc, char *argv[])
 
     int opt = 0;
 
-    while ((opt = getopt(argc, argv, "b:c:d:l:r:")) != -1)
+    while ((opt = getopt(argc, argv, "b:c:d:l:r:x:y:")) != -1)
     {
         switch(opt)
         {
@@ -111,6 +117,18 @@ int main(int argc, char *argv[])
         case 'r':
 
             rows = atoi(optarg);
+            break;
+
+        case 'x':
+
+            xOffset = strtol(optarg, NULL, 10);
+            xOffsetSet = true;
+            break;
+
+        case 'y':
+
+            yOffset = strtol(optarg, NULL, 10);
+            yOffsetSet = true;
             break;
 
         default:
@@ -158,8 +176,26 @@ int main(int argc, char *argv[])
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
     assert(update != 0);
 
-    addElementBackgroundLayer(&bg, display, update);
-    addElementSpriteLayerCentered(&sprite, &info, display, update);
+    if (background > 0)
+    {
+        addElementBackgroundLayer(&bg, display, update);
+    }
+
+    if (xOffsetSet == false)
+    {
+        xOffset = (info.width - sprite.width) / 2;
+    }
+
+    if (yOffsetSet == false)
+    {
+        yOffset = (info.height - sprite.height) / 2;
+    }
+
+    addElementSpriteLayerOffset(&sprite,
+                                xOffset,
+                                yOffset,
+                                display,
+                                update);
 
     result = vc_dispmanx_update_submit_sync(update);
     assert(result == 0);

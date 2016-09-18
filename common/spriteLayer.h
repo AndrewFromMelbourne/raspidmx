@@ -65,6 +65,14 @@ initSpriteLayer(
     int32_t layer);
 
 void
+addElementSpriteLayerOffset(
+    SPRITE_LAYER_T *s,
+    int32_t xOffset,
+    int32_t yOffset,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update);
+
+void
 addElementSpriteLayerCentered(
     SPRITE_LAYER_T *s,
     DISPMANX_MODEINFO_T *info,

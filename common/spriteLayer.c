@@ -109,6 +109,31 @@ void initSpriteLayer(
 //-------------------------------------------------------------------------
 
 void
+addElementSpriteLayerOffset(
+    SPRITE_LAYER_T *s,
+    int32_t xOffset,
+    int32_t yOffset,
+    DISPMANX_DISPLAY_HANDLE_T display,
+    DISPMANX_UPDATE_HANDLE_T update)
+{
+    vc_dispmanx_rect_set(&(s->srcRect),
+                         0 << 16,
+                         0 << 16,
+                         s->image.width << 16,
+                         s->image.height << 16);
+
+    vc_dispmanx_rect_set(&(s->dstRect),
+                         xOffset,
+                         yOffset,
+                         s->width,
+                         s->height);
+
+    addElementSpriteLayer(s, display, update);
+}
+
+//-------------------------------------------------------------------------
+
+void
 addElementSpriteLayerCentered(
     SPRITE_LAYER_T *s,
     DISPMANX_MODEINFO_T *info,
