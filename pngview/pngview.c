@@ -83,6 +83,7 @@ void usage(void)
     fprintf(stderr, "    -l - DispmanX layer number\n");
     fprintf(stderr, "    -x - offset (pixels from the left)\n");
     fprintf(stderr, "    -y - offset (pixels from the top)\n");
+    fprintf(stderr, "    -n - non-interactive mode\n");
 
     exit(EXIT_FAILURE);
 }
@@ -98,6 +99,7 @@ int main(int argc, char *argv[])
     int32_t yOffset = 0;
     bool xOffsetSet = false;
     bool yOffsetSet = false;
+    bool interactive = true;
 
     program = basename(argv[0]);
 
@@ -105,7 +107,7 @@ int main(int argc, char *argv[])
 
     int opt = 0;
 
-    while ((opt = getopt(argc, argv, "b:d:l:x:y:")) != -1)
+    while ((opt = getopt(argc, argv, "b:d:l:x:y:n")) != -1)
     {
         switch(opt)
         {
@@ -135,6 +137,10 @@ int main(int argc, char *argv[])
             yOffset = strtol(optarg, NULL, 10);
             yOffsetSet = true;
             break;
+        
+        case 'n':
+			interactive = false;
+			break;
 
         default:
 
@@ -234,7 +240,7 @@ int main(int argc, char *argv[])
     while (run)
     {
         int c = 0;
-        if (keyPressed(&c))
+        if (interactive && keyPressed(&c))
         {
             c = tolower(c);
 
