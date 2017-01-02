@@ -10,4 +10,5 @@ Utility to display a PNG image on the Raspberry Pi screen using the Dispmanx win
     -l - DispmanX layer number
     -x - offset (pixels from the left)
     -y - offset (pixels from the top)
+    -n - non-interactive mode
 
