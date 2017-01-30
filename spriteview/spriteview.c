@@ -61,8 +61,11 @@ void usage(void)
     fprintf(stderr, "         e.g. 0x000F is opaque black\n");
     fprintf(stderr, "    -c - number of columns in sprite\n");
     fprintf(stderr, "    -d - Raspberry Pi display number\n");
+    fprintf(stderr, "    -i - Interval between changes in ms\n");
     fprintf(stderr, "    -l - DispmanX layer number\n");
+    fprintf(stderr, "    -n - non-interactive mode\n");
     fprintf(stderr, "    -r - number of rows in sprite\n");
+    fprintf(stderr, "    -t - Timeout in ms\n");
     fprintf(stderr, "    -x - offset (pixels from the left)\n");
     fprintf(stderr, "    -y - offset (pixels from the top)\n");
 
@@ -76,8 +79,11 @@ int main(int argc, char *argv[])
     uint16_t background = 0x000F;
     int32_t layer = 1;
     uint32_t displayNumber = 0;
+    uint32_t interval = 0;
+    uint32_t timeout = 0;
     int32_t xOffset = 0;
     int32_t yOffset = 0;
+    bool interactive = true;
     bool xOffsetSet = false;
     bool yOffsetSet = false;
     int columns = 1;
@@ -90,7 +96,7 @@ int main(int argc, char *argv[])
 
     int opt = 0;
 
-    while ((opt = getopt(argc, argv, "b:c:d:l:r:x:y:")) != -1)
+    while ((opt = getopt(argc, argv, "b:c:d:i:l:r:t:x:y:n")) != -1)
     {
         switch(opt)
         {
@@ -109,14 +115,29 @@ int main(int argc, char *argv[])
             displayNumber = atoi(optarg);
             break;
 
+        case 'i':
+
+            interval = atoi(optarg);
+            break;
+
         case 'l':
 
             layer = atoi(optarg);
             break;
 
+        case 'n':
+
+            interactive = false;
+            break;
+
         case 'r':
 
             rows = atoi(optarg);
+            break;
+
+        case 't':
+
+            timeout = atoi(optarg);
             break;
 
         case 'x':
@@ -205,10 +226,13 @@ int main(int argc, char *argv[])
     int c = 0;
     bool paused = false;
     bool step = false;
+    bool run = true;
 
-    while (c != 27)
+    uint32_t currentTime = 0;
+
+    while (run)
     {
-        if (keyPressed(&c))
+        if (interactive && keyPressed(&c))
         {
             c = tolower(c);
 
@@ -226,7 +250,12 @@ int main(int argc, char *argv[])
                     step = true;
                 }
                 break;
+            
+            case 27:
+                run = false;
+                break;
             }
+
         }
 
         //-----------------------------------------------------------------
@@ -242,6 +271,14 @@ int main(int argc, char *argv[])
             assert(result == 0);
 
             step = false;
+        }
+
+        if (!interactive)
+        {
+            usleep(interval*1000);
+            currentTime += interval;
+            if (timeout != 0 && currentTime >= timeout)
+                run = false;
         }
     }
 
