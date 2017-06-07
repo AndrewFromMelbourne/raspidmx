@@ -1,11 +1,8 @@
-OBJS=main.o ../common/scrollingLayer.o ../common/spriteLayer.o \
-	 ../common/backgroundLayer.o ../common/image.o ../common/imageLayer.o \
-	 ../common/key.o ../common/loadpng.o
-
+OBJS=main.o
 BIN=game
 
 CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags)
+LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags) -L../lib -lraspidmx
 
 INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
 

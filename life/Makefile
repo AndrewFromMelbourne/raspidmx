@@ -1,11 +1,8 @@
-OBJS=main.o life.o info.o ../common/backgroundLayer.o ../common/font.o \
-     ../common/key.o ../common/imageGraphics.o ../common/imageKey.o \
-     ../common/imageLayer.o ../common/image.o
-
+OBJS=main.o life.o info.o
 BIN=life
 
 CFLAGS+=-Wall -g -O3 -I../common
-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host
+LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -L../lib -lraspidmx
 
 INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
 
