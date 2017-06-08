@@ -1,13 +1,8 @@
-OBJS=main.o mandelbrot.o info.o ../common/backgroundLayer.o \
-	  ../common/font.o ../common/key.o ../common/hsv2rgb.o \
-	  ../common/imageGraphics.o ../common/imageKey.o \
-	  ../common/imageLayer.o ../common/image.o \
-	  ../common/savepng.o
-
+OBJS=main.o mandelbrot.o info.o
 BIN=mandelbrot
 
 CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags)
+LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags) -L../lib -lraspidmx
 
 INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
 

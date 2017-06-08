@@ -1,9 +1,8 @@
-OBJS=main.o worms.o ../common/backgroundLayer.o ../common/hsv2rgb.o \
-	 ../common/image.o ../common/key.o
+OBJS=main.o worms.o
 BIN=worms
 
 CFLAGS+=-Wall -g -O3 -I../common
-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm
+LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm -L../lib -lraspidmx
 
 INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
 

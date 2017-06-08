@@ -1,14 +1,15 @@
-TARGETS=	life \
-			mandelbrot \
-			offscreen \
-			pngview \
-			radar_sweep \
-			radar_sweep_alpha \
-			rgb_triangle \
-			game \
-			spriteview \
-			test_pattern \
-			worms
+TARGETS=lib \
+	life \
+	mandelbrot \
+	offscreen \
+	pngview \
+	radar_sweep \
+	radar_sweep_alpha \
+	rgb_triangle \
+	game \
+	spriteview \
+	test_pattern \
+	worms
 
 default :all
 

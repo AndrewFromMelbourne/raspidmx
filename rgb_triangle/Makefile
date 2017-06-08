@@ -1,8 +1,8 @@
-OBJS=rgb_triangle.o ../common/image.o ../common/key.o
+OBJS=rgb_triangle.o
 BIN=rgb_triangle
 
 CFLAGS+=-Wall -O3 -g -I../common
-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm
+LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm -L../lib -lraspidmx
 
 INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
 
