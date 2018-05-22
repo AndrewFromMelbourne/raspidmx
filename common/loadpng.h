@@ -29,12 +29,14 @@
 #define LOADPNG_H
 
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "image.h"
 
 //-------------------------------------------------------------------------
 
-bool loadPng(IMAGE_T *image, const char *file);
+bool loadPng(IMAGE_T *image, const char *path);
+bool loadPngFile(IMAGE_T* image, FILE *file);
 
 //-------------------------------------------------------------------------
 

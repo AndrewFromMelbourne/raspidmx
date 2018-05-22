@@ -43,18 +43,28 @@
 bool
 loadPng(
     IMAGE_T* image,
-    const char *file)
+    const char *path)
 {
-    FILE* fpin = fopen(file, "rb");
+    FILE* file = fopen(path, "rb");
 
-    if (fpin == NULL)
+    if (file == NULL)
     {
         fprintf(stderr, "loadpng: can't open file for reading\n");
         return false;
     }
 
-    //---------------------------------------------------------------------
+    bool result = loadPngFile(image, file);
 
+    fclose(file);
+
+    return result;
+}
+
+bool
+loadPngFile(
+    IMAGE_T* image,
+    FILE *file)
+{
     png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
                                                  NULL,
                                                  NULL,
@@ -62,7 +72,6 @@ loadPng(
 
     if (png_ptr == NULL)
     {
-        fclose(fpin);
         return false;
     }
 
@@ -71,20 +80,18 @@ loadPng(
     if (info_ptr == NULL)
     {
         png_destroy_read_struct(&png_ptr, 0, 0);
-        fclose(fpin);
         return false;
     }
 
     if (setjmp(png_jmpbuf(png_ptr)))
     {
         png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        fclose(fpin);
         return false;
     }
 
     //---------------------------------------------------------------------
 
-    png_init_io(png_ptr, fpin);
+    png_init_io(png_ptr, file);
 
     png_read_info(png_ptr, info_ptr);
 
@@ -166,8 +173,6 @@ loadPng(
     png_read_image(png_ptr, row_pointers);
 
     //---------------------------------------------------------------------
-
-    fclose(fpin);
 
     free(row_pointers);
 

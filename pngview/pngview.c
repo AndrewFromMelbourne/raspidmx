@@ -166,6 +166,29 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
+    IMAGE_LAYER_T imageLayer;
+
+    const char *imagePath = argv[optind];
+
+    if(strcmp(imagePath, "-") == 0) {
+        // Use stdin
+        if (loadPngFile(&(imageLayer.image), stdin) == false)
+        {
+            fprintf(stderr, "unable to load %s\n", imagePath);
+            exit(EXIT_FAILURE);
+        }
+    }
+    else {
+        // Load image from path
+        if (loadPng(&(imageLayer.image), imagePath) == false)
+        {
+            fprintf(stderr, "unable to load %s\n", imagePath);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    //---------------------------------------------------------------------
+
     if (signal(SIGINT, signalHandler) == SIG_ERR)
     {
         perror("installing SIGINT signal handler");
@@ -205,11 +228,6 @@ int main(int argc, char *argv[])
         initBackgroundLayer(&backgroundLayer, background, 0);
     }
 
-    IMAGE_LAYER_T imageLayer;
-    if (loadPng(&(imageLayer.image), argv[optind]) == false)
-    {
-        fprintf(stderr, "unable to load %s\n", argv[optind]);
-    }
     createResourceImageLayer(&imageLayer, layer);
 
     //---------------------------------------------------------------------
