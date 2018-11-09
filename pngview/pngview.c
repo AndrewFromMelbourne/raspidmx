@@ -170,7 +170,8 @@ int main(int argc, char *argv[])
 
     const char *imagePath = argv[optind];
 
-    if(strcmp(imagePath, "-") == 0) {
+    if(strcmp(imagePath, "-") == 0)
+    {
         // Use stdin
         if (loadPngFile(&(imageLayer.image), stdin) == false)
         {
@@ -178,7 +179,8 @@ int main(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
     }
-    else {
+    else
+    {
         // Load image from path
         if (loadPng(&(imageLayer.image), imagePath) == false)
         {
