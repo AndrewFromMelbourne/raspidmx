@@ -3,18 +3,21 @@
 #
 
 LIB=raspidmx
+LIBPNG=raspidmxPng
 
-OBJS=../common/backgroundLayer.o ../common/imageGraphics.o ../common/key.o ../common/spriteLayer.o \
- ../common/font.o ../common/imageKey.o ../common/loadpng.o \
- ../common/hsv2rgb.o ../common/imageLayer.o ../common/savepng.o \
- ../common/image.o ../common/imagePalette.o ../common/scrollingLayer.o
+OBJS=../common/backgroundLayer.o ../common/imageGraphics.o ../common/key.o \
+ ../common/font.o ../common/imageKey.o ../common/hsv2rgb.o \
+ ../common/imageLayer.o ../common/image.o ../common/imagePalette.o
+
+OBJSPNG=../common/spriteLayer.o ../common/loadpng.o ../common/savepng.o ../common/scrollingLayer.o
 
 CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags)
+LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm
+LDFLAGSPNG=${LDFLAGS} $(shell libpng-config --ldflags)
 
 INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
 
-all: $(LIB)
+all: $(LIB) $(LIBPNG)
 
 %.o: %.c
 	@rm -f $@ 
@@ -22,12 +25,11 @@ all: $(LIB)
 
 $(LIB): $(OBJS)
 	$(AR) rcs lib$(LIB).a $(OBJS)
-	$(CC) -shared -Wl,-soname,lib$(LIB).so.1 $(LDFLAGS) -o lib$(LIB).so.1 $(OBJS)
 
-# TODO: move to debian package
-	ln -sfv lib$(LIB).so.1 lib$(LIB).so
+$(LIBPNG): $(OBJSPNG)
+	$(AR) rcs lib$(LIBPNG).a $(OBJSPNG)
+
 
 clean:
 	@rm -f $(OBJS)
-	@rm -f lib$(LIB).so*
 	@rm -f lib$(LIB).a
