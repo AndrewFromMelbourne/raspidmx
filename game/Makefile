@@ -18,6 +18,8 @@ $(BIN): $(OBJS)
 install: $(BIN)
 	install -d $(DESTDIR)/usr/bin
 	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
+	install -d $(DESTDIR)/usr/share/raspidmx
+	install -m 444 spotlight.png sprite.png texture.png $(DESTDIR)/usr/share/raspidmx
 
 clean:
 	@rm -f $(OBJS)
