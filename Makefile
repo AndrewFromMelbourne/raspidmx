@@ -16,6 +16,9 @@ default :all
 all:
 	for target in $(TARGETS); do ($(MAKE) -C $$target); done
 
+install:
+	for target in $(TARGETS); do ($(MAKE) -C $$target install); done
+
 clean:
 	for target in $(TARGETS); do ($(MAKE) -C $$target clean); done
 

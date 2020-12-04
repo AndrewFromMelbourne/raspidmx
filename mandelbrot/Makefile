@@ -15,6 +15,10 @@ all: $(BIN)
 $(BIN): $(OBJS)
 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -pthread -Wl,--no-whole-archive -rdynamic
 
+install: $(BIN)
+	install -d $(DESTDIR)/usr/bin
+	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
+
 clean:
 	@rm -f $(OBJS)
 	@rm -f $(BIN)

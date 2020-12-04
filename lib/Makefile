@@ -29,6 +29,7 @@ $(LIB): $(OBJS)
 $(LIBPNG): $(OBJSPNG)
 	$(AR) rcs lib$(LIBPNG).a $(OBJSPNG)
 
+install:
 
 clean:
 	@rm -f $(OBJS)
