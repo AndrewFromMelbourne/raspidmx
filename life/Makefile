@@ -2,7 +2,7 @@ OBJS=main.o life.o info.o
 BIN=life
 
 CFLAGS+=-Wall -g -O3 -I../common
-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -L../lib -lraspidmx
+LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -L../lib -lraspidmx
 
 INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
 
@@ -14,6 +14,10 @@ all: $(BIN)
 
 $(BIN): $(OBJS)
 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -pthread -Wl,--no-whole-archive -rdynamic
+
+install: $(BIN)
+	install -d $(DESTDIR)/usr/bin
+	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
 
 clean:
 	@rm -f $(OBJS)

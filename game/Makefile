@@ -1,8 +1,8 @@
 OBJS=main.o
 BIN=game
 
-CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags) -L../lib -lraspidmx -lraspidmxPng
+CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
+LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm -L../lib -lraspidmx -lraspidmxPng $(shell pkg-config --libs libpng)
 
 INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
 
@@ -14,6 +14,12 @@ all: $(BIN)
 
 $(BIN): $(OBJS)
 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
+
+install: $(BIN)
+	install -d $(DESTDIR)/usr/bin
+	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
+	install -d $(DESTDIR)/usr/share/raspidmx
+	install -m 444 spotlight.png sprite.png texture.png $(DESTDIR)/usr/share/raspidmx
 
 clean:
 	@rm -f $(OBJS)
