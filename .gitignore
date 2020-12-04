@@ -21,5 +21,6 @@ test_pattern/test_pattern
 worms/worms
 
 # other directories
+lib/*a
 
 *_/
