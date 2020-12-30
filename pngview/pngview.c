@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "backgroundLayer.h"
 #include "imageLayer.h"
@@ -53,6 +54,7 @@ const char *program = NULL;
 //-------------------------------------------------------------------------
 
 volatile bool run = true;
+volatile bool reload = false;
 
 //-------------------------------------------------------------------------
 
@@ -62,6 +64,9 @@ signalHandler(
 {
     switch (signalNumber)
     {
+    case SIGTSTP:
+        reload = true;
+        break;
     case SIGINT:
     case SIGTERM:
 
@@ -70,12 +75,19 @@ signalHandler(
     };
 }
 
+time_t getFileModificationTime(const char *path) {
+    struct stat attr;
+    stat(path, &attr);
+    //printf("Last modified time: %s", ctime(&attr.st_mtime));
+    return attr.st_mtime;
+}
+
 //-------------------------------------------------------------------------
 
 void usage(void)
 {
     fprintf(stderr, "Usage: %s ", program);
-    fprintf(stderr, "[-b <RGBA>] [-d <number>] [-l <layer>] ");
+    fprintf(stderr, "[-b <BGRA>] [-d <number>] [-l <layer>] ");
     fprintf(stderr, "[-x <offset>] [-y <offset>] <file.png>\n");
     fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
     fprintf(stderr, "         e.g. 0x000F is opaque black\n");
@@ -85,6 +97,8 @@ void usage(void)
     fprintf(stderr, "    -y - offset (pixels from the top)\n");
     fprintf(stderr, "    -t - timeout in ms\n");
     fprintf(stderr, "    -n - non-interactive mode\n");
+    fprintf(stderr, "    -m - monitor <file.png> for changes\n");
+    fprintf(stderr, "    Use 'killall -s SIGTSTP pngview' to refresh from <file.png>\n");
 
     exit(EXIT_FAILURE);
 }
@@ -102,6 +116,8 @@ int main(int argc, char *argv[])
     bool xOffsetSet = false;
     bool yOffsetSet = false;
     bool interactive = true;
+    bool monitorChanges = false;
+    time_t lastFileMod = 0;
 
     program = basename(argv[0]);
 
@@ -109,7 +125,7 @@ int main(int argc, char *argv[])
 
     int opt = 0;
 
-    while ((opt = getopt(argc, argv, "b:d:l:x:y:t:n")) != -1)
+    while ((opt = getopt(argc, argv, "b:d:l:x:y:t:nm")) != -1)
     {
         switch(opt)
         {
@@ -139,7 +155,7 @@ int main(int argc, char *argv[])
             yOffset = strtol(optarg, NULL, 10);
             yOffsetSet = true;
             break;
-        
+
         case 't':
 
             timeout = atoi(optarg);
@@ -148,6 +164,11 @@ int main(int argc, char *argv[])
         case 'n':
 
             interactive = false;
+            break;
+
+        case 'm':
+
+            monitorChanges = true;
             break;
 
         default:
@@ -187,9 +208,15 @@ int main(int argc, char *argv[])
             fprintf(stderr, "unable to load %s\n", imagePath);
             exit(EXIT_FAILURE);
         }
+        lastFileMod = getFileModificationTime(imagePath);
     }
 
     //---------------------------------------------------------------------
+    if (signal(SIGTSTP, signalHandler) == SIG_ERR)
+    {
+        perror("installing SIGTSTP signal handler");
+        exit(EXIT_FAILURE);
+    }
 
     if (signal(SIGINT, signalHandler) == SIG_ERR)
     {
@@ -265,6 +292,7 @@ int main(int argc, char *argv[])
 
     int32_t step = 1;
     uint32_t currentTime = 0;
+    uint32_t lastModCheckTime = 0;
 
     // Sleep for 10 milliseconds every run-loop
     const int sleepMilliseconds = 10;
@@ -272,6 +300,33 @@ int main(int argc, char *argv[])
     while (run)
     {
         int c = 0;
+
+        // Optionally check for changes to the png file
+        if (monitorChanges && ((currentTime-lastModCheckTime) >= 1000)) {
+            lastModCheckTime = currentTime;
+            time_t modTime = getFileModificationTime(imagePath);
+            if (lastFileMod != modTime) {
+                reload=true;
+            }
+            lastFileMod = modTime;
+        }
+
+        if (reload) {
+            reload = false;
+            if(strcmp(imagePath, "-") != 0)
+            {
+                // Load image from path
+                if (loadPng(&(imageLayer.image), imagePath) == false)
+                {
+                    usleep(200*1000); // wait and try again
+                } else
+                {
+                    reload = false;
+                    changeSourceAndUpdateImageLayer(&imageLayer);
+                }
+            }
+        }
+
         if (interactive && keyPressed(&c))
         {
             c = tolower(c);
