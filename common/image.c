@@ -775,3 +775,55 @@ printImageTypes(
     }
 }
 
+//-----------------------------------------------------------------------
+
+void
+setImageAlphaRelative(
+    IMAGE_T *image,
+    uint8_t alpha)
+{
+    if (image->setPixelDirect != NULL)
+    {
+        RGBA8_T rgba;
+        int j;
+        for (j = 0 ; j < image->height ; j++)
+        {
+            int i;
+            for (i = 0 ; i < image->width ; i++)
+            {
+                getPixelRGB(image, i, j, &rgba);
+                rgba.alpha = (uint8_t)(rgba.alpha * (uint16_t)alpha / 255);
+                setPixelRGB(image, i, j, &rgba);
+            }
+        }
+    }
+}
+
+
+//-----------------------------------------------------------------------
+
+void
+setImageRGB (
+    IMAGE_T *image,
+    uint8_t red,
+    uint8_t green,
+    uint8_t blue)
+{
+    if (image->setPixelDirect != NULL)
+    {
+        RGBA8_T rgba;
+        int j;
+        for (j = 0 ; j < image->height ; j++)
+        {
+            int i;
+            for (i = 0 ; i < image->width ; i++)
+            {
+                getPixelRGB(image, i, j, &rgba);
+                rgba.red = red;
+                rgba.green = green;
+                rgba.blue = blue;
+                setPixelRGB(image, i, j, &rgba);
+            }
+        }
+    }
+}
