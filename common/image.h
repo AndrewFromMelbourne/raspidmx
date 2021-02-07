@@ -145,6 +145,11 @@ getPixelRGB(
 void
 destroyImage(
     IMAGE_T *image);
+    
+void
+setImageAlphaRelative(
+    IMAGE_T *image,
+    uint8_t alpha);
 
 //-------------------------------------------------------------------------
 

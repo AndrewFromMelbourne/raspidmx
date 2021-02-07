@@ -99,9 +99,11 @@ int main(int argc, char *argv[])
     int32_t xOffset = 0;
     int32_t yOffset = 0;
     uint32_t timeout = 0;
+    uint8_t alphaRelative = 0;
     bool xOffsetSet = false;
     bool yOffsetSet = false;
     bool interactive = true;
+    bool alphaRelativeSet = false;
 
     program = basename(argv[0]);
 
@@ -109,7 +111,7 @@ int main(int argc, char *argv[])
 
     int opt = 0;
 
-    while ((opt = getopt(argc, argv, "b:d:l:x:y:t:n")) != -1)
+    while ((opt = getopt(argc, argv, "b:d:l:x:y:t:na:")) != -1)
     {
         switch(opt)
         {
@@ -150,6 +152,12 @@ int main(int argc, char *argv[])
             interactive = false;
             break;
 
+        case 'a':
+
+            alphaRelative = (uint8_t)strtol(optarg, NULL, 10);
+            alphaRelativeSet = true;
+            break;
+
         default:
 
             usage();
@@ -187,6 +195,13 @@ int main(int argc, char *argv[])
             fprintf(stderr, "unable to load %s\n", imagePath);
             exit(EXIT_FAILURE);
         }
+    }
+    
+    //---------------------------------------------------------------------
+    
+    if (alphaRelativeSet == true)
+    {
+      setImageAlphaRelative(&(imageLayer.image), alphaRelative);
     }
 
     //---------------------------------------------------------------------
