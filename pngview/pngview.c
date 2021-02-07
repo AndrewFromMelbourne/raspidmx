@@ -85,6 +85,9 @@ void usage(void)
     fprintf(stderr, "    -y - offset (pixels from the top)\n");
     fprintf(stderr, "    -t - timeout in ms\n");
     fprintf(stderr, "    -n - non-interactive mode\n");
+    fprintf(stderr, "    -a - set relative alpha value (0-255)\n");
+    fprintf(stderr, "    -c - set image colour 24 bit RGB\n");
+    fprintf(stderr, "         e.g. 0x00FF00 is green\n");
 
     exit(EXIT_FAILURE);
 }
@@ -100,10 +103,12 @@ int main(int argc, char *argv[])
     int32_t yOffset = 0;
     uint32_t timeout = 0;
     uint8_t alphaRelative = 0;
+    uint32_t rgb = 0x000000;
     bool xOffsetSet = false;
     bool yOffsetSet = false;
     bool interactive = true;
     bool alphaRelativeSet = false;
+    bool rgbSet = false;
 
     program = basename(argv[0]);
 
@@ -111,7 +116,7 @@ int main(int argc, char *argv[])
 
     int opt = 0;
 
-    while ((opt = getopt(argc, argv, "b:d:l:x:y:t:na:")) != -1)
+    while ((opt = getopt(argc, argv, "b:d:l:x:y:t:na:c:")) != -1)
     {
         switch(opt)
         {
@@ -156,6 +161,12 @@ int main(int argc, char *argv[])
 
             alphaRelative = (uint8_t)strtol(optarg, NULL, 10);
             alphaRelativeSet = true;
+            break;
+            
+        case 'c':
+
+            rgb = strtol(optarg, NULL, 16);
+            rgbSet = true;
             break;
 
         default:
@@ -202,6 +213,16 @@ int main(int argc, char *argv[])
     if (alphaRelativeSet == true)
     {
       setImageAlphaRelative(&(imageLayer.image), alphaRelative);
+    }
+
+    //---------------------------------------------------------------------
+    
+    if (rgbSet == true)
+    {
+      uint8_t red = (rgb>>16) & 0xff;
+      uint8_t green = (rgb>>8) & 0xff;
+      uint8_t blue = rgb & 0xff;
+      setImageRGB(&(imageLayer.image), red , green, blue);
     }
 
     //---------------------------------------------------------------------
