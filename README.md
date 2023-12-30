@@ -1,19 +1,19 @@
-# Dispmanx
+# `DispmanX`
 
 There are a number of APIs available for the Raspberry Pi that can make use
-of the computers GPU. These include OpenMAX, Open GL ES(1 and 2) and OpenVG.
+of the computer's GPU. These include OpenMAX, Open GL ES(1 and 2) and OpenVG.
 The raspberrypi/firmware repository has short examples for these and other
-APIs. They can be found in /opt/vc/src/hello_pi/ on the Raspbian 'wheezy'
-image. Among these examples is a program called hello_dispmanx. It is a
-very small example of the Dispmanx windowing system. Apart from this:-
+APIs. They can be found in `/opt/vc/src/hello_pi/` on the Raspbian (now "Raspberry Pi OS") 'wheezy'
+image. Among these examples is a program called `hello_dispmanx`. It is a
+very small example of the `DispmanX` windowing system. Apart from this:-
 
 https://github.com/raspberrypi/firmware/tree/master/opt/vc/src/hello_pi/hello_dispmanx
 
 example, there is very little documentation available for this API. There
 are snippets of information on the Raspberry Pi forum, but I have not found
-a single place with detailed information on DispmanX.  Hopefully these
+a single place with detailed information on `DispmanX`. Hopefully these
 programs can be used as a starting point for anyone wanting to make use of
-DispmanX.
+`DispmanX`.
 
 The programs demonstrate layers with the following types: 4BPP (4 bit
 indexed), 8BPP (8 bit indexed), RGB565 (16 bit), RGB888 (24 bit), RGBA16
@@ -41,11 +41,11 @@ number of coloured worms on the screen of the Raspberry Pi.
 
 ## pngview
 
-Load a png image file and display it as a Dispmanx layer.
+Load a PNG image file and display it as a `DispmanX` layer.
 
 ## spriteview
 
-Loads a sprite (png) image file and displays it as an animation.
+Loads a sprite (PNG) image file and displays it as an animation.
 
 ## game
 
@@ -58,11 +58,11 @@ The famous (in the 1990s) Mandelbrot set.
 
 ## radar_sweep
 
-An animation of a 'radar sweep' using 16 bit (rgb) palette animation.
+An animation of a 'radar sweep' using 16 bit (RGB) palette animation.
 
 ## radar_sweep_alpha
 
-An animation of a 'radar sweep' using 32 bit (rgba) palette animation.
+An animation of a 'radar sweep' using 32 bit (RGBA) palette animation.
 
 ## offscreen
 
@@ -79,4 +79,4 @@ If you type make in the top level directory, the make file will build all
 the different programs in this repository. Each program has its own make
 file, so you can build them individually if you wish.
 
-You will need to install the latest version of libpng-dev before you build the program. On Raspbian
+You will need to install the latest version of `libpng-dev`` before you can build the program on Raspbian.
