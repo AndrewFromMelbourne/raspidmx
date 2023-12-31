@@ -1,5 +1,4 @@
-TARGETS=lib \
-	life \
+TARGETS=life \
 	mandelbrot \
 	offscreen \
 	pngview \
@@ -10,12 +9,11 @@ TARGETS=lib \
 	spriteview \
 	test_pattern \
 	worms
+.PHONY: all lib install clean $(TARGETS)
 
-default :all
+all: $(TARGETS)
 
-all:
-	for target in $(TARGETS); do ($(MAKE) -C $$target); done
-
-clean:
-	for target in $(TARGETS); do ($(MAKE) -C $$target clean); done
-
+$(TARGETS): lib
+	$(MAKE) -C $@ $(TARGET)
+lib:
+	$(MAKE) -C $@ $(TARGET)

@@ -11,9 +11,9 @@ OBJS=../common/backgroundLayer.o ../common/imageGraphics.o ../common/key.o \
 
 OBJSPNG=../common/spriteLayer.o ../common/loadpng.o ../common/savepng.o ../common/scrollingLayer.o
 
-CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
+CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
 LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm
-LDFLAGSPNG=${LDFLAGS} $(shell libpng-config --ldflags)
+LDFLAGSPNG=${LDFLAGS} $(shell pkg-config --libs libpng)
 
 INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
 
@@ -29,6 +29,7 @@ $(LIB): $(OBJS)
 $(LIBPNG): $(OBJSPNG)
 	$(AR) rcs lib$(LIBPNG).a $(OBJSPNG)
 
+install:
 
 clean:
 	@rm -f $(OBJS)
