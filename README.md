@@ -1,3 +1,5 @@
+# This repository will no longer be updated. The DispmanX API is no longer supported in recent version of the Raspberry Pi OS.
+
 # `DispmanX`
 
 There are a number of APIs available for the Raspberry Pi that can make use

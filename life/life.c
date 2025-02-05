@@ -62,10 +62,10 @@ setCell(
 
     uint8_t *cell = life->fieldNext + col + (row * width);
 
-    uint32_t left = (col == 0) ? width - 1 :  -1;
-    uint32_t right = (col == width - 1) ?  -(width - 1) : 1;
-    uint32_t above = (row == 0) ? fieldLength - width : -width;
-    uint32_t below = (row == height - 1) ? -(fieldLength - width) : width;
+    int32_t left = (col == 0) ? width - 1 :  -1;
+    int32_t right = (col == width - 1) ?  -(width - 1) : 1;
+    int32_t above = (row == 0) ? fieldLength - width : -width;
+    int32_t below = (row == height - 1) ? -(fieldLength - width) : width;
 
     *(cell) |= 0x01;
     *(cell + above + left) += 2;
@@ -94,10 +94,10 @@ clearCell(
 
     uint8_t *cell = life->fieldNext + col + (row * width);
 
-    uint32_t left = (col == 0) ? width - 1 :  -1;
-    uint32_t right = (col == width - 1) ?  -(width - 1) : 1;
-    uint32_t above = (row == 0) ? fieldLength - width : -width;
-    uint32_t below = (row == height - 1) ? -(fieldLength - width) : width;
+    int32_t left = (col == 0) ? width - 1 :  -1;
+    int32_t right = (col == width - 1) ?  -(width - 1) : 1;
+    int32_t above = (row == 0) ? fieldLength - width : -width;
+    int32_t below = (row == height - 1) ? -(fieldLength - width) : width;
 
     *(cell) &= ~0x01;
     *(cell + above + left) -= 2;
